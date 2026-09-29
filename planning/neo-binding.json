@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "kind": "existing-neo-workspace-reference",
+  "apiBaseUrl": "http://localhost:5180",
+  "webBaseUrl": "http://localhost:5181",
+  "organizationId": "2b9b57ca-ce22-8456-b465-f71a74f66825",
+  "workspaceId": "10d4741c-b839-7f5a-8ad6-4a4f065e5b9b",
+  "workspaceKey": "legacy-workmanagement",
+  "projectId": "cc7b16e3-1328-446d-91ab-7295368efbc4",
+  "projectKey": "CONTRACTS",
+  "projectName": "مدیریت قراردادها",
+  "executionRoleKey": "NEOCONTRACT-DEVELOPMENT",
+  "repository": "https://github.com/SeyediDev/NeoContract",
+  "branch": "main"
+}

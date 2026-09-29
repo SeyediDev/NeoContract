@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "database": "NeoAgentOrchestration",
+  "organization": {
+    "key": "entekhab",
+    "name": "گروه انتخاب"
+  },
+  "workspace": {
+    "key": "contract-management",
+    "name": "مدیریت قراردادها"
+  },
+  "project": {
+    "key": "contract-production",
+    "name": "تولید قراردادها"
+  },
+  "roles": [
+    {
+      "key": "product-owner",
+      "name": "مالک محصول",
+      "scopeDescription": "تعریف دامنه و پذیرش خروجی‌های محصول قراردادها."
+    },
+    {
+      "key": "domain-analyst",
+      "name": "تحلیلگر قرارداد",
+      "scopeDescription": "طراحی مدل دامنه، فرآیند و الزامات قرارداد."
+    },
+    {
+      "key": "frontend",
+      "name": "توسعه‌دهنده رابط",
+      "scopeDescription": "پیاده‌سازی UI/UX و جریان‌های پنل وب."
+    },
+    {
+      "key": "backend",
+      "name": "توسعه‌دهنده سرویس",
+      "scopeDescription": "پیاده‌سازی API، ذخیره‌سازی SQL و اتصال به Neo."
+    },
+    {
+      "key": "qa",
+      "name": "بازبین کیفیت",
+      "scopeDescription": "بررسی پذیرش، responsive و صحت فرآیندهای دمو."
+    }
+  ]
+}
