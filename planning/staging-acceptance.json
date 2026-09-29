@@ -1,0 +1,29 @@
+{
+  "checkedAt": "2026-09-29T23:43:21.469Z",
+  "environment": "isolated-local-staging",
+  "portDuringCheck": 4189,
+  "backup": {
+    "relativePath": ".data/backups/acceptance-20260930.json",
+    "checksum": "50005f96583890cf81d8c4fffc8418e2b8d26b901fc243de59ae68b210a8dfde",
+    "rows": 445
+  },
+  "restoredCounts": {
+    "tenants": 1,
+    "templates": 15,
+    "zones": 5,
+    "centers": 14,
+    "services": 87,
+    "customers": 4,
+    "managers": 3,
+    "contracts": 3
+  },
+  "allContractSnapshotsEqual": true,
+  "neoBindingsPreserved": true,
+  "neoConnected": true,
+  "retryParentId": "0a7b5b3b-8628-4b9b-a87d-8ab353e69b0f",
+  "newStagingContractId": "34dd0e35-9c5e-4e72-8446-0a1c7920b67a",
+  "newContractPersisted": true,
+  "limitations": [
+    "External PostgreSQL and public deployment were not used; local durable PGlite staging was verified."
+  ]
+}

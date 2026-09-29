@@ -29,9 +29,10 @@ function reply(req, res, status, message, headers = {}) {
   res.end(req.method === 'HEAD' ? undefined : data);
 }
 
-export function createStaticServer({ publicRoot = defaultPublicRoot } = {}) {
+export function createStaticServer({ publicRoot = defaultPublicRoot, apiHandler } = {}) {
   const root = resolve(publicRoot);
   return createServer(async (req, res) => {
+    if (apiHandler && await apiHandler(req, res)) return;
     if (req.method !== 'GET' && req.method !== 'HEAD') {
       reply(req, res, 405, 'Method Not Allowed', { Allow: 'GET, HEAD' });
       return;
@@ -90,7 +91,10 @@ export function createStaticServer({ publicRoot = defaultPublicRoot } = {}) {
 }
 
 if (process.argv[1] && pathToFileURL(resolve(process.argv[1])).href === import.meta.url) {
-  const server = createStaticServer();
+  const { createApi } = await import('./lib/http-api.mjs');
+  const app = await createApi({ dataDir: process.env.NEOCONTRACT_DATA_DIR, connectionString: process.env.NEOCONTRACT_DATABASE_URL });
+  const server = createStaticServer({ apiHandler: app.handler });
+  for (const signal of ['SIGINT', 'SIGTERM']) process.once(signal, () => server.close(async () => { await app.close(); process.exit(0); }));
   const port = Number(process.env.PORT || 4173);
   server.listen(port, '127.0.0.1', () => {
     console.log(`NeoContract demo: http://127.0.0.1:${server.address().port}`);

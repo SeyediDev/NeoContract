@@ -29,14 +29,14 @@
         "وجود ۵ پهنه، ۱۴ مرکز و ۸۷ کد یکتا و نگاشت مدل درآمدی",
         "تفکیک مجموع SLAها از نگاشت ناموجود SLA و روش تحویل هر سرویس"
       ],
-      "progressNote": "داده مشاهده‌شده موجود است؛ تأیید تولیدی و نگاشت SLA هر سرویس در CTR-015 انجام می‌شود.",
+      "progressNote": "برداشت اولیه منبع ثبت شد؛ برداشت کامل HTTP بعدی در CTR-015 مستند است.",
       "artifacts": [
-        "planning/fanasa-catalog-observed.json",
         "planning/fanasa-source-research.md"
       ],
       "executionTitle": "ثبت کاتالوگ مشاهده‌شده فن‌آسا و محدودیت‌های منبع",
       "neoItemId": "775bc189-8457-4d85-904a-2dd22bb41d5c",
-      "actualOwnerRoleId": "391cbbf6-0ee5-41f6-9da9-ae7b8e513afb"
+      "actualOwnerRoleId": "391cbbf6-0ee5-41f6-9da9-ae7b8e513afb",
+      "evidenceCount": 4
     },
     {
       "key": "CTR-001",
@@ -57,13 +57,14 @@
         "SLA سرویس از زمان انجام مرحله فرآیند جدا باشد",
         "دامنه دمو، محدودیت‌ها و کارهای خارج از MVP روشن باشد"
       ],
-      "progressNote": "دامنه در planning/MVP_SCOPE.md ثبت شده است؛ این پذیرش مربوط به تعریف دامنه است، نه پیاده‌سازی همه آن.",
+      "progressNote": "دامنه دمو SaaS، نقش‌های فرآیند، نسخه ثابت سند و خروج کاربران/RBAC مستند شد.",
       "artifacts": [
         "planning/MVP_SCOPE.md"
       ],
       "executionTitle": "تثبیت دامنه MVP و قواعد تولید قرارداد",
       "neoItemId": "cef997a5-583a-4086-b6ab-7b71949a6b92",
-      "actualOwnerRoleId": "391cbbf6-0ee5-41f6-9da9-ae7b8e513afb"
+      "actualOwnerRoleId": "391cbbf6-0ee5-41f6-9da9-ae7b8e513afb",
+      "evidenceCount": 3
     },
     {
       "key": "CTR-003",
@@ -84,21 +85,20 @@
         "HEAD و پاسخ‌های 400، 403، 404، 405 صحیح؛ URI خراب سرور را متوقف نکند",
         "عبور از مسیر public و symlink بیرونی مسدود و تست HTTP روی پورت موقت موفق باشد"
       ],
-      "progressNote": "سرور اصلاح شد؛ ۸ تست HTTP موفق، بدون شکست یا skip. API و ذخیره‌سازی در CTR-018 است.",
+      "progressNote": "سرور HTTP، مرز مسیر فایل و خطاهای درخواست با ۸ آزمون تأیید شد.",
       "artifacts": [
-        "server.mjs",
-        "tests/server.test.mjs",
-        "planning/EXECUTION_LOG.md"
+        "tests/server.test.mjs"
       ],
       "executionTitle": "تکمیل زیرساخت اجرای دمو و تست HTTP",
       "neoItemId": "ef326865-a325-424c-b851-6102b6db88ae",
-      "actualOwnerRoleId": "391cbbf6-0ee5-41f6-9da9-ae7b8e513afb"
+      "actualOwnerRoleId": "391cbbf6-0ee5-41f6-9da9-ae7b8e513afb",
+      "evidenceCount": 5
     },
     {
       "key": "CTR-002",
       "title": "طراحی اسکیما PostgreSQL برای Neon",
       "domain": "contracts",
-      "status": "Ready",
+      "status": "Done",
       "priority": "High",
       "ownerRole": "backend",
       "estimateHours": 6,
@@ -114,20 +114,20 @@
         "SLA نامشخص سرویس به‌جای T2 فرضی ثبت شود؛ روز کاری واحد مستقل داشته باشد",
         "نسخه الگو، فرآیند و شرایط سرویس در قرارداد قابل snapshot باشد"
       ],
-      "progressNote": "DDL موجود است؛ نگاشت فرضی SLA، تقویم کاری و integrity tenant نیاز به اصلاح دارد. اجرای واقعی DB هنوز انجام نشده.",
+      "progressNote": "دو migration نسخه‌دار PostgreSQL، روابط tenant، snapshot تغییرناپذیر و یکتایی idempotency اجرا و آزموده شد.",
       "artifacts": [
-        "database/schema.sql",
-        "database/fanasa-catalog.sql"
+        "database/migrations/002_contract_integrity.sql"
       ],
       "executionTitle": "اصلاح و بازبینی طراحی SQL و جداسازی tenantها",
       "neoItemId": "933b1e4b-fd92-482e-9d6b-ccfc1660ee69",
-      "actualOwnerRoleId": null
+      "actualOwnerRoleId": "04d8eac5-9bf5-4fa5-91ef-c96170b99dd2",
+      "evidenceCount": 2
     },
     {
       "key": "CTR-008",
       "title": "Seed داده نمایشی و مستند راه‌اندازی Neon",
       "domain": "platform",
-      "status": "Backlog",
+      "status": "Done",
       "priority": "Normal",
       "ownerRole": "backend",
       "estimateHours": 3,
@@ -143,20 +143,20 @@
         "تکرار seed رکورد تکراری نسازد و شمارش ۵/۱۴/۸۷ تأیید شود",
         "داده‌های CRM دمو و داده منبع تأییدنشده از داده تأییدشده متمایز باشد"
       ],
-      "progressNote": "فایل seed موجود است؛ اجرای SQL و نتیجه آزمون ثبت نشده است.",
+      "progressNote": "seed تکرارپذیر شامل ۱۵ الگو، ۵ پهنه، ۱۴ مرکز، ۸۷ سرویس، ۴ مشتری و ۳ مدیر حساب روی SQL واقعی اجرا شد.",
       "artifacts": [
-        "database/schema.sql",
-        "database/fanasa-catalog.sql"
+        "tests/database.test.mjs"
       ],
       "executionTitle": "اجرای آزمایشی SQL و seed قابل تکرار",
       "neoItemId": "3aa18d5f-8b11-41de-8b90-2ab4dfd11385",
-      "actualOwnerRoleId": null
+      "actualOwnerRoleId": "04d8eac5-9bf5-4fa5-91ef-c96170b99dd2",
+      "evidenceCount": 2
     },
     {
       "key": "CTR-004",
       "title": "پیاده‌سازی پنل SaaS RTL و داشبورد مدیریتی",
       "domain": "frontend",
-      "status": "Backlog",
+      "status": "Done",
       "priority": "High",
       "ownerRole": "frontend",
       "estimateHours": 10,
@@ -171,21 +171,20 @@
         "شاخص‌های ثابت با برچسب دمو یا از داده جاری محاسبه شوند",
         "عملیات نمایان فعال باشند یا وضعیت توسعه آن‌ها صریح باشد"
       ],
-      "progressNote": "اسکلت UI موجود است؛ آمار و بعضی عملیات نمایشی‌اند و پذیرش نهایی نشده است.",
+      "progressNote": "پنل فارسی RTL و داشبورد از API واقعی؛ داده نمایشی محلی در SQL پایدار و آمار مشتق‌شده است.",
       "artifacts": [
-        "public/index.html",
-        "public/app.js",
-        "public/styles.css"
+        "public/product.css"
       ],
       "executionTitle": "تکمیل پنل SaaS فارسی و داشبورد",
       "neoItemId": "f2b6434c-b8db-4629-8acb-492c3a2041a5",
-      "actualOwnerRoleId": null
+      "actualOwnerRoleId": "914b9315-65d4-4f49-9d86-d86e6d51e35b",
+      "evidenceCount": 2
     },
     {
       "key": "CTR-012",
       "title": "ساخت کاتالوگ درختی و انتخاب سرویس",
       "domain": "frontend",
-      "status": "Backlog",
+      "status": "Done",
       "priority": "High",
       "ownerRole": "frontend",
       "estimateHours": 8,
@@ -201,20 +200,20 @@
         "SLA و تحویل نامشخص از ترتیب آرایه یا مدل درآمدی استنتاج نشود",
         "انتخاب در جابه‌جایی صفحه حفظ و حالت خالی/خطای منبع نمایش داده شود"
       ],
-      "progressNote": "کاتالوگ موجود است؛ نگاشت SLA و روش تحویل در UI نیاز به اصلاح دارد.",
+      "progressNote": "درخت مراکز/سرویس، جست‌وجو، انتخاب چندگانه، مدل درآمدی، SLA و جزئیات منبع پیاده و در Chrome تأیید شد.",
       "artifacts": [
-        "public/fanasa.js",
-        "public/fanasa.css"
+        "public/app.js"
       ],
       "executionTitle": "اصلاح کاتالوگ درختی و انتخاب سرویس",
       "neoItemId": "86cb42c8-6fb0-4d55-98cc-d2b82896d450",
-      "actualOwnerRoleId": null
+      "actualOwnerRoleId": "914b9315-65d4-4f49-9d86-d86e6d51e35b",
+      "evidenceCount": 2
     },
     {
       "key": "CTR-013",
       "title": "مشتریان هلدینگی و نگاشت اکانت‌منیجر",
       "domain": "crm",
-      "status": "Backlog",
+      "status": "Done",
       "priority": "High",
       "ownerRole": "frontend",
       "estimateHours": 5,
@@ -229,13 +228,14 @@
         "رابطه مشتری و مدیر حساب منبع واحد داشته و شمارش پرتفوی از آن محاسبه شود",
         "انتخاب مشتری در قرارداد، طرف قرارداد و مدیر حساب مرتبط را پیشنهاد کند"
       ],
-      "progressNote": "فرم‌های دمو موجودند؛ انسجام روابط و اعتبارسنجی هنوز نیاز به تکمیل دارد.",
+      "progressNote": "CRM هلدینگی و تخصیص مدیر حساب، شمارش پرتفوی و جلوگیری از چرخه هم‌زمان و ارجاع بین tenantها آزموده شد.",
       "artifacts": [
-        "public/fanasa.js"
+        "tests/api.test.mjs"
       ],
       "executionTitle": "تکمیل مشتریان هلدینگی و تخصیص اکانت‌منیجر",
       "neoItemId": "08b83ab4-b8c1-433a-989f-e5c5878909fa",
-      "actualOwnerRoleId": null
+      "actualOwnerRoleId": "914b9315-65d4-4f49-9d86-d86e6d51e35b",
+      "evidenceCount": 2
     },
     {
       "key": "CTR-017",
@@ -246,7 +246,7 @@
       "title": "مدیریت الگوها، نسخه‌ها و مدل‌های قرارداد خدمات",
       "sequence": 9,
       "phase": "templates",
-      "status": "Backlog",
+      "status": "Done",
       "dependsOn": [
         "CTR-004",
         "CTR-011"
@@ -257,13 +257,14 @@
         "الگو بدنه، متغیرها، مدل درآمدی و مراحل مستقل داشته باشد",
         "ایجاد، ویرایش، پیش‌نمایش و انتشار نسخه انجام و نسخه منتشرشده ثابت بماند"
       ],
-      "progressNote": "کار مفقود به برنامه افزوده شد؛ الگوهای فعلی UI ثابت و عمومی هستند.",
+      "progressNote": "ویرایش و انتشار نسخه الگو با revision، حفظ نسخه منتشرشده قبلی و انتخاب تاریخچه در ویزارد پیاده شد.",
       "artifacts": [
-        "public/app.js"
+        "lib/store.mjs"
       ],
       "executionTitle": "مدیریت الگوها، نسخه‌ها و مدل‌های قرارداد خدمات",
       "neoItemId": "233b2908-b3a3-4924-87ae-70f2521eac36",
-      "actualOwnerRoleId": null
+      "actualOwnerRoleId": "914b9315-65d4-4f49-9d86-d86e6d51e35b",
+      "evidenceCount": 2
     },
     {
       "key": "CTR-016",
@@ -274,7 +275,7 @@
       "title": "افزودن الگوهای قرارداد غیرخرید",
       "sequence": 10,
       "phase": "templates",
-      "status": "Backlog",
+      "status": "Done",
       "dependsOn": [
         "CTR-017"
       ],
@@ -284,19 +285,20 @@
         "هر الگو نسخه، مراحل گردش‌کار و مهلت مناسب داشته باشد",
         "الگوی خرید موجود حفظ و انتخاب هر الگو در قرارداد آزمایش شود"
       ],
-      "progressNote": "این کار از قبل در برد ثبت شده است؛ شرح و سابقه اصلی آن حفظ می‌شود.",
+      "progressNote": "۱۵ الگوی خرید و غیرخرید با متن و فرآیند مستقل وجود دارد؛ پیش‌نمایش هر ۱۵ نسخه از API موفق بود.",
       "artifacts": [
-        "public/app.js"
+        "planning/live-acceptance.json"
       ],
       "executionTitle": "افزودن الگوهای قرارداد غیرخرید",
       "neoItemId": "63fb7904-a77f-4145-b689-80395ac939d3",
-      "actualOwnerRoleId": null
+      "actualOwnerRoleId": "391cbbf6-0ee5-41f6-9da9-ae7b8e513afb",
+      "evidenceCount": 2
     },
     {
       "key": "CTR-005",
       "title": "جریان ایجاد قرارداد با فرآیند سفارشی",
       "domain": "frontend",
-      "status": "Backlog",
+      "status": "Done",
       "priority": "High",
       "ownerRole": "frontend",
       "estimateHours": 8,
@@ -313,20 +315,20 @@
         "مراحل فرآیند با نقش، ترتیب، الزام و مهلت قابل تنظیم باشند",
         "رفت‌وبرگشت ویزارد داده را حفظ کند؛ اطلاعات ناقص مانع ایجاد شود"
       ],
-      "progressNote": "ویزارد پایه وجود دارد؛ افزونه فن‌آسا مرحله فرآیند را پوشانده و باید اصلاح شود.",
+      "progressNote": "ویزارد پنج‌مرحله‌ای با نسخه واقعی الگو، فرآیند سفارشی، قفل نقش‌های الزامی و کنترل فیلدهای ناقص در UI/API تکمیل شد. صفر فقط در صورت ورود صریح معتبر است.",
       "artifacts": [
-        "public/app.js",
-        "public/fanasa.js"
+        "tests/e2e/workflow.spec.mjs"
       ],
       "executionTitle": "تولید قرارداد و فرآیند سفارشی هر قرارداد",
       "neoItemId": "85c0b966-5c7a-4dfa-8fbe-4c954e48a905",
-      "actualOwnerRoleId": null
+      "actualOwnerRoleId": "391cbbf6-0ee5-41f6-9da9-ae7b8e513afb",
+      "evidenceCount": 2
     },
     {
       "key": "CTR-014",
       "title": "اتصال انتخاب سرویس به wizard قرارداد",
       "domain": "contracts",
-      "status": "Backlog",
+      "status": "Done",
       "priority": "High",
       "ownerRole": "frontend",
       "estimateHours": 6,
@@ -341,20 +343,20 @@
         "نسخه الگو، متن سند، مراحل، مشتری و مدیر حساب نیز snapshot کامل داشته باشند",
         "تغییر کاتالوگ یا الگو یا مشتری، قرارداد پیشین را تغییر ندهد"
       ],
-      "progressNote": "فعلاً تنها کد سرویس و انتخاب tier ذخیره می‌شود؛ snapshot کامل پیاده نشده است.",
+      "progressNote": "اطلاعات مشتری/مدیر، الگو، سرویس، نرخ‌نامه چندبخشی، SLA، منبع و فرآیند در snapshot ثابت ذخیره می‌شود؛ تغییرات بعدی منبع قرارداد گذشته را تغییر نمی‌دهد.",
       "artifacts": [
-        "public/app.js",
-        "public/fanasa.js"
+        "lib/domain.mjs"
       ],
       "executionTitle": "ثبت نسخه ثابت مشتری، سرویس و SLA در قرارداد",
       "neoItemId": "6f367d46-b3e1-4d06-bc59-98b8a57591be",
-      "actualOwnerRoleId": null
+      "actualOwnerRoleId": "391cbbf6-0ee5-41f6-9da9-ae7b8e513afb",
+      "evidenceCount": 2
     },
     {
       "key": "CTR-006",
       "title": "فهرست و جزئیات قراردادها",
       "domain": "frontend",
-      "status": "Backlog",
+      "status": "Done",
       "priority": "Normal",
       "ownerRole": "frontend",
       "estimateHours": 6,
@@ -369,13 +371,14 @@
         "جزئیات و timeline از داده همان قرارداد خوانده شود",
         "نمایش سند و عملیات اعلام‌شده خروجی واقعی داشته باشد"
       ],
-      "progressNote": "فهرست نمایشی موجود است؛ نمایش سند و جزئیات snapshot نیاز به تکمیل دارد.",
+      "progressNote": "فهرست/جست‌وجو، سند، رخدادها، مرحله فعال، پیشروی همراه کنترل تعارض، الحاقیه و چاپ/خروجی از داده واقعی تکمیل شد.",
       "artifacts": [
         "public/app.js"
       ],
       "executionTitle": "تکمیل فهرست و جزئیات قراردادها",
       "neoItemId": "be9953b8-2d7f-425a-a993-4abf28d9994d",
-      "actualOwnerRoleId": null
+      "actualOwnerRoleId": "391cbbf6-0ee5-41f6-9da9-ae7b8e513afb",
+      "evidenceCount": 2
     },
     {
       "key": "CTR-018",
@@ -386,7 +389,7 @@
       "title": "API و ذخیره‌سازی SQL قراردادها",
       "sequence": 14,
       "phase": "persistence",
-      "status": "Backlog",
+      "status": "Done",
       "dependsOn": [
         "CTR-002",
         "CTR-008",
@@ -398,17 +401,20 @@
         "CRUD مشتری و مدیر حساب و بازیابی قرارداد پس از restart برقرار باشد",
         "validation و جلوگیری از ارجاع بین tenantها و health دیتابیس آزموده شود"
       ],
-      "progressNote": "کار مفقود به برنامه افزوده شد؛ برنامه فعلی static است و ذخیره‌سازی فقط در حافظه صفحه انجام می‌شود.",
-      "artifacts": [],
+      "progressNote": "API و SQL واقعی، ایجاد تراکنشی، عدم ثبت تکراری، کنترل تعارض، tenant و ماندگاری پس از restart/restore با آزمون تأیید شد.",
+      "artifacts": [
+        "lib/http-api.mjs"
+      ],
       "executionTitle": "API و ذخیره‌سازی SQL قراردادها",
       "neoItemId": "aa0e7f29-2813-4ff3-8cc3-ff19e89de378",
-      "actualOwnerRoleId": null
+      "actualOwnerRoleId": "391cbbf6-0ee5-41f6-9da9-ae7b8e513afb",
+      "evidenceCount": 2
     },
     {
       "key": "CTR-009",
       "title": "بازبینی تجربه کاربری و تست responsive",
       "domain": "qa",
-      "status": "Backlog",
+      "status": "Done",
       "priority": "Normal",
       "ownerRole": "qa",
       "estimateHours": 5,
@@ -424,17 +430,20 @@
         "صفحه‌کلید، RTL، خطاهای اعتبارسنجی و حالت خالی بررسی شود",
         "استقلال snapshot و بازیابی پس از restart با شواهد ثبت شود"
       ],
-      "progressNote": "پذیرش انتهابه‌انتها پس از تکمیل جریان و ذخیره‌سازی انجام می‌شود.",
-      "artifacts": [],
+      "progressNote": "۲ آزمون واقعی Chrome: CRM تا قرارداد سفارشی/الحاقیه و موبایل RTL/منو/صفحه‌کلید؛ تصاویر نهایی فاقد خطای JS و عرض موبایل ۳۹۰/۳۹۰ بود.",
+      "artifacts": [
+        "tests/e2e/workflow.spec.mjs"
+      ],
       "executionTitle": "پذیرش جریان دمو و تجربه کاربری",
       "neoItemId": "c8f5ff89-25ad-4d72-9b36-70d29fc70427",
-      "actualOwnerRoleId": null
+      "actualOwnerRoleId": "391cbbf6-0ee5-41f6-9da9-ae7b8e513afb",
+      "evidenceCount": 2
     },
     {
       "key": "CTR-007",
       "title": "اتصال قراردادها به Project و WorkItem در Neo",
       "domain": "integration",
-      "status": "Backlog",
+      "status": "Done",
       "priority": "High",
       "ownerRole": "backend",
       "estimateHours": 12,
@@ -450,19 +459,20 @@
         "ثبت/تلاش مجدد idempotent باشد و خطا باعث تسک تکراری نشود",
         "یک چرخه واقعی در workspace مجاز Neo با شواهد انجام شود"
       ],
-      "progressNote": "برد Neo در localhost:5180 فعال است؛ اتصال خود برنامه قراردادها به API و نگاشت مراحل هنوز پیاده نشده است.",
+      "progressNote": "اتصال واقعی قرارداد NC-2026-80CC27CD به پروژه موجود CONTRACTS با یک کار مادر و پنج مرحله زنجیره‌ای انجام شد. تکرار و بازیابی هیچ WorkItem تکراری نساخت.",
       "artifacts": [
-        "planning/neo-api-seed.md"
+        "planning/live-acceptance.json"
       ],
       "executionTitle": "اتصال قرارداد و مراحل به پروژه و WorkItem در Neo",
       "neoItemId": "bbac4b41-df53-4711-b7cb-92b20c98bd8a",
-      "actualOwnerRoleId": null
+      "actualOwnerRoleId": "391cbbf6-0ee5-41f6-9da9-ae7b8e513afb",
+      "evidenceCount": 2
     },
     {
       "key": "CTR-015",
       "title": "اتصال تولیدی منبع فن‌آسا و تأیید provenance",
       "domain": "integration",
-      "status": "Backlog",
+      "status": "Done",
       "priority": "High",
       "ownerRole": "backend",
       "estimateHours": 10,
@@ -478,19 +488,20 @@
         "نگاشت واقعی SLA و تحویل هر سرویس فقط با مدرک منبع فعال شود",
         "خطای دریافت آخرین نسخه معتبر را از بین نبرد و تأیید منبع ثبت شود"
       ],
-      "progressNote": "داده موجود صرفاً مشاهده مرورگر است؛ API یا importer رسمی و تأیید تولیدی موجود نیست.",
+      "progressNote": "۹۰ صفحه رسمی fanasa.net با URL، زمان، hash و HTTP خوانده شد. ۸۷ سرویس/۱۴ مرکز با SLA، تحویل و نرخ‌نامه کامل پس از بازبینی اپراتور فعال شد. وضعیت http-observed-unverified حفظ می‌شود؛ این برداشت تأیید حقوقی نیست.",
       "artifacts": [
-        "planning/fanasa-source-research.md"
+        "planning/fanasa-catalog-current.json"
       ],
       "executionTitle": "همگام‌سازی رسمی فن‌آسا و تأیید داده منبع",
       "neoItemId": "9f691825-4851-4ae5-a2ca-cf8b05bf146b",
-      "actualOwnerRoleId": null
+      "actualOwnerRoleId": "391cbbf6-0ee5-41f6-9da9-ae7b8e513afb",
+      "evidenceCount": 2
     },
     {
       "key": "CTR-010",
       "title": "آماده‌سازی اتصال تولیدی و migration نهایی",
       "domain": "integration",
-      "status": "Backlog",
+      "status": "Done",
       "priority": "Normal",
       "ownerRole": "backend",
       "estimateHours": 8,
@@ -507,11 +518,14 @@
         "مسیر کامل ذخیره‌سازی و اتصال‌ها در staging تأیید شود",
         "بازیابی و rollback با شواهد ثبت شود"
       ],
-      "progressNote": "پس از پذیرش دمو و اتصال‌های واقعی اجرا خواهد شد.",
-      "artifacts": [],
+      "progressNote": "دموی پایدار روی 4173 و staging محلی جدا پذیرفته شد. پشتیبان ۴۴۵ ردیفی در مقصد خالی بازیابی شد؛ هر سه snapshot و لینک Neo یکسان ماند و قرارداد جدید در staging ذخیره شد. PostgreSQL خارجی/استقرار عمومی آزموده نشده و جزو دمو نیست.",
+      "artifacts": [
+        "planning/staging-acceptance.json"
+      ],
       "executionTitle": "آماده‌سازی محیط staging و migration نهایی",
       "neoItemId": "c09b7994-b024-44a7-942c-71bbdda2bc39",
-      "actualOwnerRoleId": null
+      "actualOwnerRoleId": "391cbbf6-0ee5-41f6-9da9-ae7b8e513afb",
+      "evidenceCount": 2
     }
   ],
   "schemaVersion": 2,
@@ -522,5 +536,8 @@
     "lastSyncedAt": "2026-09-29T22:29:09.090Z",
     "note": "برد Neo مرجع عملیاتی است؛ این فایل خروجی ترتیب و معیارهای ثبت‌شده در برد است."
   },
-  "executionPolicy": "ترتیب sequence مبنای اجراست؛ شروع هر کار پس از Done شدن dependsOn. وضعیت Done نیازمند شواهد متناسب با معیار پذیرش است."
+  "executionPolicy": "ترتیب sequence مبنای اجراست؛ شروع هر کار پس از Done شدن dependsOn. وضعیت Done نیازمند شواهد متناسب با معیار پذیرش است.",
+  "exportedAt": "2026-09-29T23:53:27.802Z",
+  "executionStatus": "completed",
+  "completionScope": "18 development work items; contract demonstration workflow items are separate"
 }

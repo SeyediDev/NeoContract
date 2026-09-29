@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#1d4ed8" />
   <title>نئوکنتراکت | مدیریت قرارداد گروه انتخاب</title>
   <link rel="stylesheet" href="/styles.css" />
-  <link rel="stylesheet" href="/fanasa.css" />
+  <link rel="stylesheet" href="/product.css" />
 </head>
 <body>
   <div id="app" class="app-shell">
@@ -23,16 +23,16 @@
 
       <div class="workspace-switcher">
         <div class="workspace-avatar">گ</div>
-        <div class="workspace-copy"><span>فضای کاری</span><strong>گروه انتخاب</strong></div>
+        <div class="workspace-copy"><span>فضای کاری</span><strong id="workspaceLabel">گروه انتخاب</strong></div>
         <span class="chevron">⌄</span>
       </div>
 
       <div class="nav-label">نمای کلی</div>
       <nav class="main-nav" aria-label="ناوبری اصلی">
         <button class="nav-item active" data-view="dashboard"><span class="nav-icon">⌂</span><span>داشبورد</span></button>
-        <button class="nav-item" data-view="contracts"><span class="nav-icon">▣</span><span>قراردادها</span><span class="nav-badge">۲۴</span></button>
+        <button class="nav-item" data-view="contracts"><span class="nav-icon">▣</span><span>قراردادها</span><span class="nav-badge" data-nav-count="contracts">۰</span></button>
         <button class="nav-item" data-view="templates"><span class="nav-icon">▤</span><span>الگوهای قرارداد</span></button>
-        <button class="nav-item" data-view="catalog"><span class="nav-icon">⌘</span><span>کاتالوگ سرویس</span><span class="nav-badge">۸۷</span></button>
+        <button class="nav-item" data-view="catalog"><span class="nav-icon">⌘</span><span>کاتالوگ سرویس</span><span class="nav-badge" data-nav-count="catalog">۸۷</span></button>
         <button class="nav-item" data-view="customers"><span class="nav-icon">♧</span><span>مشتریان هلدینگی</span></button>
         <button class="nav-item" data-view="managers"><span class="nav-icon">◉</span><span>اکانت منیجرها</span></button>
         <button class="nav-item" data-view="processes"><span class="nav-icon">◈</span><span>فرآیندها</span></button>
@@ -41,19 +41,19 @@
 
       <div class="nav-label nav-label-spaced">سامانه</div>
       <nav class="main-nav">
-        <button class="nav-item" data-view="settings"><span class="nav-icon">⚙</span><span>تنظیمات دمو</span></button>
+        <button class="nav-item" data-view="settings"><span class="nav-icon">⚙</span><span>تنظیمات و اتصال‌ها</span></button>
       </nav>
 
       <div class="sidebar-bottom">
         <div class="help-card">
           <div class="help-icon">?</div>
           <div><strong>راهنمای شروع</strong><span>در ۳ دقیقه آماده شوید</span></div>
-          <button class="icon-btn">›</button>
+          <button class="icon-btn" data-action="guide" aria-label="راهنمای شروع">›</button>
         </div>
         <div class="sidebar-user">
           <div class="user-avatar">م</div>
-          <div class="user-copy"><strong>محمد رضایی</strong><span>مدیر قراردادها</span></div>
-          <button class="icon-btn">•••</button>
+          <div class="user-copy"><strong>پنل مدیریتی</strong><span>فضای نمایشی</span></div>
+
         </div>
       </div>
     </aside>
@@ -68,17 +68,17 @@
           <label class="global-search"><span>⌕</span><input id="globalSearch" type="search" placeholder="جست‌وجوی قرارداد، طرف قرارداد..." /><kbd>/</kbd></label>
           <button class="topbar-icon has-dot" aria-label="اعلان‌ها" data-action="notifications">♧</button>
           <div class="topbar-divider"></div>
-          <button class="profile-pill"><span class="user-avatar small">م</span><span>محمد رضایی</span><span class="chevron">⌄</span></button>
+          <span class="profile-pill"><span class="user-avatar small">م</span><span>پنل مدیریتی</span><span class="tag blue">دمو</span></span>
         </div>
       </header>
 
-      <div id="viewRoot" class="view-root"></div>
+      <div id="viewRoot" class="view-root" tabindex="-1"></div>
     </main>
   </div>
 
   <div id="modalRoot"></div>
   <div id="toastRoot" class="toast-root"></div>
   <script src="/app.js" defer></script>
-  <script src="/fanasa.js" defer></script>
+
 </body>
 </html>

@@ -17,3 +17,7 @@ Thumbs.db
 *.pfx
 *.p12
 *.pem
+
+.data/
+artifacts/
+*.tgz

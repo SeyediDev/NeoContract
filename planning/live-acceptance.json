@@ -1,0 +1,124 @@
+{
+  "checkedAt": "2026-09-29T23:38:51.152Z",
+  "demoUrl": "http://127.0.0.1:4173",
+  "health": {
+    "ok": true,
+    "backend": "pglite-postgresql",
+    "durable": true,
+    "migrations": [
+      {
+        "version": 1,
+        "name": "001_initial.sql",
+        "checksum": "3fac5254e57e824c289e910ca27e744ee66ed091474eccf30c291fbc09016d42",
+        "applied_at": "2026-09-29T23:08:42.848Z"
+      },
+      {
+        "version": 2,
+        "name": "002_contract_integrity.sql",
+        "checksum": "bf81eb4fdf2084c8a59c05f768e14b884cf37efc3674adbb55a965fded5ee0b4",
+        "applied_at": "2026-09-29T23:15:32.455Z"
+      }
+    ],
+    "counts": {
+      "tenants": 1,
+      "templates": 15,
+      "zones": 5,
+      "centers": 14,
+      "services": 87,
+      "customers": 4,
+      "managers": 3,
+      "contracts": 3
+    }
+  },
+  "source": {
+    "url": "https://fanasa.net/fa",
+    "centers": 14,
+    "services": 87,
+    "verificationStatus": "http-observed-unverified",
+    "importId": "d2e07dae-3d77-47d2-afd9-42f6384a6d3d"
+  },
+  "templatePreviews": [
+    "consulting",
+    "fixed",
+    "hybrid",
+    "it",
+    "lease",
+    "license",
+    "managed",
+    "msa",
+    "nda",
+    "project",
+    "purchase",
+    "sla",
+    "subscription",
+    "transport",
+    "usage"
+  ],
+  "contracts": [
+    {
+      "id": "a831a711-68b7-4753-8c07-18109840bc9c",
+      "number": "NC-2026-A831A711",
+      "status": "draft",
+      "title": "دمو | خدمات ابری هلدینگ",
+      "stages": 5
+    },
+    {
+      "id": "80cc27cd-dc18-4609-8a95-fd7607206476",
+      "number": "NC-2026-80CC27CD",
+      "status": "in_process",
+      "title": "دمو | پشتیبانی مدیریت‌شده",
+      "stages": 5
+    },
+    {
+      "id": "359b23c4-d1a1-44e0-ba5a-6d3f5758a258",
+      "number": "NC-2026-359B23C4",
+      "status": "active",
+      "title": "دمو | سفارش خدمات فناوری",
+      "stages": 5
+    }
+  ],
+  "neo": {
+    "organizationId": "2b9b57ca-ce22-8456-b465-f71a74f66825",
+    "workspaceId": "10d4741c-b839-7f5a-8ad6-4a4f065e5b9b",
+    "projectId": "cc7b16e3-1328-446d-91ab-7295368efbc4",
+    "parentItemId": "0a7b5b3b-8628-4b9b-a87d-8ab353e69b0f",
+    "key": "NC-80CC27CDDC184609",
+    "stages": [
+      {
+        "stageId": "legal",
+        "itemId": "75313b65-1a9c-4dcd-8cca-ee39cb316d85",
+        "key": "NC-80CC27CDDC184609-S1",
+        "status": "Backlog"
+      },
+      {
+        "stageId": "technical",
+        "itemId": "a85fe428-4d33-4070-9017-b9fa4d0d56d9",
+        "key": "NC-80CC27CDDC184609-S2",
+        "status": "Backlog"
+      },
+      {
+        "stageId": "finance",
+        "itemId": "1b94f86e-ae83-4dfa-9b01-2f72bdc5510b",
+        "key": "NC-80CC27CDDC184609-S3",
+        "status": "Backlog"
+      },
+      {
+        "stageId": "management",
+        "itemId": "913e94be-2dc3-4af9-9896-367829b1de6f",
+        "key": "NC-80CC27CDDC184609-S4",
+        "status": "Backlog"
+      },
+      {
+        "stageId": "sign",
+        "itemId": "ca82df3a-c470-4580-91c8-753f5ab38a52",
+        "key": "NC-80CC27CDDC184609-S5",
+        "status": "Backlog"
+      }
+    ],
+    "url": "http://localhost:5181",
+    "syncedAt": "2026-09-29T23:38:50.499Z",
+    "status": "synced",
+    "workItemCount": 6,
+    "retryCreatedDuplicates": false
+  }
+}
