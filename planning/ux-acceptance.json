@@ -1,0 +1,376 @@
+{
+  "tasks": [
+    "CTR-022",
+    "CTR-023",
+    "CTR-024"
+  ],
+  "checkedAt": "2026-09-30T10:26:31.486Z",
+  "scope": "Deep Fanasa UI/UX workbench redesign; browser interaction and responsive acceptance",
+  "tests": [
+    {
+      "command": "npm test",
+      "passed": 50,
+      "failed": 0
+    },
+    {
+      "command": "npm run test:e2e",
+      "passed": 23,
+      "failed": 0
+    }
+  ],
+  "browserCoverage": [
+    "global and wizard search retain full input and focus",
+    "draft resumes after Escape and reload; explicit discard",
+    "dirty form confirmation and structural template edits",
+    "keyboard selection and collapsed centers",
+    "mobile navigation focus trap and search",
+    "inline customer creation returns to contract",
+    "Persian amount persists as exact numeric value",
+    "real source SLA rendering",
+    "save controls freeze while a request is pending",
+    "same-template click preserves customized text",
+    "late detail and Neo responses do not overwrite another form",
+    "amendment back preserves dirty form until confirmed",
+    "existing full CRM/template/contract workflow and integration settings"
+  ],
+  "layout": [
+    {
+      "width": 1440,
+      "view": "dashboard",
+      "overflow": false,
+      "firstService": null
+    },
+    {
+      "width": 1440,
+      "view": "catalog",
+      "overflow": false,
+      "firstService": {
+        "x": 32,
+        "y": 580.140625,
+        "width": 930,
+        "height": 79
+      }
+    },
+    {
+      "width": 1440,
+      "view": "contracts",
+      "overflow": false,
+      "firstService": null
+    },
+    {
+      "width": 1440,
+      "view": "customers",
+      "overflow": false,
+      "firstService": null
+    },
+    {
+      "width": 1440,
+      "view": "templates",
+      "overflow": false,
+      "firstService": null
+    },
+    {
+      "width": 1440,
+      "view": "managers",
+      "overflow": false,
+      "firstService": null
+    },
+    {
+      "width": 1440,
+      "view": "processes",
+      "overflow": false,
+      "firstService": null
+    },
+    {
+      "width": 1440,
+      "view": "reports",
+      "overflow": false,
+      "firstService": null
+    },
+    {
+      "width": 1440,
+      "view": "settings",
+      "overflow": false,
+      "firstService": null
+    },
+    {
+      "width": 1440,
+      "errors": []
+    },
+    {
+      "width": 768,
+      "view": "dashboard",
+      "overflow": false,
+      "firstService": null
+    },
+    {
+      "width": 768,
+      "view": "catalog",
+      "overflow": false,
+      "firstService": {
+        "x": 22,
+        "y": 673.6875,
+        "width": 724,
+        "height": 79
+      }
+    },
+    {
+      "width": 768,
+      "view": "contracts",
+      "overflow": false,
+      "firstService": null
+    },
+    {
+      "width": 768,
+      "view": "customers",
+      "overflow": false,
+      "firstService": null
+    },
+    {
+      "width": 768,
+      "view": "templates",
+      "overflow": false,
+      "firstService": null
+    },
+    {
+      "width": 768,
+      "view": "managers",
+      "overflow": false,
+      "firstService": null
+    },
+    {
+      "width": 768,
+      "view": "processes",
+      "overflow": false,
+      "firstService": null
+    },
+    {
+      "width": 768,
+      "view": "reports",
+      "overflow": false,
+      "firstService": null
+    },
+    {
+      "width": 768,
+      "view": "settings",
+      "overflow": false,
+      "firstService": null
+    },
+    {
+      "width": 768,
+      "errors": []
+    },
+    {
+      "width": 390,
+      "view": "dashboard",
+      "overflow": false,
+      "firstService": null
+    },
+    {
+      "width": 390,
+      "view": "catalog",
+      "overflow": false,
+      "firstService": {
+        "x": 18,
+        "y": 662.03125,
+        "width": 354,
+        "height": 103.234375
+      }
+    },
+    {
+      "width": 390,
+      "view": "contracts",
+      "overflow": false,
+      "firstService": null
+    },
+    {
+      "width": 390,
+      "view": "customers",
+      "overflow": false,
+      "firstService": null
+    },
+    {
+      "width": 390,
+      "view": "templates",
+      "overflow": false,
+      "firstService": null
+    },
+    {
+      "width": 390,
+      "view": "managers",
+      "overflow": false,
+      "firstService": null
+    },
+    {
+      "width": 390,
+      "view": "processes",
+      "overflow": false,
+      "firstService": null
+    },
+    {
+      "width": 390,
+      "view": "reports",
+      "overflow": false,
+      "firstService": null
+    },
+    {
+      "width": 390,
+      "view": "settings",
+      "overflow": false,
+      "firstService": null
+    },
+    {
+      "width": 390,
+      "errors": []
+    }
+  ],
+  "flow": [
+    {
+      "width": 1440,
+      "step": 1,
+      "overflow": false,
+      "title": "انتخاب الگو"
+    },
+    {
+      "width": 1440,
+      "step": 2,
+      "overflow": false,
+      "title": "طرفین و زمان"
+    },
+    {
+      "width": 1440,
+      "step": 3,
+      "overflow": false,
+      "title": "خدمات و شرایط"
+    },
+    {
+      "width": 1440,
+      "step": 4,
+      "overflow": false,
+      "title": "فرآیند سفارشی"
+    },
+    {
+      "width": 1440,
+      "step": 5,
+      "overflow": false,
+      "title": "بازبینی سند"
+    },
+    {
+      "width": 1440,
+      "errors": []
+    },
+    {
+      "width": 390,
+      "step": 1,
+      "overflow": false,
+      "title": "انتخاب الگو"
+    },
+    {
+      "width": 390,
+      "step": 2,
+      "overflow": false,
+      "title": "طرفین و زمان"
+    },
+    {
+      "width": 390,
+      "step": 3,
+      "overflow": false,
+      "title": "خدمات و شرایط"
+    },
+    {
+      "width": 390,
+      "step": 4,
+      "overflow": false,
+      "title": "فرآیند سفارشی"
+    },
+    {
+      "width": 390,
+      "step": 5,
+      "overflow": false,
+      "title": "بازبینی سند"
+    },
+    {
+      "width": 390,
+      "errors": []
+    }
+  ],
+  "liveIntegrity": {
+    "checkedAt": "2026-09-30T10:11:16.127Z",
+    "contractCount": 3,
+    "unchanged": true,
+    "contracts": [
+      {
+        "id": "359b23c4-d1a1-44e0-ba5a-6d3f5758a258",
+        "status": "active",
+        "sha256": "f58d56468d19c6831d3b1a382d90aa2d0ec86ca11c5959192aa4625aac7d6af5",
+        "serialization": "snapshot,document,amendments"
+      },
+      {
+        "id": "80cc27cd-dc18-4609-8a95-fd7607206476",
+        "status": "in_process",
+        "sha256": "855c08289166b0def152ad23c45a72fabfcccfed1cfc164b7ac6bab26b76c7de",
+        "serialization": "snapshot,document,amendments"
+      },
+      {
+        "id": "a831a711-68b7-4753-8c07-18109840bc9c",
+        "status": "draft",
+        "sha256": "851a0d13005d458189585cda6fb84d1adfdacd67ac39956693ab244529aeafa2",
+        "serialization": "snapshot,document,amendments"
+      }
+    ]
+  },
+  "screenshots": [
+    "artifacts/ux/after/1440-catalog-selection.png",
+    "artifacts/ux/after/1440-catalog.png",
+    "artifacts/ux/after/1440-contract-detail.png",
+    "artifacts/ux/after/1440-contracts.png",
+    "artifacts/ux/after/1440-customer-empty.png",
+    "artifacts/ux/after/1440-customers.png",
+    "artifacts/ux/after/1440-dashboard.png",
+    "artifacts/ux/after/1440-dirty-guard.png",
+    "artifacts/ux/after/1440-managers.png",
+    "artifacts/ux/after/1440-processes.png",
+    "artifacts/ux/after/1440-reports.png",
+    "artifacts/ux/after/1440-settings.png",
+    "artifacts/ux/after/1440-templates.png",
+    "artifacts/ux/after/1440-wizard-1.png",
+    "artifacts/ux/after/1440-wizard-2.png",
+    "artifacts/ux/after/1440-wizard-3.png",
+    "artifacts/ux/after/1440-wizard-4.png",
+    "artifacts/ux/after/1440-wizard-5.png",
+    "artifacts/ux/after/390-catalog-selection.png",
+    "artifacts/ux/after/390-catalog.png",
+    "artifacts/ux/after/390-contract-detail.png",
+    "artifacts/ux/after/390-contracts.png",
+    "artifacts/ux/after/390-customer-empty.png",
+    "artifacts/ux/after/390-customers.png",
+    "artifacts/ux/after/390-dashboard.png",
+    "artifacts/ux/after/390-dirty-guard.png",
+    "artifacts/ux/after/390-managers.png",
+    "artifacts/ux/after/390-processes.png",
+    "artifacts/ux/after/390-reports.png",
+    "artifacts/ux/after/390-settings.png",
+    "artifacts/ux/after/390-templates.png",
+    "artifacts/ux/after/390-wizard-1.png",
+    "artifacts/ux/after/390-wizard-2.png",
+    "artifacts/ux/after/390-wizard-3.png",
+    "artifacts/ux/after/390-wizard-4.png",
+    "artifacts/ux/after/390-wizard-5.png",
+    "artifacts/ux/after/768-catalog.png",
+    "artifacts/ux/after/768-contracts.png",
+    "artifacts/ux/after/768-customers.png",
+    "artifacts/ux/after/768-dashboard.png",
+    "artifacts/ux/after/768-managers.png",
+    "artifacts/ux/after/768-processes.png",
+    "artifacts/ux/after/768-reports.png",
+    "artifacts/ux/after/768-settings.png",
+    "artifacts/ux/after/768-templates.png"
+  ],
+  "limits": [
+    "Chrome desktop and mobile viewports, not physical devices or a full WCAG audit.",
+    "Temporary wizard uses tenant-scoped sessionStorage in the current browser tab; no cross-device draft synchronization.",
+    "Live capture only reads existing data and previews documents; record-creation tests use isolated temporary SQL storage on port4188.",
+    "Screenshots remain local under ignored artifacts/ux/after.",
+    "No authentication, public deployment, database migration or source import was added."
+  ]
+}

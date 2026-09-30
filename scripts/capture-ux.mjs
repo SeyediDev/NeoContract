@@ -1,0 +1,8 @@
+import {fileURLToPath} from 'node:url';
+import {chromium} from '@playwright/test';
+import {mkdir,writeFile} from 'node:fs/promises';
+const out=fileURLToPath(new URL('../artifacts/ux/after',import.meta.url));await mkdir(out,{recursive:true});
+const browser=await chromium.launch({executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe',headless:true});const report=[];
+for(const width of [1440,768,390]){const page=await browser.newPage({reducedMotion:'reduce',viewport:{width,height:width===390?844:1000}});const errors=[];page.on('pageerror',e=>errors.push(e.message));await page.goto('http://127.0.0.1:4173/');await page.locator('[data-action="new-contract"]').first().waitFor();await page.evaluate(()=>document.fonts.ready);
+for(const view of ['dashboard','catalog','contracts','customers','templates','managers','processes','reports','settings']){if(width<=980&&view!=='dashboard')await page.locator('.hamburger').click();if(view!=='dashboard')await page.locator('#sidebar [data-view="'+view+'"]').click();if(view==='settings')await page.locator('#neoIntegrationPanel[aria-busy="false"]').waitFor();await page.screenshot({path:out+'/'+width+'-'+view+'.png',fullPage:true});report.push({width,view,overflow:await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),firstService: view==='catalog'?await page.locator('.catalog-row').first().boundingBox():null});}
+await page.close();report.push({width,errors});}await browser.close();await writeFile(out+'/layout-report.json',JSON.stringify(report,null,2));console.log(JSON.stringify(report));if(report.some(r=>r.overflow||r.errors?.length||(r.width===390&&r.firstService&&r.firstService.y+r.firstService.height>844)))throw new Error('UX acceptance check failed');

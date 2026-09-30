@@ -618,6 +618,91 @@
       "neoItemId": "e12cb111-8978-49c6-bcb3-ba4e0b41f8d3",
       "actualOwnerRoleId": "391cbbf6-0ee5-41f6-9da9-ae7b8e513afb",
       "evidenceCount": 2
+    },
+    {
+      "key": "CTR-022",
+      "title": "ارزیابی عمیق تجربه کاربری و طرح بازطراحی",
+      "domain": "ux",
+      "status": "Done",
+      "priority": "High",
+      "ownerRole": "NEOCONTRACT-UI",
+      "description": "روی UI-UX پروژه کار شدید و عمیق انجام بده",
+      "sequence": 22,
+      "phase": "ux-redesign",
+      "dependsOn": [
+        "CTR-021"
+      ],
+      "acceptanceCriteria": [
+        "بازبینی واقعی مسیرهای اصلی و موبایل",
+        " فهرست مشکلات اولویت‌دار",
+        " طرح اجرایی یکپارچه با هویت فناسا و معیار پذیرش قابل آزمون."
+      ],
+      "progressNote": "ارزیابی مشکلات مشاهده‌شده و ثبت طرح و هشت معیار پذیرش.",
+      "artifacts": [
+        "docs/UX_REDESIGN.md"
+      ],
+      "neoItemId": "fe146e2c-2c6f-4287-9119-f2d8a5615e0b",
+      "actualOwnerRoleId": "914b9315-65d4-4f49-9d86-d86e6d51e35b",
+      "evidenceCount": 1
+    },
+    {
+      "key": "CTR-023",
+      "title": "پیاده‌سازی بازطراحی عمیق رابط و جریان قرارداد",
+      "domain": "frontend",
+      "status": "Done",
+      "priority": "High",
+      "ownerRole": "NEOCONTRACT-UI",
+      "description": "روی UI-UX پروژه کار شدید و عمیق انجام بده",
+      "sequence": 23,
+      "phase": "ux-redesign",
+      "dependsOn": [
+        "CTR-022"
+      ],
+      "acceptanceCriteria": [
+        "داشبورد عملیاتی و ناوبری خوانا",
+        " مرور و انتخاب مؤثر کاتالوگ",
+        " فرم و مراحل قرارداد روشن",
+        " جلوگیری از اتلاف ورودی",
+        " دسترسی صفحه‌کلید و موبایل",
+        " حفظ API و داده و هویت رسمی فناسا."
+      ],
+      "progressNote": "میزکار، کاتالوگ، فرم قرارداد و مدیریت اطلاعات نیمه‌تمام بازطراحی شد.",
+      "artifacts": [
+        "public/app.js",
+        "public/ux-workbench.css",
+        "docs/UX_GUIDE.md"
+      ],
+      "neoItemId": "2eb3ced3-6ad7-423e-b192-8cdcaa6cad82",
+      "actualOwnerRoleId": "914b9315-65d4-4f49-9d86-d86e6d51e35b",
+      "evidenceCount": 2
+    },
+    {
+      "key": "CTR-024",
+      "title": "پذیرش بصری و رفتاری بازطراحی UI-UX",
+      "domain": "qa",
+      "status": "Done",
+      "priority": "High",
+      "ownerRole": "NEOCONTRACT-UI",
+      "description": "روی UI-UX پروژه کار شدید و عمیق انجام بده",
+      "sequence": 24,
+      "phase": "ux-redesign",
+      "dependsOn": [
+        "CTR-023"
+      ],
+      "acceptanceCriteria": [
+        "آزمون مسیر کامل قرارداد و رگرسیون‌های جدید UX",
+        " بازبینی واقعی صفحه‌ها، فرم‌ها و حالت‌های خالی/خطا در دسکتاپ و موبایل",
+        " حفظ سه قرارداد دمو",
+        " ثبت شواهد و گیت."
+      ],
+      "progressNote": "پذیرش بصری و رفتاری با شواهد در planning/ux-acceptance.json؛ قراردادهای موجود ثابت ماندند.",
+      "artifacts": [
+        "planning/ux-acceptance.json",
+        "tests/e2e/ux.spec.mjs"
+      ],
+      "neoItemId": "84d1c1ec-9afe-4eed-9d1f-80159aa54524",
+      "actualOwnerRoleId": "914b9315-65d4-4f49-9d86-d86e6d51e35b",
+      "evidenceCount": 2
     }
   ],
   "schemaVersion": 2,
@@ -625,11 +710,11 @@
   "tracking": {
     "mode": "export-from-neo",
     "onlineRegistration": "existing-project-reconciled",
-    "lastSyncedAt": "2026-09-30T08:38:31.416Z",
+    "lastSyncedAt": "2026-09-30T10:26:33.137Z",
     "note": "برد Neo مرجع عملیاتی است؛ این فایل خروجی ترتیب و معیارهای ثبت‌شده در برد است."
   },
   "executionPolicy": "ترتیب sequence مبنای اجراست؛ شروع هر کار پس از Done شدن dependsOn. وضعیت Done نیازمند شواهد متناسب با معیار پذیرش است.",
-  "exportedAt": "2026-09-30T08:38:31.416Z",
+  "exportedAt": "2026-09-30T10:26:33.137Z",
   "executionStatus": "completed",
-  "completionScope": "21 development work items; contract demonstration workflow items are separate"
+  "completionScope": "24 development work items; contract demonstration workflow items are separate"
 }
