@@ -1,0 +1,93 @@
+{
+  "workItem": "CTR-026",
+  "request": "یادت باشه وب SPA باشه و بسیار حرفه ای",
+  "status": "passed",
+  "checkedAt": "2026-09-30T11:10:05.271Z",
+  "architecture": "Single HTML document and shared shell, client-side view rendering, fetch API for data. No framework migration.",
+  "permanentCriteria": [
+    "SPA internal navigation without document reload",
+    "Preserve selections and unfinished forms",
+    "Official Fanasa visual identity and Persian RTL",
+    "Responsive desktop/mobile and keyboard focus",
+    "Clear loading, error, empty and save states"
+  ],
+  "changes": [
+    "Settings edits remain in memory when changing views",
+    "Unsaved notice and beforeunload protection",
+    "Failed save preserves draft/error for retry",
+    "A late save response does not clear a newer edit",
+    "Native settings form submission cannot reload the document"
+  ],
+  "tests": {
+    "command": "npm run test:e2e",
+    "passed": 30,
+    "failed": 0,
+    "duration": "9.7m",
+    "database": "isolated memory SQL",
+    "port": 4188,
+    "backendNote": "No backend changes in CTR-026; preceding CTR-025 passed61 Node tests.",
+    "cleanupNote": "All30 cases reported success. Chrome temporary test processes were terminated after the cases finished to unblock browser teardown; the runner subsequently exited0 with30 passed and its last-run report passed. Application code was not changed for cleanup."
+  },
+  "liveAudit": {
+    "checkedAt": "2026-09-30T11:05:26.064Z",
+    "results": [
+      {
+        "width": 1440,
+        "visited": [
+          "dashboard",
+          "catalog",
+          "contracts",
+          "templates",
+          "customers",
+          "managers",
+          "processes",
+          "reports",
+          "settings"
+        ],
+        "documentRequests": 1,
+        "sameDocumentAndShell": true,
+        "selectionPreserved": true,
+        "settingsDraftPreserved": true,
+        "unsavedNoticeVisible": true,
+        "overflow": false,
+        "jsErrors": [],
+        "writeRequests": [],
+        "screenshot": "artifacts/spa/1440-settings-draft.png"
+      },
+      {
+        "width": 390,
+        "visited": [
+          "dashboard",
+          "catalog",
+          "contracts",
+          "templates",
+          "customers",
+          "managers",
+          "processes",
+          "reports",
+          "settings"
+        ],
+        "documentRequests": 1,
+        "sameDocumentAndShell": true,
+        "selectionPreserved": true,
+        "settingsDraftPreserved": true,
+        "unsavedNoticeVisible": true,
+        "overflow": false,
+        "jsErrors": [],
+        "writeRequests": [],
+        "screenshot": "artifacts/spa/390-settings-draft.png"
+      }
+    ],
+    "liveReadOnly": true,
+    "settingsUnchanged": true,
+    "threeContractContentsAndStagesUnchanged": true,
+    "artifact": "artifacts/spa/live-audit.json",
+    "screenshotsViewedByAgent": true,
+    "artifactStorage": "Raw JSON and screenshots are local ignored artifacts; this tracked file contains the result summary."
+  },
+  "limits": [
+    "Settings drafts are memory-only; browser close/reload warns before losing them.",
+    "Current section is not stored in URL/history; reload returns to dashboard. Contract wizard drafts still resume from sessionStorage."
+  ],
+  "guide": "docs/SPA.md"
+}

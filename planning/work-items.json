@@ -735,6 +735,36 @@
       ],
       "neoItemId": "c3723dd3-71c2-4d35-b41f-b09cd778c4f0",
       "actualOwnerRoleId": "391cbbf6-0ee5-41f6-9da9-ae7b8e513afb",
+      "evidenceCount": 4
+    },
+    {
+      "key": "CTR-026",
+      "title": "تثبیت معیار SPA و حفظ کیفیت حرفه‌ای وب",
+      "domain": "ux",
+      "status": "Done",
+      "priority": "High",
+      "ownerRole": "NEOCONTRACT-UI",
+      "description": "یادت باشه وب SPA باشه و بسیار حرفه ای",
+      "sequence": 26,
+      "phase": "spa-acceptance",
+      "dependsOn": [
+        "CTR-025"
+      ],
+      "acceptanceCriteria": [
+        "SPA بودن نسخه فعلی از کد و مرورگر کنترل شود",
+        "جابه‌جایی نه نمای اصلی بدون سند جدید و با حفظ انتخاب سرویس آزموده شود",
+        "معیار ثابت معماری و کیفیت رابط در راهنمای پروژه ثبت شود",
+        "نتیجه آزمون و گیت در Neo ثبت شود."
+      ],
+      "progressNote": "معیار دائمی SPA و کیفیت رابط ثبت شد. ناوبری ۹ بخش دسکتاپ/موبایل با یک سند و حفظ انتخاب سرویس تأیید شد. ویرایش تنظیمات هنگام جابه‌جایی حفظ می‌شود، شکست ذخیره امکان تلاش مجدد دارد و پاسخ دیرهنگام ویرایش تازه را پاک نمی‌کند. ۳۰ آزمون مرورگر موفق؛ بررسی زنده بدون درخواست نوشتنی و بدون تغییر تنظیمات یا سه قرارداد انجام شد.",
+      "artifacts": [
+        "docs/SPA.md",
+        "planning/spa-acceptance.json",
+        "tests/e2e/spa.spec.mjs",
+        "tests/e2e/settings-draft.spec.mjs"
+      ],
+      "neoItemId": "8be0a41c-ea99-44b5-ad1b-39b1b0fb872b",
+      "actualOwnerRoleId": "914b9315-65d4-4f49-9d86-d86e6d51e35b",
       "evidenceCount": 2
     }
   ],
@@ -743,11 +773,11 @@
   "tracking": {
     "mode": "export-from-neo",
     "onlineRegistration": "existing-project-reconciled",
-    "lastSyncedAt": "2026-09-30T10:48:51.936Z",
+    "lastSyncedAt": "2026-09-30T11:10:06.472Z",
     "note": "برد Neo مرجع عملیاتی است؛ این فایل خروجی ترتیب و معیارهای ثبت‌شده در برد است."
   },
   "executionPolicy": "ترتیب sequence مبنای اجراست؛ شروع هر کار پس از Done شدن dependsOn. وضعیت Done نیازمند شواهد متناسب با معیار پذیرش است.",
-  "exportedAt": "2026-09-30T10:48:51.936Z",
+  "exportedAt": "2026-09-30T11:10:06.472Z",
   "executionStatus": "completed",
-  "completionScope": "25 development work items; contract demonstration workflow items are separate"
+  "completionScope": "26 development work items; contract demonstration workflow items are separate"
 }
