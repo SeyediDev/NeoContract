@@ -29,3 +29,24 @@ test('mobile menu, RTL catalog and keyboard modal remain usable without page ove
  await page.locator('.hamburger').click();await expect(sidebar).toHaveClass(/open/);await sidebar.locator('[data-view="catalog"]').click();await expect(sidebar).not.toHaveClass(/open/);await expect(page.locator('[data-service]')).toHaveCount(87);
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();await page.locator('[data-service="ABR-01"]').check();await page.locator('[data-action="catalog-contract"]').first().click();await expect(page.getByRole('dialog')).toBeVisible();await page.keyboard.press('Escape');await expect(page.getByRole('dialog')).toHaveCount(0);
 });
+
+test('published process remains visible and stale publication requires review of the newer draft',async({page,request})=>{
+ const data=await(await request.get('/api/bootstrap')).json();
+ const base=data.templates.find(x=>x.code==='usage');
+ let response=await request.post('/api/templates',{data:{...base,title:'فرآیند منتشرشده آزمون',body:'نسخه نخست برای {{title}}'}});expect(response.status()).toBe(201);let template=await response.json();
+ const tokens=t=>({revision:t.revision,templateVersionId:t.templateVersionId});
+ response=await request.post('/api/templates/'+template.id+'/publish',{data:tokens(template)});expect(response.status()).toBe(200);template=await response.json();
+ response=await request.put('/api/templates/'+template.id,{data:{...template,title:'پیش‌نویس دوم آزمون',body:'نسخه دوم برای {{title}}'}});expect(response.status()).toBe(200);template=await response.json();
+ await page.goto('/');await page.locator('[data-view="processes"]').first().click();
+ await expect(page.getByRole('heading',{name:'فرآیند منتشرشده آزمون',exact:true})).toBeVisible();
+ await expect(page.getByRole('heading',{name:'پیش‌نویس دوم آزمون',exact:true})).toHaveCount(0);
+ await page.locator('[data-view="templates"]').first().click();
+ const staleCard=page.locator('.template-card').filter({hasText:'پیش‌نویس دوم آزمون'});await expect(staleCard).toBeVisible();
+ response=await request.put('/api/templates/'+template.id,{data:{...template,title:'نسخه ویرایش‌شده همکار',body:'محتوای جدید همکار برای {{title}}'}});expect(response.status()).toBe(200);
+ await staleCard.locator('[data-action="publish-template"]').click();
+ const freshCard=page.locator('.template-card').filter({hasText:'نسخه ویرایش‌شده همکار'});await expect(freshCard).toBeVisible();
+ const current=(await(await request.get('/api/templates')).json()).find(x=>x.id===template.id);expect(current.status).toBe('draft');
+ await freshCard.locator('[data-action="template-preview"]').click();await expect(page.locator('.document-paper')).toContainText('محتوای جدید همکار');await page.locator('[data-action="close-modal"]').first().click();
+ await freshCard.locator('[data-action="publish-template"]').click();await expect(freshCard.locator('[data-action="publish-template"]')).toHaveCount(0);
+ const published=(await(await request.get('/api/templates')).json()).find(x=>x.id===template.id);expect(published.status).toBe('published');expect(published.body).toBe('محتوای جدید همکار برای {{title}}');expect(published.versions.find(v=>v.version===1).title).toBe('فرآیند منتشرشده آزمون');
+});

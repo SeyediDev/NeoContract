@@ -1,0 +1,27 @@
+{
+  "checkedAt": "2026-09-30T03:15:52.298Z",
+  "demoUrl": "http://127.0.0.1:4173",
+  "previousContractsUnchanged": 3,
+  "contractHashes": [
+    {
+      "id": "359b23c4-d1a1-44e0-ba5a-6d3f5758a258",
+      "hash": "08451914b1a62cf195d56c70038822a7ff9d58f4e9853e5885cf21786334b189"
+    },
+    {
+      "id": "80cc27cd-dc18-4609-8a95-fd7607206476",
+      "hash": "8e1fc8bc88bebe23189ec6ccfb97f2ed0c1b4cf6879ca27d8d18a02b346491eb"
+    },
+    {
+      "id": "a831a711-68b7-4753-8c07-18109840bc9c",
+      "hash": "397d2bb36dfcc18ee79da37f9ba3521289f4c51b255f0dc3a77f2f68e956f990"
+    }
+  ],
+  "previewShowsNegotiatedDelivery": true,
+  "previewShowsAvailabilityPercent": true,
+  "unknownVariableStatus": 400,
+  "unreviewedPublicationStatus": 409,
+  "tests": {
+    "node": 49,
+    "chrome": 3
+  }
+}

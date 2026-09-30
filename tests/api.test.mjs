@@ -23,6 +23,7 @@ test('real HTTP API with PostgreSQL: CRM, templates, snapshots, workflow and doc
  const ok=async(path,options={},status=200)=>{const r=await call(path,options);assert.equal(r.status,status,`${options.method||'GET'} ${path}: ${r.text}`);return r.data;};
  let bootstrap,manager,parent,customer,template,versionOne,contract,contractSnapshot;
  const validTerms={start:'2026-10-01',end:'2027-09-30',owner:'مالک آزمون',paymentTerms:'پرداخت ماهانه پس از پذیرش'};
+ const publishInput=value=>({revision:value.revision,templateVersionId:value.templateVersionId});
  const advanceInput=value=>({expectedStatus:value.status,expectedStepId:value.stages.find(s=>s.status==='active')?.stepId||null});
  const malicious='<img src=x onerror="alert(1)"> & <script>alert(2)</script>';
  try {
@@ -60,11 +61,13 @@ test('real HTTP API with PostgreSQL: CRM, templates, snapshots, workflow and doc
    const firstId=template.templateVersionId;
    template=await ok(`/api/templates/${template.id}`,{method:'PUT',body:{...template,body:template.body+'؛ متن تکمیلی'}});
    assert.equal(template.templateVersionId,firstId);assert.equal(template.version,1);
-   template=await ok(`/api/templates/${template.id}/publish`,{method:'POST',body:{}});assert.equal(template.status,'published');versionOne={...template};
-   template=await ok(`/api/templates/${template.id}`,{method:'PUT',body:{...template,body:template.body+'؛ نسخه دوم'}});
+   template=await ok(`/api/templates/${template.id}/publish`,{method:'POST',body:publishInput(template)});assert.equal(template.status,'published');versionOne={...template};
+   template=await ok(`/api/templates/${template.id}`,{method:'PUT',body:{...template,title:'عنوان نسخه دوم',category:'دسته جدید',description:'شرح تازه',revenueModels:['hybrid'],serviceCodes:['ABR-01'],body:template.body+'؛ نسخه دوم'}});
    assert.equal(template.status,'draft');assert.equal(template.version,2);assert.notEqual(template.templateVersionId,versionOne.templateVersionId);
+   assert.equal(template.currentPublishedVersion.title,versionOne.title);assert.equal(template.currentPublishedVersion.category,versionOne.category);assert.deepEqual(template.currentPublishedVersion.revenueModels,versionOne.revenueModels);assert.deepEqual(template.currentPublishedVersion.serviceCodes,versionOne.serviceCodes);
+   assert.equal(template.title,'عنوان نسخه دوم');assert.equal(template.category,'دسته جدید');
    const old=(await app.db.query('SELECT body_template,status FROM contracts.contract_template_versions WHERE tenant_id=$1 AND id=$2',[DEMO_TENANT_ID,versionOne.templateVersionId])).rows[0];assert.equal(old.body_template,versionOne.body);assert.equal(old.status,'published');
-   template=await ok(`/api/templates/${template.id}/publish`,{method:'POST',body:{}});assert.equal(template.status,'published');
+   template=await ok(`/api/templates/${template.id}/publish`,{method:'POST',body:publishInput(template)});assert.equal(template.status,'published');
    assert.equal((await call('/api/templates',{method:'POST',body:{...template,body:'{{unknownVariable}}'}})).status,400);
   });
   await t.test('stale draft revisions cannot overwrite a newer edit',async()=>{
@@ -77,6 +80,19 @@ test('real HTTP API with PostgreSQL: CRM, templates, snapshots, workflow and doc
    const raced=await Promise.all([call(`/api/templates/${first.id}`,{method:'PUT',body:{...saved,title:'عنوان هم‌زمان نخست'}}),call(`/api/templates/${first.id}`,{method:'PUT',body:{...saved,title:'عنوان هم‌زمان دوم'}})]);assert.deepEqual(raced.map(r=>r.status).sort(),[200,409],raced.map(r=>r.text).join('\n'));
    const latest=(await ok('/api/templates')).find(x=>x.id===first.id);assert.equal(latest.title,raced.find(r=>r.status===200).data.title);assert.equal(latest.body,saved.body);
   });
+  await t.test('publication requires the reviewed version and rejects stale or concurrent changes',async()=>{
+   const first=await ok('/api/templates',{method:'POST',body:{...bootstrap.templates.find(x=>x.code==='purchase'),title:'انتشار بازبینی‌شده',body:'متن نخست {{title}}'}},201);
+   const latest=await ok('/api/templates/'+first.id,{method:'PUT',body:{...first,body:'متن تازه {{title}}'}});
+   for(const body of [{},publishInput(first),{...publishInput(latest),templateVersionId:randomUUID()}])assert.equal((await call('/api/templates/'+first.id+'/publish',{method:'POST',body})).status,409);
+   assert.equal((await ok('/api/templates')).find(x=>x.id===first.id).status,'draft');
+   const race=await Promise.all([call('/api/templates/'+first.id+'/publish',{method:'POST',body:publishInput(latest)}),call('/api/templates/'+first.id,{method:'PUT',body:{...latest,body:'ویرایش هم‌زمان {{title}}'}})]);
+   assert.deepEqual(race.map(x=>x.status).sort(),[200,409]);
+   let now=(await ok('/api/templates')).find(x=>x.id===first.id);
+   if(now.status==='published')assert.equal(now.body,latest.body);else {assert.equal(now.body,'ویرایش هم‌زمان {{title}}');assert.equal((await call('/api/templates/'+first.id+'/publish',{method:'POST',body:publishInput(latest)})).status,409);now=await ok('/api/templates/'+first.id+'/publish',{method:'POST',body:publishInput(now)});}
+   assert.equal(now.status,'published');
+   const legacy=bootstrap.templates.find(x=>x.code==='license');const legacyDraft=await ok('/api/templates/'+legacy.id,{method:'PUT',body:{...legacy,title:'پیش‌نویس مجوز تازه',revenueModels:['usage']}});
+   assert.equal(legacyDraft.title,'پیش‌نویس مجوز تازه');assert.equal(legacyDraft.currentPublishedVersion.title,legacy.title);assert.deepEqual(legacyDraft.currentPublishedVersion.revenueModels,legacy.revenueModels);
+  });
   await t.test('preview/create validate requirements and atomically store the full snapshot',async()=>{
    const service=bootstrap.catalog.services[0];
    const input={...validTerms,templateId:template.id,customerId:customer.id,managerId:manager.id,title:malicious,party:customer.name,amount:'۱۲۰۰۰',start:'2026-10-01',end:'2027-09-30',owner:'مالک آزمون',unit:'فناوری',services:[{code:service.code,slaTier:'T1',quantity:2,unitPrice:6000,delivery:'managed'}]};
@@ -85,6 +101,7 @@ test('real HTTP API with PostgreSQL: CRM, templates, snapshots, workflow and doc
    assert.equal((await call('/api/contracts/preview',{method:'POST',body:{...input,services:[{code:service.code,quantity:-1}]}})).status,400);
    assert.equal((await call('/api/contracts/preview',{method:'POST',body:{...input,services:[...input.services,...input.services]}})).status,400);
    assert.equal((await call('/api/contracts/preview',{method:'POST',body:{...input,stages:template.stages.filter(s=>!s.required)}})).status,400);
+   for(const body of ['متغیر {{tax}}','{{contract_number}}','{{tax\nRate}}','{{title'])for(const path of ['/api/contracts/preview','/api/contracts'])assert.equal((await call(path,{method:'POST',body:{...input,body}})).status,400);
    const preview=await ok('/api/contracts/preview',{method:'POST',body:input});assert.equal(preview.snapshot.services[0].name,service.name);assert.equal(preview.snapshot.services[0].sla.code,'T1');assert.equal(preview.snapshot.services[0].model,service.model);assert.ok(!preview.document.includes('{{'));assert.equal(preview.snapshot.template.version,2);
    assert.equal((await ok('/api/contracts')).length,0,'preview and invalid requests create no contracts');
    contract=await ok('/api/contracts',{method:'POST',body:input},201);contractSnapshot=structuredClone(contract.snapshot);
@@ -143,7 +160,7 @@ test('real HTTP API with PostgreSQL: CRM, templates, snapshots, workflow and doc
   await t.test('later customer, manager, template and catalog edits leave contract snapshots unchanged',async()=>{
    await ok(`/api/customers/${customer.id}`,{method:'PUT',body:{...customer,name:'نام تازه مشتری'}});
    await ok(`/api/managers/${manager.id}`,{method:'PUT',body:{...manager,name:'نام تازه مدیر'}});
-   const draft=await ok(`/api/templates/${template.id}`,{method:'PUT',body:{...template,body:template.body+'؛ نسخه سوم'}});assert.equal(draft.version,3);await ok(`/api/templates/${template.id}/publish`,{method:'POST',body:{}});
+   const draft=await ok(`/api/templates/${template.id}`,{method:'PUT',body:{...template,body:template.body+'؛ نسخه سوم'}});assert.equal(draft.version,3);await ok(`/api/templates/${template.id}/publish`,{method:'POST',body:publishInput(draft)});
    await app.db.query('UPDATE contracts.catalog_services SET name=$1 WHERE tenant_id=$2 AND service_code=$3',['نام تازه سرویس',DEMO_TENANT_ID,contract.services[0].code]);
    const reread=await ok(`/api/contracts/${contract.id}`);assert.deepEqual(reread.snapshot,contractSnapshot);assert.equal(reread.customerName,customer.name);assert.equal(reread.managerName,manager.name);
   });

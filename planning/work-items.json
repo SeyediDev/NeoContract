@@ -526,6 +526,38 @@
       "neoItemId": "c09b7994-b024-44a7-942c-71bbdda2bc39",
       "actualOwnerRoleId": "391cbbf6-0ee5-41f6-9da9-ae7b8e513afb",
       "evidenceCount": 2
+    },
+    {
+      "key": "CTR-019",
+      "title": "اصلاح صحت متن سند و انتشار نسخه الگو",
+      "domain": "contracts",
+      "status": "Done",
+      "priority": "High",
+      "ownerRole": "NEOCONTRACT-DEVELOPMENT",
+      "description": "ادامه بده — ادامه درخواست تکمیل NeoContract. بازبینی پس از دمو: متغیر ناشناخته سند باید خطا دهد و انتشار نسخه باید به نسخه بازبینی‌شده متصل بماند.",
+      "sequence": 19,
+      "phase": "integrity",
+      "dependsOn": [
+        "CTR-017",
+        "CTR-018"
+      ],
+      "acceptanceCriteria": [
+        "رد متغیر ناشناخته یا ناقص پیش از ثبت الگو و قرارداد",
+        "انتشار همان نسخه بازبینی‌شده با کنترل هم‌زمانی",
+        "استقلال عنوان و شرایط نسخه منتشرشده و حفظ فرآیند فعال",
+        "درج روش ارائه توافقی و درصد SLA در متن سند",
+        "آزمون مرورگر و API و ثابت‌ماندن قراردادهای قبلی پس از به‌روزرسانی"
+      ],
+      "progressNote": "متغیرهای ناشناخته، ناقص و چندخطی در الگو و سند رد می‌شوند. روش ارائه توافقی و واحد درصد SLA در متن درج می‌شود. metadata هر نسخه همراه بدنه مستقل است؛ انتشار در تراکنش با revision و شناسه نسخه بازبینی‌شده کنترل می‌شود. فرآیند منتشرشده هنگام وجود پیش‌نویس حفظ شده و تعارض UI نیازمند بازبینی مجدد است. ۴۹ تست Node و ۳ تست Chrome موفق؛ پس از restart هش سند و snapshot هر سه قرارداد قبلی برابر بود. migration جدید لازم نشد.",
+      "artifacts": [
+        "planning/integrity-acceptance.json",
+        "tests/domain.test.mjs",
+        "tests/api.test.mjs",
+        "tests/e2e/workflow.spec.mjs"
+      ],
+      "neoItemId": "b6868339-f5c9-41fd-ae33-abba7130073e",
+      "evidenceCount": 2,
+      "actualOwnerRoleId": "391cbbf6-0ee5-41f6-9da9-ae7b8e513afb"
     }
   ],
   "schemaVersion": 2,
@@ -537,7 +569,7 @@
     "note": "برد Neo مرجع عملیاتی است؛ این فایل خروجی ترتیب و معیارهای ثبت‌شده در برد است."
   },
   "executionPolicy": "ترتیب sequence مبنای اجراست؛ شروع هر کار پس از Done شدن dependsOn. وضعیت Done نیازمند شواهد متناسب با معیار پذیرش است.",
-  "exportedAt": "2026-09-29T23:53:27.802Z",
+  "exportedAt": "2026-09-30T03:16:52.127Z",
   "executionStatus": "completed",
-  "completionScope": "18 development work items; contract demonstration workflow items are separate"
+  "completionScope": "19 development work items; contract demonstration workflow items are separate"
 }
