@@ -1,0 +1,176 @@
+{
+  "workItem": "CTR-025",
+  "status": "passed",
+  "checkedAt": "2026-09-30T10:48:50.847Z",
+  "request": "کنترل کن هر قرارداد برای طی فلوی سازمانی و گردش کار تعیین شده در تمپلیت خود بچرخد",
+  "implementation": {
+    "templateVersionPinned": true,
+    "independentSqlProcessPerContract": true,
+    "requiredIdentityRoleEnabledAndRelativeOrderProtected": true,
+    "optionalCustomizationPreserved": true,
+    "staleAdvanceRejected": true,
+    "signatureStatusFromExactRole": true,
+    "eventsIncludeTemplateAndStepIdentity": true,
+    "neoDependencyDeviationRejected": true
+  },
+  "tests": [
+    {
+      "command": "npm test",
+      "passed": 61,
+      "failed": 0,
+      "durationMs": 99026.5195
+    },
+    {
+      "command": "npm run test:e2e",
+      "passed": 25,
+      "failed": 0,
+      "duration": "2.9m",
+      "browser": "Chrome",
+      "database": "isolated memory SQL",
+      "port": 4188
+    }
+  ],
+  "liveAudit": {
+    "artifact": "artifacts/workflow/live-audit.json",
+    "contracts": 3,
+    "contentAndWorkflowUnchanged": true,
+    "liveContractMutations": 0,
+    "beforeCheckedAt": "2026-09-30T10:32:30.952Z",
+    "afterCheckedAt": "2026-09-30T10:47:02.491Z",
+    "hashAlgorithm": "SHA-256 of JSON.stringify({snapshot,document,amendments})",
+    "results": [
+      {
+        "number": "NC-2026-359B23C4",
+        "status": "active",
+        "template": {
+          "id": "f6f66943-4764-5d00-98ac-303f61f58532",
+          "versionId": "3d387187-0755-5763-893a-d879903e3f83",
+          "title": "قرارداد خدمات فناوری اطلاعات",
+          "version": 1
+        },
+        "sha256Before": "f58d56468d19c6831d3b1a382d90aa2d0ec86ca11c5959192aa4625aac7d6af5",
+        "sha256After": "f58d56468d19c6831d3b1a382d90aa2d0ec86ca11c5959192aa4625aac7d6af5",
+        "workflowUnchanged": true,
+        "templateVersionMatches": true,
+        "requiredOrderPreserved": true,
+        "requiredRolesPreserved": true,
+        "snapshotMatchesSteps": true
+      },
+      {
+        "number": "NC-2026-80CC27CD",
+        "status": "in_process",
+        "template": {
+          "id": "4310a5a1-0fff-534c-a03f-381c37a6f3dc",
+          "versionId": "1e0e16f0-2cc4-58a5-ae5d-8531857fc821",
+          "title": "قرارداد خدمات مدیریت‌شده",
+          "version": 1
+        },
+        "sha256Before": "855c08289166b0def152ad23c45a72fabfcccfed1cfc164b7ac6bab26b76c7de",
+        "sha256After": "855c08289166b0def152ad23c45a72fabfcccfed1cfc164b7ac6bab26b76c7de",
+        "workflowUnchanged": true,
+        "templateVersionMatches": true,
+        "requiredOrderPreserved": true,
+        "requiredRolesPreserved": true,
+        "snapshotMatchesSteps": true
+      },
+      {
+        "number": "NC-2026-A831A711",
+        "status": "draft",
+        "template": {
+          "id": "b67c9d64-a75e-5c06-9cc2-42d98ee5f780",
+          "versionId": "2dc9ed3d-41d7-582f-b2ac-a90d5cfc79eb",
+          "title": "اشتراک نرم‌افزار به‌عنوان خدمت",
+          "version": 1
+        },
+        "sha256Before": "851a0d13005d458189585cda6fb84d1adfdacd67ac39956693ab244529aeafa2",
+        "sha256After": "851a0d13005d458189585cda6fb84d1adfdacd67ac39956693ab244529aeafa2",
+        "workflowUnchanged": true,
+        "templateVersionMatches": true,
+        "requiredOrderPreserved": true,
+        "requiredRolesPreserved": true,
+        "snapshotMatchesSteps": true
+      }
+    ]
+  },
+  "visualAudit": {
+    "artifact": "artifacts/workflow/live-audit.json",
+    "widths": [
+      1440,
+      390
+    ],
+    "screenshots": [
+      "artifacts/workflow/1440-contract-routing.png",
+      "artifacts/workflow/1440-routing-panel.png",
+      "artifacts/workflow/390-contract-routing.png",
+      "artifacts/workflow/390-routing-panel.png"
+    ],
+    "viewedByAgent": true,
+    "overflow": false,
+    "javaScriptErrors": 0,
+    "artifactStorage": "Screenshots and raw audit JSON are local artifacts excluded by the repository .gitignore; the verification summary is tracked here."
+  },
+  "neoAudit": {
+    "artifact": "artifacts/workflow/neo-audit.json",
+    "dependenciesMatch": true,
+    "liveNeoContractMutations": 0,
+    "scope": "Neo mirrors workflow structure and logs. NeoContract remains the execution authority; no automatic Neo claiming, role assignment or status advancement.",
+    "checkedAt": "2026-09-30T10:46:36.710Z",
+    "contractNumber": "NC-2026-80CC27CD",
+    "allNeoItems": {
+      "status": "Backlog",
+      "ownerRoleId": null,
+      "ownerAgentId": null,
+      "ownerChatId": null
+    },
+    "stages": [
+      {
+        "key": "NC-80CC27CDDC184609-S1",
+        "contractStageId": "legal",
+        "contractStageRole": "legal",
+        "contractStageStatus": "active",
+        "dependencyPredecessorKeys": []
+      },
+      {
+        "key": "NC-80CC27CDDC184609-S2",
+        "contractStageId": "technical",
+        "contractStageRole": "technical",
+        "contractStageStatus": "pending",
+        "dependencyPredecessorKeys": [
+          "NC-80CC27CDDC184609-S1"
+        ]
+      },
+      {
+        "key": "NC-80CC27CDDC184609-S3",
+        "contractStageId": "finance",
+        "contractStageRole": "finance",
+        "contractStageStatus": "pending",
+        "dependencyPredecessorKeys": [
+          "NC-80CC27CDDC184609-S2"
+        ]
+      },
+      {
+        "key": "NC-80CC27CDDC184609-S4",
+        "contractStageId": "management",
+        "contractStageRole": "management",
+        "contractStageStatus": "pending",
+        "dependencyPredecessorKeys": [
+          "NC-80CC27CDDC184609-S3"
+        ]
+      },
+      {
+        "key": "NC-80CC27CDDC184609-S5",
+        "contractStageId": "sign",
+        "contractStageRole": "signatory",
+        "contractStageStatus": "pending",
+        "dependencyPredecessorKeys": [
+          "NC-80CC27CDDC184609-S4"
+        ]
+      }
+    ]
+  },
+  "limits": [
+    "No user management or RBAC in the demo; steps are advanced through the administrative panel.",
+    "Existing snapshots, events, documents and amendments were not rewritten."
+  ],
+  "guide": "docs/WORKFLOW.md"
+}

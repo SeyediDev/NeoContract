@@ -703,6 +703,39 @@
       "neoItemId": "84d1c1ec-9afe-4eed-9d1f-80159aa54524",
       "actualOwnerRoleId": "914b9315-65d4-4f49-9d86-d86e6d51e35b",
       "evidenceCount": 2
+    },
+    {
+      "key": "CTR-025",
+      "title": "کنترل گردش هر قرارداد بر اساس الگو و نسخه فرآیند خودش",
+      "domain": "workflow",
+      "status": "Done",
+      "priority": "High",
+      "ownerRole": "NEOCONTRACT-DEVELOPMENT",
+      "description": "کنترل کن هر قرارداد برای طی فلوی سازمانی و گردش کار تعیین شده در تمپلیت خود بچرخد",
+      "sequence": 25,
+      "phase": "contract-workflow",
+      "dependsOn": [
+        "CTR-024"
+      ],
+      "acceptanceCriteria": [
+        "مسیر الگوی منتشرشده و نسخه آن تا فرآیند مستقل قرارداد و Neo تطبیق داده شود",
+        "ترتیب و نقش مراحل و حفاظت مراحل الزامی کنترل شود",
+        "چند الگوی دارای فرآیند متفاوت تا پایان در محیط آزمایشی اجرا شوند",
+        "سه قرارداد موجود بدون تغییر پیش بردن وضعیت ممیزی شوند",
+        "مغایرت واقعی اصلاح و آزمون و گزارش ثبت شود."
+      ],
+      "progressNote": "هر قرارداد از نسخه منتشرشده ثابت و مراحل SQL خودش پیش می‌رود؛ ترتیب نسبی مراحل الزامی در رابط و API حفاظت شد، تشخیص امضا بر اساس نقش دقیق اصلاح شد و مغایرت وابستگی Neo با 409 مشخص می‌شود. ۶۱ آزمون Node و ۲۵ آزمون مرورگر موفق؛ سه قرارداد زنده پیش/پس از restart با هش و مسیر برابر، و نمایش دسکتاپ/موبایل بدون سرریز یا خطای JavaScript تأیید شدند.",
+      "artifacts": [
+        "docs/WORKFLOW.md",
+        "planning/workflow-acceptance.json",
+        "tests/workflow.test.mjs",
+        "tests/e2e/contract-routing.spec.mjs",
+        "artifacts/workflow/live-audit.json",
+        "artifacts/workflow/neo-audit.json"
+      ],
+      "neoItemId": "c3723dd3-71c2-4d35-b41f-b09cd778c4f0",
+      "actualOwnerRoleId": "391cbbf6-0ee5-41f6-9da9-ae7b8e513afb",
+      "evidenceCount": 2
     }
   ],
   "schemaVersion": 2,
@@ -710,11 +743,11 @@
   "tracking": {
     "mode": "export-from-neo",
     "onlineRegistration": "existing-project-reconciled",
-    "lastSyncedAt": "2026-09-30T10:26:33.137Z",
+    "lastSyncedAt": "2026-09-30T10:48:51.936Z",
     "note": "برد Neo مرجع عملیاتی است؛ این فایل خروجی ترتیب و معیارهای ثبت‌شده در برد است."
   },
   "executionPolicy": "ترتیب sequence مبنای اجراست؛ شروع هر کار پس از Done شدن dependsOn. وضعیت Done نیازمند شواهد متناسب با معیار پذیرش است.",
-  "exportedAt": "2026-09-30T10:26:33.137Z",
+  "exportedAt": "2026-09-30T10:48:51.936Z",
   "executionStatus": "completed",
-  "completionScope": "24 development work items; contract demonstration workflow items are separate"
+  "completionScope": "25 development work items; contract demonstration workflow items are separate"
 }

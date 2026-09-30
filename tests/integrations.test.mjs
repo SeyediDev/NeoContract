@@ -118,6 +118,61 @@ test('Neo synchronization and Fanasa import are idempotent, isolated and recorde
       assert.equal(logs.length,2,'one pending state and one active state');
     });
 
+    await t.test('missing predecessor on a progressed or closed Neo item fails without changing its state',async()=>{
+      for(const status of ['InProgress','Done']){
+        const c=await makeContract(),mock=neoMock(),integration=createIntegrations(store,{neoConfig:config,fetchImpl:mock.fetchImpl});
+        const synced=await integration.syncContract(c.id),second=mock.details.get(synced.stages[1].itemId);
+        second.item.status=status;second.dependencies=[];
+        const before=clone(second),offset=mock.requests.length;
+        await assert.rejects(integration.syncContract(c.id),error=>error.code==='neo_workflow_deviation'&&error.status===409);
+        assert.deepEqual(second,before,'sync must not drive status, claim ownership, or mutate a progressed item');
+        assert.equal(mock.requests.slice(offset).filter(r=>r.method==='POST').length,0);
+        assert.equal((await jobs(c.id)).filter(j=>j.status==='failed').length,1);
+      }
+    });
+
+    await t.test('unexpected dependencies on first or subsequent stages are reported and preserved',async()=>{
+      for(const stageIndex of [0,1]){
+        const c=await makeContract(),mock=neoMock(),integration=createIntegrations(store,{neoConfig:config,fetchImpl:mock.fetchImpl});
+        const synced=await integration.syncContract(c.id),stage=mock.details.get(synced.stages[stageIndex].itemId);
+        const extra=mock.add({key:'EXTERNAL-DEPENDENCY'});stage.dependencies.push(extra.id);
+        const before=clone(stage),offset=mock.requests.length;
+        await assert.rejects(integration.syncContract(c.id),error=>error.code==='neo_workflow_deviation'&&error.status===409);
+        assert.deepEqual(stage,before,'unexpected dependencies belong to Neo and must not be removed');
+        assert.equal(mock.requests.slice(offset).filter(r=>r.method==='POST').length,0);
+        assert.equal((await jobs(c.id)).filter(j=>j.status==='failed').length,1);
+      }
+    });
+
+    await t.test('binding traces frozen template and process identities separately from Neo work status',async()=>{
+      let custom=await store.saveTemplate({...template,title:'الگوی مسیر مستقل آزمون اتصال',stages:[
+        {id:'disabled-review',name:'بازبینی غیرفعال',role:'observer',slaDays:1,required:false,enabled:false},
+        template.stages[0],{id:'optional-review',name:'بازبینی تکمیلی',role:'reviewer',slaDays:1,required:false,enabled:true},...template.stages.slice(1)
+      ]});
+      custom=await store.templateAction(custom.id,'publish',{templateVersionId:custom.templateVersionId,revision:custom.revision});
+      const c=await makeContract({templateId:custom.id,templateVersionId:custom.templateVersionId});
+      const mock=neoMock(),integration=createIntegrations(store,{neoConfig:config,fetchImpl:mock.fetchImpl});
+      const first=await integration.syncContract(c.id);
+      assert.equal(first.templateId,c.templateId);assert.equal(first.templateVersionId,c.templateVersionId);assert.equal(first.templateVersion,c.snapshot.template.version);assert.equal(first.workflowStatus,'draft');
+      const expected=c.stages.map((s,index)=>({...s,sourceSequence:index+1})).filter(s=>s.enabled);
+      for(const [index,stage] of first.stages.entries()){
+        const source=expected[index];
+        assert.deepEqual({stageId:stage.stageId,stepId:stage.stepId,role:stage.role,required:stage.required,sourceSequence:stage.sourceSequence,executionSequence:stage.executionSequence,workflowStatus:stage.workflowStatus},{stageId:source.id,stepId:source.stepId,role:source.role,required:source.required,sourceSequence:source.sourceSequence,executionSequence:index+1,workflowStatus:source.status});
+        assert.equal(stage.status,'Backlog');assert.equal(stage.key,prefixFor(c.id)+'-S'+(index+1));
+      }
+      assert.equal(first.stages[0].sourceSequence,2);assert.equal(first.stages[1].required,false);
+      const advanced=await store.advance(c.id,{expectedStatus:c.status,expectedStepId:null});
+      let revised=await store.saveTemplate({...custom,title:'نسخه جدید مسیر آزمون',stages:custom.stages.map(s=>({...s,name:'نسخه جدید '+s.name,role:'new-'+s.role})).reverse()},custom.id);
+      revised=await store.templateAction(revised.id,'publish',{templateVersionId:revised.templateVersionId,revision:revised.revision});
+      assert.notEqual(revised.templateVersionId,c.templateVersionId);
+      const second=await integration.syncContract(c.id);
+      assert.equal(second.templateVersionId,c.templateVersionId);assert.equal(second.templateVersion,c.snapshot.template.version);assert.equal(second.templateId,c.templateId);
+      assert.equal(second.workflowStatus,advanced.status);assert.equal(second.stages[0].workflowStatus,'active');assert.equal(second.stages[0].status,'Backlog');
+      assert.deepEqual(second.stages.map(({workflowStatus,...trace})=>trace),first.stages.map(({workflowStatus,...trace})=>trace),'later template edits cannot change frozen routing metadata, keys, or work items');
+      assert.deepEqual((await store.contract(c.id)).snapshot,c.snapshot);
+      assert.deepEqual((await store.contract(c.id)).neoBinding,second);
+    });
+
     await t.test('another agent/chat ownership never receives dependency or log mutations',async()=>{
       const c=await makeContract(),mock=neoMock(),integration=createIntegrations(store,{neoConfig:config,fetchImpl:mock.fetchImpl});
       const synced=await integration.syncContract(c.id),foreign=mock.details.get(synced.stages[1].itemId);
