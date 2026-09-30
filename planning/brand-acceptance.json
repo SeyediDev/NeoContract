@@ -1,0 +1,405 @@
+{
+  "task": "CTR-020",
+  "checkedAt": "2026-09-30T04:38:29.583Z",
+  "scope": "Fanasa visual identity for the existing local NeoContract demo",
+  "sources": {
+    "brand": "https://fanasa.net/fa/brand",
+    "observedAt": "2026-09-30T04:15:03.841Z",
+    "referenceThread": "01a0e1fa-8caf-77c0-b132-bdf609862dfb",
+    "referenceTitle": "تهیه پروپوزال و قرارداد",
+    "referenceCover": "E:/SJVS/Basalam/Fanasa/Input/Fanasa-Cover-05-Mihrab.docx",
+    "assetManifest": "public/assets/brand/provenance.json"
+  },
+  "originalAssets": {
+    "count": 23,
+    "allSha256Verified": true,
+    "delivery": "local SVG and WOFF2 assets; SIL OFL license bundled"
+  },
+  "browser": {
+    "name": "Google Chrome via Playwright",
+    "views": [
+      "dashboard",
+      "contracts",
+      "templates",
+      "catalog",
+      "customers",
+      "managers",
+      "processes",
+      "reports",
+      "settings"
+    ],
+    "widths": [
+      1440,
+      768,
+      390
+    ],
+    "checks": [
+      {
+        "view": "dashboard",
+        "viewport": 1440,
+        "documentWidth": 1440
+      },
+      {
+        "view": "contracts",
+        "viewport": 1440,
+        "documentWidth": 1440
+      },
+      {
+        "view": "templates",
+        "viewport": 1440,
+        "documentWidth": 1440
+      },
+      {
+        "view": "catalog",
+        "viewport": 1440,
+        "documentWidth": 1440
+      },
+      {
+        "view": "customers",
+        "viewport": 1440,
+        "documentWidth": 1440
+      },
+      {
+        "view": "managers",
+        "viewport": 1440,
+        "documentWidth": 1440
+      },
+      {
+        "view": "processes",
+        "viewport": 1440,
+        "documentWidth": 1440
+      },
+      {
+        "view": "reports",
+        "viewport": 1440,
+        "documentWidth": 1440
+      },
+      {
+        "view": "settings",
+        "viewport": 1440,
+        "documentWidth": 1440
+      },
+      {
+        "view": "dashboard",
+        "viewport": 768,
+        "documentWidth": 768
+      },
+      {
+        "view": "contracts",
+        "viewport": 768,
+        "documentWidth": 768
+      },
+      {
+        "view": "templates",
+        "viewport": 768,
+        "documentWidth": 768
+      },
+      {
+        "view": "catalog",
+        "viewport": 768,
+        "documentWidth": 768
+      },
+      {
+        "view": "customers",
+        "viewport": 768,
+        "documentWidth": 768
+      },
+      {
+        "view": "managers",
+        "viewport": 768,
+        "documentWidth": 768
+      },
+      {
+        "view": "processes",
+        "viewport": 768,
+        "documentWidth": 768
+      },
+      {
+        "view": "reports",
+        "viewport": 768,
+        "documentWidth": 768
+      },
+      {
+        "view": "settings",
+        "viewport": 768,
+        "documentWidth": 768
+      },
+      {
+        "view": "dashboard",
+        "viewport": 390,
+        "documentWidth": 390
+      },
+      {
+        "view": "contracts",
+        "viewport": 390,
+        "documentWidth": 390
+      },
+      {
+        "view": "templates",
+        "viewport": 390,
+        "documentWidth": 390
+      },
+      {
+        "view": "catalog",
+        "viewport": 390,
+        "documentWidth": 390
+      },
+      {
+        "view": "customers",
+        "viewport": 390,
+        "documentWidth": 390
+      },
+      {
+        "view": "managers",
+        "viewport": 390,
+        "documentWidth": 390
+      },
+      {
+        "view": "processes",
+        "viewport": 390,
+        "documentWidth": 390
+      },
+      {
+        "view": "reports",
+        "viewport": 390,
+        "documentWidth": 390
+      },
+      {
+        "view": "settings",
+        "viewport": 390,
+        "documentWidth": 390
+      }
+    ],
+    "errors": [],
+    "assetFailures": [],
+    "fontMime": "font/woff2"
+  },
+  "tests": [
+    {
+      "command": "node --test tests/server.test.mjs",
+      "passed": 8
+    },
+    {
+      "command": "npm run test:e2e",
+      "passed": 3
+    },
+    {
+      "command": "npx playwright test -g 'mobile menu'",
+      "passed": 1,
+      "note": "Rerun after the final responsive CSS correction"
+    },
+    {
+      "command": "node scripts/capture-brand-ui.mjs",
+      "passed": 27
+    }
+  ],
+  "visuallyReviewed": [
+    "all nine desktop views",
+    "dashboard at desktop/tablet/mobile",
+    "catalog at desktop/mobile",
+    "template form",
+    "contract detail",
+    "wizard at desktop/mobile"
+  ],
+  "fixes": [
+    "Constrain grid/card min-content widths and keep horizontal table scrolling within its container",
+    "Contain absolute screen-reader table labels inside the scroller",
+    "Use visible teal keyboard outlines and saffron outlines on dark surfaces"
+  ],
+  "screenshots": [
+    {
+      "path": "artifacts/brand/1440-catalog.png",
+      "width": 1440,
+      "height": 1000,
+      "sha256": "08eb98b59911641ea2c7893a55459d7d270efadbca788463d64ee18abe804c3e"
+    },
+    {
+      "path": "artifacts/brand/1440-contract-detail.png",
+      "width": 1440,
+      "height": 1000,
+      "sha256": "1642f0d4c4498b911c9f56f612994ddbb029c66ad8c48f627649c2f3eab1f068"
+    },
+    {
+      "path": "artifacts/brand/1440-contracts.png",
+      "width": 1440,
+      "height": 1000,
+      "sha256": "d0db36f8391d2500955238f279cd70d894472391c63b30a894f7e0e5e695db30"
+    },
+    {
+      "path": "artifacts/brand/1440-customers.png",
+      "width": 1440,
+      "height": 1000,
+      "sha256": "3b7012bc631f426c2fd4a04f3b9818224cd2a52d822cfee33efd2bbe2819d4c4"
+    },
+    {
+      "path": "artifacts/brand/1440-dashboard.png",
+      "width": 1440,
+      "height": 1200,
+      "sha256": "136e39fd87a81da7d9e11a6809a11d9b9450c6e6de7fe38491161266f6fa4f01"
+    },
+    {
+      "path": "artifacts/brand/1440-managers.png",
+      "width": 1440,
+      "height": 1000,
+      "sha256": "0007edb36122d39dde3ddf505eeced38a0614a96998ef907fac79fe578ece45c"
+    },
+    {
+      "path": "artifacts/brand/1440-processes.png",
+      "width": 1440,
+      "height": 1000,
+      "sha256": "1f63c9431d768b543704f0f9e64a0206a5bb77e4708961f7f26ca479c263c967"
+    },
+    {
+      "path": "artifacts/brand/1440-reports.png",
+      "width": 1440,
+      "height": 1000,
+      "sha256": "9df6d7320fa9e9cba7ed469a6a0298732009f1588ab6e92f60d0459e0d749f75"
+    },
+    {
+      "path": "artifacts/brand/1440-settings.png",
+      "width": 1440,
+      "height": 1000,
+      "sha256": "58b4b017e5f8c3fe54507d619cd260823dba0bdf7b349b324fecf000f3e06a6e"
+    },
+    {
+      "path": "artifacts/brand/1440-template-form.png",
+      "width": 1440,
+      "height": 1000,
+      "sha256": "8fcd27e5e18cf38dae2f93e91057bf901bd8f01690a305e455369f95f628b27d"
+    },
+    {
+      "path": "artifacts/brand/1440-templates.png",
+      "width": 1440,
+      "height": 1000,
+      "sha256": "195a6ed1bc4206988a0cd8b919206695e2dd4bdf9c15c341e7bef0626667fc34"
+    },
+    {
+      "path": "artifacts/brand/1440-wizard.png",
+      "width": 1440,
+      "height": 1000,
+      "sha256": "fd62f3bb9e66f653e1d97af741d9c9e906a1bc790d020ac8dbc38887a68469a4"
+    },
+    {
+      "path": "artifacts/brand/390-catalog.png",
+      "width": 390,
+      "height": 844,
+      "sha256": "f957fbd71fd9946b679293c9619c3a452691dfa11f596754a8432a26e336ade4"
+    },
+    {
+      "path": "artifacts/brand/390-contracts.png",
+      "width": 390,
+      "height": 844,
+      "sha256": "85676dc30a6c205deb44c5405e0f7a6d00a0b0317f60ded97172e3b36a7e0c2a"
+    },
+    {
+      "path": "artifacts/brand/390-customers.png",
+      "width": 390,
+      "height": 844,
+      "sha256": "8dceb71350ce416d38ba306cbafab24152914da6ac611f9a79ebff66551dca6b"
+    },
+    {
+      "path": "artifacts/brand/390-dashboard.png",
+      "width": 390,
+      "height": 1685,
+      "sha256": "b4f463315cec83ecf92ca8030dc4392ed2bcf441a491ef8efc5b3ffd63227580"
+    },
+    {
+      "path": "artifacts/brand/390-managers.png",
+      "width": 390,
+      "height": 844,
+      "sha256": "d29e035f69c94ca209bd633d02538d8da965ab124d4b9d07e29dcbd31bfdfd27"
+    },
+    {
+      "path": "artifacts/brand/390-processes.png",
+      "width": 390,
+      "height": 844,
+      "sha256": "d4e02c2e49a72eab49bc1996540739663eb9ba111c0aacb67d31539050927237"
+    },
+    {
+      "path": "artifacts/brand/390-reports.png",
+      "width": 390,
+      "height": 844,
+      "sha256": "6fe792ac5c76c2cab16e5ddcb7a87baef8fa03a4973a7bb6c75c4ac899420f1c"
+    },
+    {
+      "path": "artifacts/brand/390-settings.png",
+      "width": 390,
+      "height": 844,
+      "sha256": "082ad500c60e992487c37493d7a900177bdb972074b5fdb94d254d0ef7bb8145"
+    },
+    {
+      "path": "artifacts/brand/390-templates.png",
+      "width": 390,
+      "height": 844,
+      "sha256": "4ba0ec5ba1bdc7c7f24118cf475df0172373fd3d5743021e5a66bf7c62e3e34f"
+    },
+    {
+      "path": "artifacts/brand/390-wizard.png",
+      "width": 390,
+      "height": 844,
+      "sha256": "79f2c6e8107e6dc7e73c8ab953a60a71e43be7db398a8ba4e548337a60932b1d"
+    },
+    {
+      "path": "artifacts/brand/768-catalog.png",
+      "width": 768,
+      "height": 1024,
+      "sha256": "7f49ce6c6d417e3e6cc08d7b44abc7566f3dc6147904e27e8d22177c1cb40d57"
+    },
+    {
+      "path": "artifacts/brand/768-contracts.png",
+      "width": 768,
+      "height": 1024,
+      "sha256": "273227339ddf54431a20f1ebc5c8cedd2e08033319053410f569c070c04a7e5c"
+    },
+    {
+      "path": "artifacts/brand/768-customers.png",
+      "width": 768,
+      "height": 1024,
+      "sha256": "4be39535cec56c41cb1b1b4c1354bab6f1b8d2f2082adee9e54d34d0561acb4c"
+    },
+    {
+      "path": "artifacts/brand/768-dashboard.png",
+      "width": 768,
+      "height": 1515,
+      "sha256": "ca4f9cf74fb7042ec2beab883b430682a6021d36bdb3488121ac5cf0e3e0c0ba"
+    },
+    {
+      "path": "artifacts/brand/768-managers.png",
+      "width": 768,
+      "height": 1024,
+      "sha256": "d32c3e81ee379bc7cefbc7e383cfc6d99f9037d92e3d8f153462799329d34426"
+    },
+    {
+      "path": "artifacts/brand/768-processes.png",
+      "width": 768,
+      "height": 1024,
+      "sha256": "545d90e6949f1e812e9f9d41115063099a19833bc74dd9ff557f8dad2a1cb436"
+    },
+    {
+      "path": "artifacts/brand/768-reports.png",
+      "width": 768,
+      "height": 1024,
+      "sha256": "eec076e551c34a71dc94606678377dc009629fc3c831cd45f9ec60069c081239"
+    },
+    {
+      "path": "artifacts/brand/768-settings.png",
+      "width": 768,
+      "height": 1024,
+      "sha256": "25b7f15450f23fba736ccffcff999df85bcea9e13d12139c264e9e1527bc4387"
+    },
+    {
+      "path": "artifacts/brand/768-templates.png",
+      "width": 768,
+      "height": 1024,
+      "sha256": "bd80ec9bf79b1aea5c8f6a7f81105d3eeacfca2bce45626346c85b2ef6b4ba56"
+    },
+    {
+      "path": "artifacts/brand/768-wizard.png",
+      "width": 768,
+      "height": 1024,
+      "sha256": "ef019e8fc69aa8803fe1622ac56e81cebfc754791d475cd4aaca98f90eb0e069"
+    }
+  ],
+  "screenshotsStoredLocally": true,
+  "note": "Visual capture inspects existing demo data without creating contracts. Existing E2E tests run on a separate in-memory database. No database migration or contract API change was required."
+}

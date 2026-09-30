@@ -558,6 +558,35 @@
       "neoItemId": "b6868339-f5c9-41fd-ae33-abba7130073e",
       "evidenceCount": 2,
       "actualOwnerRoleId": "391cbbf6-0ee5-41f6-9da9-ae7b8e513afb"
+    },
+    {
+      "key": "CTR-020",
+      "title": "اعمال هویت بصری فناسا روی وب نئوکنتراکت",
+      "domain": "frontend",
+      "status": "Done",
+      "priority": "High",
+      "ownerRole": "NEOCONTRACT-UI",
+      "description": "از هویت بصری فناسا (چت بقلی در پروژه باسلام را ببین) برای وب این محصول استفاده کن.",
+      "sequence": 20,
+      "phase": "branding",
+      "dependsOn": [
+        "CTR-019"
+      ],
+      "acceptanceCriteria": [
+        "مرجع بصری گفت‌وگوی تهیه پروپوزال و قرارداد در باسلام رعایت شود",
+        "پالت، نشان رسمی، تایپوگرافی فارسی و نقش محراب اعمال شود",
+        "تمام نماها و موبایل هماهنگ و بدون سرریز صفحه باشند",
+        "جریان ساخت قرارداد حفظ و با مرورگر واقعی بررسی شود"
+      ],
+      "progressNote": "هویت فناسا از مرجع جلد محراب باسلام و راهنمای رسمی برند اعمال شد: پالت لاجورد/فیروزه/زعفران/گچ، نشان‌های رسمی و ۱۴ مرکز، قلم محلی وزیرمتن و پوسته هر ۹ نما. ۲۳ دارایی اصلی با hash برابر منبع حفظ شدند. بررسی ۲۷ ترکیب نما/اندازه در ۱۴۴۰، ۷۶۸ و ۳۹۰ پیکسل و ۳۲ تصویر موفق بود؛ فونت و تصاویر بارگذاری شدند و خطای JavaScript یا دارایی وجود ندارد. مشکل عرض داشبورد موبایل و فوکوس صفحه‌کلید اصلاح شد. ۸ تست سرور و ۳ تست کامل مرورگر موفق؛ تست موبایل پس از اصلاح نهایی نیز موفق بود.",
+      "artifacts": [
+        "docs/BRAND.md",
+        "planning/brand-acceptance.json",
+        "public/fanasa-theme.css"
+      ],
+      "neoItemId": "771f4649-f42e-485e-a465-36217abee949",
+      "actualOwnerRoleId": "914b9315-65d4-4f49-9d86-d86e6d51e35b",
+      "evidenceCount": 2
     }
   ],
   "schemaVersion": 2,
@@ -565,11 +594,11 @@
   "tracking": {
     "mode": "export-from-neo",
     "onlineRegistration": "existing-project-reconciled",
-    "lastSyncedAt": "2026-09-29T22:29:09.090Z",
+    "lastSyncedAt": "2026-09-30T04:39:04.091Z",
     "note": "برد Neo مرجع عملیاتی است؛ این فایل خروجی ترتیب و معیارهای ثبت‌شده در برد است."
   },
   "executionPolicy": "ترتیب sequence مبنای اجراست؛ شروع هر کار پس از Done شدن dependsOn. وضعیت Done نیازمند شواهد متناسب با معیار پذیرش است.",
-  "exportedAt": "2026-09-30T03:16:52.127Z",
+  "exportedAt": "2026-09-30T04:39:04.091Z",
   "executionStatus": "completed",
-  "completionScope": "19 development work items; contract demonstration workflow items are separate"
+  "completionScope": "20 development work items; contract demonstration workflow items are separate"
 }

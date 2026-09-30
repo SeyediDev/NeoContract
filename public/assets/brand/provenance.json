@@ -1,0 +1,147 @@
+{
+  "source": "https://fanasa.net/fa/brand",
+  "observedAt": "2026-09-30T04:15:03.841Z",
+  "referenceThread": "01a0e1fa-8caf-77c0-b132-bdf609862dfb",
+  "referenceTitle": "تهیه پروپوزال و قرارداد",
+  "referenceCover": "E:/SJVS/Basalam/Fanasa/Input/Fanasa-Cover-05-Mihrab.docx",
+  "files": [
+    {
+      "path": "brand/fanasa-logo-horizontal-fa-color.svg",
+      "sourceUrl": "https://fanasa.net/brand-assets/fanasa-logo-horizontal-fa-color.svg",
+      "sha256": "2566a0edfd493a16a2c51d87da67dc97fd46797144476dbe369153bcfbb90785",
+      "bytes": 4093
+    },
+    {
+      "path": "brand/fanasa-logo-horizontal-fa-reverse.svg",
+      "sourceUrl": "https://fanasa.net/brand-assets/fanasa-logo-horizontal-fa-reverse.svg",
+      "sha256": "2fa9947f0a65b4decf6e8b26834ee69e4679875e1d922367d8faa94d47363392",
+      "bytes": 4093
+    },
+    {
+      "path": "brand/fanasa-mark-color.svg",
+      "sourceUrl": "https://fanasa.net/brand-assets/fanasa-mark-color.svg",
+      "sha256": "25664c1f47d81435d66aad4f765c5a661148cc93fad8818dad85535b54c4a24e",
+      "bytes": 1032
+    },
+    {
+      "path": "brand/fanasa-mark-reverse.svg",
+      "sourceUrl": "https://fanasa.net/brand-assets/fanasa-mark-reverse.svg",
+      "sha256": "12e24d2bedd3e93afa677384e1e83280ca8fd0d3a6c859ebd8c80028ed75d8d7",
+      "bytes": 1032
+    },
+    {
+      "path": "brand/fanasa-favicon.svg",
+      "sourceUrl": "https://fanasa.net/brand-assets/fanasa-favicon.svg",
+      "sha256": "86686398e24d85fc97414fa100d59fc9af08a1b2a7aae4c2b37fca183e197bcb",
+      "bytes": 970
+    },
+    {
+      "path": "brand/center-abrgan-mark-color.svg",
+      "sourceUrl": "https://fanasa.net/brand-assets/center-abrgan-mark-color.svg",
+      "sha256": "0c71f268456dff599ef342867379f0f655616b99a69685650c037af57a312e35",
+      "bytes": 1004
+    },
+    {
+      "path": "brand/center-karavan-mark-color.svg",
+      "sourceUrl": "https://fanasa.net/brand-assets/center-karavan-mark-color.svg",
+      "sha256": "bb07e62b7e87ce29d9f724ff6513ff33e532317e65a817e2413522c3d9c27198",
+      "bytes": 948
+    },
+    {
+      "path": "brand/center-kavan-mark-color.svg",
+      "sourceUrl": "https://fanasa.net/brand-assets/center-kavan-mark-color.svg",
+      "sha256": "081f3bfe96f88621efabffd993b78dec28be0203e99d5e76b4f5284500c2c6bd",
+      "bytes": 860
+    },
+    {
+      "path": "brand/center-peyvand-mark-color.svg",
+      "sourceUrl": "https://fanasa.net/brand-assets/center-peyvand-mark-color.svg",
+      "sha256": "3ee50eebd544a8c3c66266b06cd08ab25206182a21da69bbfaa0db109478acdc",
+      "bytes": 1251
+    },
+    {
+      "path": "brand/center-dana-mark-color.svg",
+      "sourceUrl": "https://fanasa.net/brand-assets/center-dana-mark-color.svg",
+      "sha256": "30e7fb63f4c38e548d5bfa595df7f26e3d998a9f6ff84eb41f85cab8a512307c",
+      "bytes": 933
+    },
+    {
+      "path": "brand/center-bonyan-mark-color.svg",
+      "sourceUrl": "https://fanasa.net/brand-assets/center-bonyan-mark-color.svg",
+      "sha256": "43a192c03876d873b332cb328ed10823f6d2ca2fe57ad4589a2d9f36344528d5",
+      "bytes": 962
+    },
+    {
+      "path": "brand/center-fanasa-cloud-mark-color.svg",
+      "sourceUrl": "https://fanasa.net/brand-assets/center-fanasa-cloud-mark-color.svg",
+      "sha256": "9901f48c45690f4cfc7a233f3a5747a6ad727b0efe5c996781ba723b561a07ff",
+      "bytes": 1116
+    },
+    {
+      "path": "brand/center-asman-mark-color.svg",
+      "sourceUrl": "https://fanasa.net/brand-assets/center-asman-mark-color.svg",
+      "sha256": "841d2f5fd5110e57390d39d13c7ffd3b1bcaba6fa4ca2ed38dc9a4b2e5c45ecf",
+      "bytes": 850
+    },
+    {
+      "path": "brand/center-kerane-mark-color.svg",
+      "sourceUrl": "https://fanasa.net/brand-assets/center-kerane-mark-color.svg",
+      "sha256": "97184c6b75f2d6f17b7cad94875a28596d5a0a823a0b899062ee4f870c1ba598",
+      "bytes": 1053
+    },
+    {
+      "path": "brand/center-rayan-mark-color.svg",
+      "sourceUrl": "https://fanasa.net/brand-assets/center-rayan-mark-color.svg",
+      "sha256": "894a3e258b07af7519d50e73828e133a87c5a7d2d5073e21103d44ebb62d2f5b",
+      "bytes": 930
+    },
+    {
+      "path": "brand/center-dejan-mark-color.svg",
+      "sourceUrl": "https://fanasa.net/brand-assets/center-dejan-mark-color.svg",
+      "sha256": "2fac8d336feceefdb2624958c8f27d3a45af98c26db5b457b836cd4409a5cbf7",
+      "bytes": 901
+    },
+    {
+      "path": "brand/center-ayin-mark-color.svg",
+      "sourceUrl": "https://fanasa.net/brand-assets/center-ayin-mark-color.svg",
+      "sha256": "9db3c0c290245adb426ab94ca98e76f454f550cd3e04b9e1f696f49f9d0540c2",
+      "bytes": 884
+    },
+    {
+      "path": "brand/center-didban-mark-color.svg",
+      "sourceUrl": "https://fanasa.net/brand-assets/center-didban-mark-color.svg",
+      "sha256": "8bd8d45b6d90eff73f9809f7976ab5ec9428f5300a053fcfd9155e26cbf5cd60",
+      "bytes": 1143
+    },
+    {
+      "path": "brand/center-tarazu-mark-color.svg",
+      "sourceUrl": "https://fanasa.net/brand-assets/center-tarazu-mark-color.svg",
+      "sha256": "121ba710bd6cd1f9fcdfd3f16a0b3f8d9ccda8385b1ab058cc3b6e08d1ee1a91",
+      "bytes": 1203
+    },
+    {
+      "path": "fonts/Vazirmatn-Fa.woff2",
+      "sourceUrl": "https://fanasa.net/_next/static/media/f1d25eabcf1db66d-s.p.21se6xk6bxqs6.woff2",
+      "sha256": "07c90f3690c05c7722300d9933824191a77f5eb8367e498a07ffc9552f2c2635",
+      "bytes": 46272
+    },
+    {
+      "path": "fonts/Vazirmatn-LatinExt.woff2",
+      "sourceUrl": "https://fanasa.net/_next/static/media/3be67f396f7d45c3-s.10ayu6ka6csf1.woff2",
+      "sha256": "a448627c36553c00e67cc488376e13f8f4211f3ddc9d12de22e48a468d306a90",
+      "bytes": 21796
+    },
+    {
+      "path": "fonts/Vazirmatn-Latin.woff2",
+      "sourceUrl": "https://fanasa.net/_next/static/media/ec8f59eafded4799-s.2avnhkksosb5d.woff2",
+      "sha256": "454d44a1112afe0a95f40216cd231d0fb725269e31c8692ff36003c56eb23d7c",
+      "bytes": 34444
+    },
+    {
+      "path": "fonts/OFL.txt",
+      "sourceUrl": "https://raw.githubusercontent.com/google/fonts/main/ofl/vazirmatn/OFL.txt",
+      "sha256": "17e355067c8284f47743a1ee3b1ef7ff684ff0601eda357f9353b10b3016ab31",
+      "bytes": 4391
+    }
+  ]
+}

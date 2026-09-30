@@ -1,3 +1,7 @@
 * text=auto eol=lf
 # Preserve applied migration bytes because the ledger records their SHA-256.
 database/migrations/*.sql -text whitespace=cr-at-eol,-blank-at-eol
+
+# Preserve the original downloaded brand assets and font license bytes.
+public/assets/brand/*.svg -text
+public/assets/fonts/OFL.txt -text whitespace=-blank-at-eol

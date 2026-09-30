@@ -3,20 +3,24 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#1d4ed8" />
+  <meta name="theme-color" content="#16326C" />
   <title>نئوکنتراکت | مدیریت قرارداد گروه انتخاب</title>
   <link rel="stylesheet" href="/styles.css" />
   <link rel="stylesheet" href="/product.css" />
+  <link rel="stylesheet" href="/assets/fonts/vazirmatn.css" />
+  <link rel="stylesheet" href="/fanasa-theme.css" />
+  <link rel="icon" href="/assets/brand/fanasa-favicon.svg" type="image/svg+xml" />
+  <link rel="preload" href="/assets/fonts/Vazirmatn-Fa.woff2" as="font" type="font/woff2" crossorigin />
 </head>
 <body>
   <div id="app" class="app-shell">
     <div class="mobile-overlay" id="mobileOverlay"></div>
     <aside class="sidebar" id="sidebar">
       <div class="brand">
-        <div class="brand-mark"><span>ن</span></div>
-        <div>
-          <div class="brand-name">نئوکنتراکت</div>
-          <div class="brand-caption">مدیریت قرارداد گروه انتخاب</div>
+        <div class="brand-identity">
+          <img class="fanasa-logo fanasa-logo-sidebar" src="/assets/brand/fanasa-logo-horizontal-fa-reverse.svg" alt="فن‌آسا" width="114" height="40" />
+          <div class="brand-product"><div class="brand-name">نئوکنتراکت</div><span class="brand-latin" lang="en" dir="ltr">NeoContract</span></div>
+          <div class="brand-caption">تولید و مدیریت قراردادهای سازمانی</div>
         </div>
         <button class="icon-btn sidebar-close" data-action="toggle-sidebar" aria-label="بستن منو">×</button>
       </div>
@@ -24,24 +28,24 @@
       <div class="workspace-switcher">
         <div class="workspace-avatar">گ</div>
         <div class="workspace-copy"><span>فضای کاری</span><strong id="workspaceLabel">گروه انتخاب</strong></div>
-        <span class="chevron">⌄</span>
+        <span class="workspace-indicator" aria-hidden="true"></span>
       </div>
 
       <div class="nav-label">نمای کلی</div>
       <nav class="main-nav" aria-label="ناوبری اصلی">
-        <button class="nav-item active" data-view="dashboard"><span class="nav-icon">⌂</span><span>داشبورد</span></button>
-        <button class="nav-item" data-view="contracts"><span class="nav-icon">▣</span><span>قراردادها</span><span class="nav-badge" data-nav-count="contracts">۰</span></button>
-        <button class="nav-item" data-view="templates"><span class="nav-icon">▤</span><span>الگوهای قرارداد</span></button>
-        <button class="nav-item" data-view="catalog"><span class="nav-icon">⌘</span><span>کاتالوگ سرویس</span><span class="nav-badge" data-nav-count="catalog">۸۷</span></button>
-        <button class="nav-item" data-view="customers"><span class="nav-icon">♧</span><span>مشتریان هلدینگی</span></button>
-        <button class="nav-item" data-view="managers"><span class="nav-icon">◉</span><span>اکانت منیجرها</span></button>
-        <button class="nav-item" data-view="processes"><span class="nav-icon">◈</span><span>فرآیندها</span></button>
-        <button class="nav-item" data-view="reports"><span class="nav-icon">◒</span><span>گزارش‌ها</span></button>
+        <button class="nav-item active" data-view="dashboard"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-8H9v8H4a1 1 0 0 1-1-1Z"/></svg></span><span>داشبورد</span></button>
+        <button class="nav-item" data-view="contracts"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h8l4 4v14H6Z"/><path d="M14 3v5h5M9 12h6M9 16h6"/></svg></span><span>قراردادها</span><span class="nav-badge" data-nav-count="contracts">۰</span></button>
+        <button class="nav-item" data-view="templates"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="14" height="16" rx="2"/><path d="M8 7h6M8 11h6M8 15h3M18 7h3v15H8v-3"/></svg></span><span>الگوهای قرارداد</span></button>
+        <button class="nav-item" data-view="catalog"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="6" height="6" rx="1"/><rect x="15" y="3" width="6" height="6" rx="1"/><rect x="3" y="15" width="6" height="6" rx="1"/><rect x="15" y="15" width="6" height="6" rx="1"/><path d="M9 6h6M6 9v6M18 9v6M9 18h6"/></svg></span><span>کاتالوگ سرویس</span><span class="nav-badge" data-nav-count="catalog">۸۷</span></button>
+        <button class="nav-item" data-view="customers"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 21V8h7v13M11 21V3h9v18M2 21h20M7 11v1M7 15v1M15 7h1M15 11h1M15 15h1"/></svg></span><span>مشتریان هلدینگی</span></button>
+        <button class="nav-item" data-view="managers"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2M5 21h14"/></svg></span><span>اکانت منیجرها</span></button>
+        <button class="nav-item" data-view="processes"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="2" width="8" height="5" rx="1"/><rect x="2" y="17" width="7" height="5" rx="1"/><rect x="15" y="17" width="7" height="5" rx="1"/><path d="M12 7v5M5.5 17v-5h13v5"/></svg></span><span>فرآیندها</span></button>
+        <button class="nav-item" data-view="reports"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3v18h17M8 17v-5M13 17V7M18 17v-8"/></svg></span><span>گزارش‌ها</span></button>
       </nav>
 
       <div class="nav-label nav-label-spaced">سامانه</div>
       <nav class="main-nav">
-        <button class="nav-item" data-view="settings"><span class="nav-icon">⚙</span><span>تنظیمات و اتصال‌ها</span></button>
+        <button class="nav-item" data-view="settings"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m10 2-.7 3-2 .9-2.8-.9-2 3.5 2.2 2.1v2.4l-2.2 2.1 2 3.5 2.8-.9 2 .9.7 3h4l.7-3 2-.9 2.8.9 2-3.5-2.2-2.1v-2.4l2.2-2.1-2-3.5-2.8.9-2-.9L14 2Z"/><circle cx="12" cy="12" r="3"/></svg></span><span>تنظیمات و اتصال‌ها</span></button>
       </nav>
 
       <div class="sidebar-bottom">
@@ -65,6 +69,7 @@
           <div class="breadcrumb"><span>فضای کاری</span><b>/</b><strong id="breadcrumbCurrent">داشبورد</strong></div>
         </div>
         <div class="topbar-actions">
+          <img class="fanasa-logo fanasa-logo-topbar" src="/assets/brand/fanasa-logo-horizontal-fa-color.svg" alt="فن‌آسا" width="80" height="28" />
           <label class="global-search"><span>⌕</span><input id="globalSearch" type="search" placeholder="جست‌وجوی قرارداد، طرف قرارداد..." /><kbd>/</kbd></label>
           <button class="topbar-icon has-dot" aria-label="اعلان‌ها" data-action="notifications">♧</button>
           <div class="topbar-divider"></div>

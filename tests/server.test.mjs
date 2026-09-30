@@ -39,6 +39,7 @@ before(async () => {
     writeFile(join(publicRoot, 'styles.css'), 'body { color: #123; }'),
     writeFile(join(publicRoot, 'catalog.json'), '{"services":87}'),
     writeFile(join(publicRoot, 'icon.svg'), '<svg xmlns="http://www.w3.org/2000/svg"/>'),
+    writeFile(join(publicRoot, 'font.woff2'), 'wOF2fixture'),
     writeFile(join(publicRoot, 'raw.bin'), Buffer.from([0, 1, 2, 255])),
     writeFile(join(publicRoot, 'report file.txt'), 'report'),
     writeFile(join(fixtureRoot, 'public-extra', 'secret.txt'), 'outside-public'),
@@ -77,6 +78,7 @@ test('serves the index and static assets with MIME types and byte lengths', asyn
     ['/styles.css', 'text/css; charset=utf-8', 'body { color: #123; }'],
     ['/catalog.json', 'application/json; charset=utf-8', '{"services":87}'],
     ['/icon.svg', 'image/svg+xml', '<svg xmlns="http://www.w3.org/2000/svg"/>'],
+    ['/font.woff2', 'font/woff2', 'wOF2fixture'],
     ['/report%20file.txt', 'application/octet-stream', 'report']
   ];
   for (const [path, contentType, body] of checks) {
