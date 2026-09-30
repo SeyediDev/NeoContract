@@ -1,0 +1,90 @@
+{
+  "task": "CTR-021",
+  "scope": "Correct catalog operator review and integration/settings UI state",
+  "checkedAt": "2026-09-30T08:36:53.344Z",
+  "tests": [
+    {
+      "command": "npm test",
+      "passed": 50,
+      "failed": 0
+    },
+    {
+      "command": "npm run test:e2e",
+      "passed": 8,
+      "failed": 0
+    }
+  ],
+  "browserCoverage": [
+    "approved review without source verification",
+    "pending/importing/failed/approved history and readiness",
+    "delayed status response preserves workspace draft",
+    "save workspace name retains default payment terms and survives reload",
+    "retry after API failure preserves draft",
+    "old unavailable response cannot replace a newer connected response",
+    "approve import updates review while preserving draft",
+    "existing contract workflow and template publication"
+  ],
+  "liveVerification": {
+    "checkedAt": "2026-09-30T08:36:53.344Z",
+    "checks": [
+      {
+        "view": "settings",
+        "viewport": 1440,
+        "documentWidth": 1440,
+        "screenshot": "artifacts/integrations/1440-settings.png"
+      },
+      {
+        "view": "catalog",
+        "viewport": 1440,
+        "documentWidth": 1440,
+        "screenshot": "artifacts/integrations/1440-catalog.png"
+      },
+      {
+        "view": "settings",
+        "viewport": 390,
+        "documentWidth": 390,
+        "screenshot": "artifacts/integrations/390-settings.png"
+      },
+      {
+        "view": "catalog",
+        "viewport": 390,
+        "documentWidth": 390,
+        "screenshot": "artifacts/integrations/390-catalog.png"
+      }
+    ],
+    "errors": [],
+    "sourceVerification": "http-observed-unverified",
+    "operatorReview": {
+      "status": "approved",
+      "importId": "d2e07dae-3d77-47d2-afd9-42f6384a6d3d",
+      "reviewedAt": "2026-09-29T23:16:28.591Z"
+    },
+    "neo": {
+      "status": "connected",
+      "project": "مدیریت قراردادها"
+    },
+    "preservedContracts": [
+      {
+        "id": "359b23c4-d1a1-44e0-ba5a-6d3f5758a258",
+        "status": "active",
+        "sha256": "f58d56468d19c6831d3b1a382d90aa2d0ec86ca11c5959192aa4625aac7d6af5"
+      },
+      {
+        "id": "80cc27cd-dc18-4609-8a95-fd7607206476",
+        "status": "in_process",
+        "sha256": "855c08289166b0def152ad23c45a72fabfcccfed1cfc164b7ac6bab26b76c7de"
+      },
+      {
+        "id": "a831a711-68b7-4753-8c07-18109840bc9c",
+        "status": "draft",
+        "sha256": "851a0d13005d458189585cda6fb84d1adfdacd67ac39956693ab244529aeafa2"
+      }
+    ],
+    "snapshotHashesUnchanged": true
+  },
+  "limits": [
+    "Browser regression integration responses are mocked; the live read-only acceptance additionally verified the configured Neo connection and current approved import.",
+    "No new source import, catalog approval, contract mutation or migration was performed against the live demo.",
+    "Screenshots remain in local ignored artifacts/integrations."
+  ]
+}

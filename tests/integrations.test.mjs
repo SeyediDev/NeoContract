@@ -137,16 +137,46 @@ test('Neo synchronization and Fanasa import are idempotent, isolated and recorde
 
     await t.test('pending import does not change active catalog; approval updates official mappings once',async()=>{
       const before=await store.catalog(),integration=createIntegrations(store,{neoConfig:config,fetchImpl:neoMock().fetchImpl,fetchCatalog:async()=>clone(report)});
+      assert.deepEqual(before.operatorReview,{status:'unreviewed',importId:null,reviewedAt:null});
       const pending=await integration.runImport();assert.equal(pending.status,'pending');assert.equal(pending.sources.length,90);assert.equal(pending.counts.services,87);
       assert.deepEqual(await store.catalog(),before);
       const approved=await integration.approveImport(pending.id);assert.equal(approved.status,'approved');
       const current=await store.catalog();assert.equal(current.services.length,87);assert.equal(current.verificationStatus,'http-observed-unverified');
+      const reviewRow=await store.one('SELECT reviewed_at FROM contracts.catalog_imports WHERE tenant_id=$1 AND id=$2',[store.tenantId,pending.id]);
+      const reviewedAt=reviewRow.reviewed_at instanceof Date?reviewRow.reviewed_at.toISOString():reviewRow.reviewed_at;
+      assert.deepEqual(current.operatorReview,{status:'approved',importId:pending.id,reviewedAt});
+      assert.deepEqual(current.services,report.catalog.services,'operator review must not rewrite source observations or service provenance');
+      assert.deepEqual((await integration.status()).sync.operatorReview,current.operatorReview);
+      assert.deepEqual((await createStore(db).catalog()).operatorReview,current.operatorReview,'review is derived from persisted active import after creating a new store');
+
       assert.equal(current.services.find(s=>s.code==='ABR-07').tier,'T3');assert.equal(current.services.find(s=>s.code==='ABR-07').delivery,'on_request');
       const mapped=await store.q('SELECT s.service_code,s.delivery,t.code FROM contracts.catalog_service_sla m JOIN contracts.catalog_services s ON s.tenant_id=m.tenant_id AND s.id=m.service_id JOIN contracts.sla_tiers t ON t.tenant_id=m.tenant_id AND t.id=m.sla_tier_id WHERE m.tenant_id=$1 AND m.is_default',[store.tenantId]);
       assert.equal(mapped.length,87);assert.equal(mapped.find(x=>x.service_code==='ABR-07').code,'T3');
       assert.deepEqual(current.services.find(s=>s.code==='DZN-02').price,report.catalog.services.find(s=>s.code==='DZN-02').price);
       await integration.approveImport(pending.id);assert.equal((await store.q('SELECT * FROM contracts.catalog_service_sla WHERE tenant_id=$1 AND is_default',[store.tenantId])).length,87);
       const restarted=createIntegrations(createStore(db),{neoConfig:config,fetchImpl:neoMock().fetchImpl});assert.ok((await restarted.imports()).some(i=>i.id===pending.id&&i.status==='approved'));
+      const laterPending=await integration.runImport();assert.equal(laterPending.status,'pending');assert.notEqual(laterPending.id,pending.id);
+      assert.deepEqual(await store.catalog(),current,'a newer pending import does not change active reviewed state');
+
+    });
+
+    await t.test('catalog review rejects missing, forged and cross-tenant import references',async()=>{
+      const saved=await store.getSetting('catalog-current');const approved=(await store.catalog()).operatorReview;
+      const foreignTenant=randomUUID(),foreignImport=randomUUID();
+      await db.query('INSERT INTO contracts.tenants(id,slug,name) VALUES($1,$2,$3)',[foreignTenant,'review-'+foreignTenant,'Foreign review tenant']);
+      await db.query("INSERT INTO contracts.catalog_imports(id,tenant_id,source_url,status,reviewed_at) VALUES($1,$2,$3,'approved',now())",[foreignImport,foreignTenant,'https://fanasa.net/fa/products']);
+      const invalidReferences=[undefined,null,randomUUID(),'not-a-uuid',foreignImport];
+      for(const status of ['pending','approved','rejected','failed']){
+        const id=randomUUID();await db.query('INSERT INTO contracts.catalog_imports(id,tenant_id,source_url,status,reviewed_at) VALUES($1,$2,$3,$4,$5)',[id,store.tenantId,'https://fanasa.net/fa/products',status,status==='approved'?null:new Date().toISOString()]);invalidReferences.push(id);
+      }
+      try {
+        for(const importId of invalidReferences){
+          await store.setSetting('catalog-current',{...saved,importId,reviewedAt:'2099-01-01T00:00:00.000Z',operatorReview:{status:'approved',importId:foreignImport,reviewedAt:'2099-01-01T00:00:00.000Z'}});
+          const actual=await store.catalog();assert.deepEqual(actual.operatorReview,{status:'unreviewed',importId:null,reviewedAt:null},`invalid active reference ${String(importId)}`);assert.equal(actual.verificationStatus,'http-observed-unverified');
+        }
+        await store.setSetting('catalog-current',{...saved,reviewedAt:'2099-01-01T00:00:00.000Z',operatorReview:{status:'unreviewed',importId:null,reviewedAt:null}});
+        assert.deepEqual((await store.catalog()).operatorReview,approved,'approval and timestamp come from the matching import row, not cached catalog fields');
+      } finally {await store.setSetting('catalog-current',saved);}
     });
 
     await t.test('failed or incomplete import preserves last active catalog and failure history',async()=>{
@@ -165,6 +195,7 @@ test('Neo synchronization and Fanasa import are idempotent, isolated and recorde
     await t.test('contract freezes complete source tariff and provenance independently from later imports',async()=>{
       const source=(await store.catalog()).services.find(s=>s.code==='DZN-02');
       const c=await makeContract({title:'آزمون حفظ حداقل و کارمزد',services:[{code:source.code,slaTier:'T1',quantity:1,unitPrice:100,revenueModel:'overhead',delivery:source.delivery}]});
+      const originalSnapshot=clone(c.snapshot);
       const frozen=c.services[0],price=frozen.sourceSnapshot?.price??frozen.sourcePrice??frozen.price;
       assert.deepEqual(price,source.price,'percent basis/minimum/rows/explanations must survive the contract snapshot');
       const provenance=frozen.sourceSnapshot??frozen;
@@ -173,6 +204,7 @@ test('Neo synchronization and Fanasa import are idempotent, isolated and recorde
       const next=clone(report);next.catalog.services.find(s=>s.code===source.code).price.terms[0].value='Changed tariff';
       const integration=createIntegrations(store,{fetchCatalog:async()=>next});const pending=await integration.runImport();await integration.approveImport(pending.id);
       const later=(await store.contract(c.id)).services[0];assert.deepEqual(later.sourceSnapshot?.price??later.sourcePrice??later.price,source.price);
+      assert.deepEqual((await store.contract(c.id)).snapshot,originalSnapshot,'later imports or derived review state cannot rewrite a registered snapshot');
     });
   }finally{await db.close();}
 });

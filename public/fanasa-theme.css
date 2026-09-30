@@ -440,3 +440,14 @@ input[type=checkbox] { accent-color: var(--primary); }
 @media(prefers-reduced-motion:reduce) {
   *,*::before,*::after { animation: none!important; transition: none!important; scroll-behavior: auto!important; }
 }
+
+/* Integration status refreshes without replacing the editable workspace form. */
+.integration-loading { display: flex; align-items: center; gap: 9px; color: var(--muted); font-size: 12px; margin: 0 0 16px; }
+.integration-loading .spinner { width: 16px; height: 16px; flex-shrink: 0; }
+#integrationLoadStatus .inline-error { margin: 0 0 16px; }
+#integrationLoadStatus .inline-error p { margin: 5px 0 10px; }
+.source-banner [data-source-verification] { display: block; color: #4e6a63; font-size: 10px; margin-top: 5px; }
+.source-banner .source-review-state { flex: 0 1 auto; display: flex; flex-direction: column; align-items: flex-start; gap: 6px; }
+.source-review-state .status-chip { margin: 0; }
+.source-review-state small { font-size: 10px; color: var(--muted); }
+@media(max-width:800px) { .source-banner .source-review-state { flex-basis: 100%; margin-inline-start: 50px; } }

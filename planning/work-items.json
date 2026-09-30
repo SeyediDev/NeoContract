@@ -586,6 +586,37 @@
       ],
       "neoItemId": "771f4649-f42e-485e-a465-36217abee949",
       "actualOwnerRoleId": "914b9315-65d4-4f49-9d86-d86e6d51e35b",
+      "evidenceCount": 4
+    },
+    {
+      "key": "CTR-021",
+      "title": "اصلاح نمایش بازبینی کاتالوگ و وضعیت اتصال‌ها",
+      "domain": "integration",
+      "status": "Done",
+      "priority": "High",
+      "ownerRole": "NEOCONTRACT-DEVELOPMENT",
+      "description": "ادامه بده — ادامه تکمیل NeoContract پس از اعمال هویت بصری فناسا.",
+      "sequence": 21,
+      "phase": "integration-status",
+      "dependsOn": [
+        "CTR-020"
+      ],
+      "acceptanceCriteria": [
+        "بازبینی اپراتور از وضعیت اعتبار منبع مستقل و متکی به برداشت معتبر همان tenant باشد",
+        "نام پروژه، نتیجه و زمان بررسی اتصال Neo و سابقه برداشت‌ها درست نمایش داده شود",
+        "دریافت دیرهنگام و تلاش مجدد متن فرم را پاک نکنند و نتیجه قدیمی غالب نشود",
+        "نام فضای کاری ذخیره و شرایط پرداخت قبلی حفظ شود",
+        "آزمون مرورگر، SQL و حفظ قراردادهای قبلی پس از restart موفق باشند"
+      ],
+      "progressNote": "وضعیت بازبینی اپراتور از رکورد معتبر برداشت فعال و همان tenant استخراج و مستقل از مشاهده HTTP نمایش داده می‌شود. نام پروژه، نتیجه و زمان اتصال Neo درست است؛ دریافت دیرهنگام، خطا و تلاش مجدد، و تأیید برداشت، فرم ویرایش‌نشده/ذخیره‌نشده را بازسازی نمی‌کنند. نام فضای کاری با workspaceName ذخیره و شرایط پرداخت قبلی حفظ می‌شود. تاریخچه شمار مرکز/سرویس و آمادگی تأیید را درست نمایش می‌دهد. ۵۰ آزمون Node و ۸ آزمون Chrome موفق؛ چهار نمای واقعی در ۱۴۴۰/۳۹۰ پیکسل بدون سرریز یا خطای JS بررسی شد و هش سند، snapshot و الحاقیه سه قرارداد قبلی بعد از restart ثابت ماند.",
+      "artifacts": [
+        "planning/integration-status-acceptance.json",
+        "tests/e2e/integrations.spec.mjs",
+        "tests/integrations.test.mjs",
+        "docs/API.md"
+      ],
+      "neoItemId": "e12cb111-8978-49c6-bcb3-ba4e0b41f8d3",
+      "actualOwnerRoleId": "391cbbf6-0ee5-41f6-9da9-ae7b8e513afb",
       "evidenceCount": 2
     }
   ],
@@ -594,11 +625,11 @@
   "tracking": {
     "mode": "export-from-neo",
     "onlineRegistration": "existing-project-reconciled",
-    "lastSyncedAt": "2026-09-30T04:39:04.091Z",
+    "lastSyncedAt": "2026-09-30T08:38:31.416Z",
     "note": "برد Neo مرجع عملیاتی است؛ این فایل خروجی ترتیب و معیارهای ثبت‌شده در برد است."
   },
   "executionPolicy": "ترتیب sequence مبنای اجراست؛ شروع هر کار پس از Done شدن dependsOn. وضعیت Done نیازمند شواهد متناسب با معیار پذیرش است.",
-  "exportedAt": "2026-09-30T04:39:04.091Z",
+  "exportedAt": "2026-09-30T08:38:31.416Z",
   "executionStatus": "completed",
-  "completionScope": "20 development work items; contract demonstration workflow items are separate"
+  "completionScope": "21 development work items; contract demonstration workflow items are separate"
 }
