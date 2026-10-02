@@ -48,7 +48,7 @@ for (const width of [1440, 390]) {
     await expect(page.getByRole('dialog')).toContainText('تعیین نشده');
     await expect(page.locator('[data-action="advance-dialog"]')).toBeVisible();
     await page.locator('[data-action="detail-tab"][data-tab="document"]').click();
-    await expect(page.locator('.document-paper')).not.toBeEmpty();
+    await expect(page.getByRole('dialog').locator('.document-paper').first()).not.toBeEmpty();
     await page.keyboard.press('Escape');
     await card.locator('[data-action="template-preview"]').click();
     await expect(page.getByRole('dialog')).toContainText(row.templateTitle);
