@@ -6,9 +6,12 @@
 
 | متغیر | کاربرد |
 | --- | --- |
+| `HOST` | نشانی bind؛ پیش‌فرض `127.0.0.1` و در کانتینر `0.0.0.0` |
 | `PORT` | پورت برنامه؛ پیش‌فرض `4173` |
 | `NEOCONTRACT_DATA_DIR` | پوشه داده PGlite؛ پیش‌فرض `.data/postgres`؛ مقدار `memory://` برای آزمون موقت |
 | `NEOCONTRACT_DATABASE_URL` | اتصال PostgreSQL مستقل؛ در صورت تنظیم، بر پوشه PGlite اولویت دارد |
+| `NEOCONTRACT_AUTH_MODE` | `local-demo`، `authenticated` یا `oidc-proxy` |
+| `NEOCONTRACT_TRUST_PROXY_AUTH` | برای `oidc-proxy` فقط پشت proxy قابل اعتماد باید `true` باشد |
 | `NEO_API_TOKEN` | توکن اتصال Neo غیرمحلی |
 | `CHROME_PATH` | مسیر Chrome برای آزمون مرورگر |
 

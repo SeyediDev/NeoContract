@@ -1,0 +1,55 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-neocontract}
+      POSTGRES_USER: ${POSTGRES_USER:-neocontract}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+  app:
+    build: .
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 4173
+      NEOCONTRACT_DATABASE_URL: postgres://${POSTGRES_USER:-neocontract}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-neocontract}
+      NEOCONTRACT_AUTH_MODE: oidc-proxy
+      NEOCONTRACT_TRUST_PROXY_AUTH: "true"
+      NEOCONTRACT_DEFAULT_TENANT: ${NEOCONTRACT_DEFAULT_TENANT:?set tenant UUID}
+      NEO_API_TOKEN: ${NEO_API_TOKEN:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    expose: ["4173"]
+  oauth2-proxy:
+    image: quay.io/oauth2-proxy/oauth2-proxy:v7.8.1
+    restart: unless-stopped
+    environment:
+      OAUTH2_PROXY_PROVIDER: oidc
+      OAUTH2_PROXY_OIDC_ISSUER_URL: ${FANASA_SSO_ISSUER:?set FANASA_SSO_ISSUER}
+      OAUTH2_PROXY_CLIENT_ID: ${FANASA_SSO_CLIENT_ID:?set FANASA_SSO_CLIENT_ID}
+      OAUTH2_PROXY_CLIENT_SECRET: ${FANASA_SSO_CLIENT_SECRET:?set FANASA_SSO_CLIENT_SECRET}
+      OAUTH2_PROXY_REDIRECT_URL: ${FANASA_SSO_REDIRECT_URL:?set FANASA_SSO_REDIRECT_URL}
+      OAUTH2_PROXY_COOKIE_SECRET: ${FANASA_SSO_COOKIE_SECRET:?set FANASA_SSO_COOKIE_SECRET}
+      OAUTH2_PROXY_EMAIL_DOMAINS: ${FANASA_SSO_EMAIL_DOMAIN:-fanasa.ir}
+      OAUTH2_PROXY_UPSTREAMS: http://app:4173
+      OAUTH2_PROXY_HTTP_ADDRESS: 0.0.0.0:4180
+      OAUTH2_PROXY_REVERSE_PROXY: "true"
+      OAUTH2_PROXY_SET_XAUTHREQUEST: "true"
+      OAUTH2_PROXY_PASS_AUTHORIZATION_HEADER: "true"
+      OAUTH2_PROXY_PASS_ACCESS_TOKEN: "false"
+      OAUTH2_PROXY_COOKIE_SECURE: "true"
+      OAUTH2_PROXY_COOKIE_SAMESITE: lax
+      OAUTH2_PROXY_SKIP_PROVIDER_BUTTON: "true"
+    depends_on: [app]
+    ports: ["${HTTP_PORT:-80}:4180"]
+volumes:
+  postgres-data:
