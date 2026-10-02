@@ -24,6 +24,10 @@ jobs:
             git fetch --prune origin
             git checkout main
             git reset --hard origin/main
+            set -a
+            . ./.env
+            set +a
+            npm run deploy:check
             docker compose -f docker-compose.production.yml pull postgres oauth2-proxy
             docker compose -f docker-compose.production.yml build app
             docker compose -f docker-compose.production.yml up -d postgres app oauth2-proxy

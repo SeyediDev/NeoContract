@@ -1,6 +1,6 @@
 -- Rerunnable PostgreSQL bootstrap generated from the versioned migrations.
 BEGIN;
--- NeoContract PostgreSQL schema v1. No users/RBAC; tenant constraints remain enforced.
+-- NeoContract PostgreSQL schema v1. Identity and RBAC extensions are applied by migrations/003_identity_rbac.sql.
 CREATE SCHEMA IF NOT EXISTS contracts;
 SET search_path TO contracts, public;
 CREATE TABLE IF NOT EXISTS schema_migrations (version integer PRIMARY KEY, name text NOT NULL, checksum text NOT NULL, applied_at timestamptz NOT NULL DEFAULT now());
