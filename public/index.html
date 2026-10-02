@@ -4,12 +4,13 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#16326C" />
-  <title>نئوکنتراکت | مدیریت قرارداد گروه انتخاب</title>
+  <title>نئوکنتراکت | فضای قرارداد تایتان</title>
   <link rel="stylesheet" href="/styles.css" />
   <link rel="stylesheet" href="/product.css" />
   <link rel="stylesheet" href="/assets/fonts/vazirmatn.css" />
   <link rel="stylesheet" href="/fanasa-theme.css" />
   <link rel="stylesheet" href="/ux-workbench.css" />
+  <link rel="stylesheet" href="/titan.css" />
   <link rel="icon" href="/assets/brand/fanasa-favicon.svg" type="image/svg+xml" />
   <link rel="preload" href="/assets/fonts/Vazirmatn-Fa.woff2" as="font" type="font/woff2" crossorigin />
 </head>
@@ -28,13 +29,13 @@
       </div>
 
       <div class="workspace-switcher">
-        <div class="workspace-avatar">گ</div>
-        <div class="workspace-copy"><span>فضای کاری</span><strong id="workspaceLabel">گروه انتخاب</strong></div>
-        <span class="workspace-indicator" aria-hidden="true"></span>
+        <div class="workspace-avatar" id="workspaceAvatar">ت</div>
+        <div class="workspace-copy"><label for="tenantSelect">فضای کاری مستقل</label><strong id="workspaceLabel">در حال دریافت…</strong><select id="tenantSelect" aria-label="انتخاب فضای کاری" disabled><option>در حال دریافت…</option></select></div>
       </div>
 
       <div class="nav-label">کار روزانه</div>
       <nav class="main-nav" aria-label="ناوبری اصلی">
+        <button class="nav-item titan-nav" data-view="titan"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 10h18M10 10v10M16 10v10"/></svg></span><span>برد تایتان</span><span class="nav-badge" data-nav-count="titan">۰</span></button>
         <button class="nav-item active" data-view="dashboard"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-8H9v8H4a1 1 0 0 1-1-1Z"/></svg></span><span>میزکار</span></button>
         <button class="nav-item" data-view="contracts"><span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h8l4 4v14H6Z"/><path d="M14 3v5h5M9 12h6M9 16h6"/></svg></span><span>قراردادها</span><span class="nav-badge" data-nav-count="contracts">۰</span></button>
         <div class="nav-label">کتابخانه و روابط</div>
@@ -59,7 +60,7 @@
         </div>
         <div class="sidebar-user">
           <div class="user-avatar">م</div>
-          <div class="user-copy"><strong>پنل مدیریتی</strong><span>فضای نمایشی</span></div>
+          <div class="user-copy"><strong>پنل مدیریتی</strong><span id="accessModeLabel">در حال دریافت فضای کاری</span></div>
 
         </div>
       </div>

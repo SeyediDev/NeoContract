@@ -1,0 +1,108 @@
+import { test, expect } from '@playwright/test';
+
+const titanId = '00000000-0000-0000-0000-000000000002';
+const tenantHeaders = { 'X-Tenant-Id': titanId };
+const selectTenant = async (page, id, mobile = false) => {
+  if (mobile) await page.locator('.hamburger').click();
+  const loaded = page.waitForResponse(response => response.url().endsWith('/api/bootstrap') && response.request().headers()['x-tenant-id'] === id);
+  await page.locator('#tenantSelect').selectOption(id);
+  await loaded;
+  await expect(page.locator('#tenantSelect')).toBeEnabled();
+  await expect(page.locator('#tenantSelect')).toHaveValue(id);
+  await expect(page.locator('#viewRoot .loading-state')).toHaveCount(0);
+};
+const visit = async (page, view, mobile = false) => {
+  if (mobile) await page.locator('.hamburger').click();
+  await page.locator(`#sidebar [data-view="${view}"]`).click();
+};
+
+for (const width of [1440, 390]) {
+  test(`Titan board opens real contracts, templates and four product scopes without reload at ${width}px`, async ({ page, request }) => {
+    const mobile = width === 390;
+    await page.setViewportSize({ width, height: mobile ? 844 : 1000 });
+    await page.addInitScript(id => sessionStorage.setItem('neocontract-active-tenant', id), titanId);
+    const errors = [], documents = [];
+    page.on('pageerror', error => errors.push(error.message));
+    page.on('request', req => { if (req.isNavigationRequest() && req.frame() === page.mainFrame()) documents.push(req.url()); });
+    const response = await request.get('/api/titan/board', { headers: tenantHeaders });
+    expect(response.ok()).toBeTruthy();
+    const board = await response.json();
+    expect(board.rows).toHaveLength(10);
+    const row = board.rows.find(item => item.kind === 'contract' && item.contractId);
+    await page.goto('/');
+    await expect(page.locator('[data-action="new-contract"]').first()).toBeVisible();
+    await page.evaluate(() => { window.originalTitanDocument = document; });
+    await visit(page, 'titan', mobile);
+    await expect(page.getByRole('heading', { name: 'برد تایتان', exact: true })).toBeVisible();
+    await expect(page.locator('[data-board-row]')).toHaveCount(10);
+    await expect(page.locator('.titan-contract-card')).toHaveCount(6);
+    await expect(page.locator('.titan-scope-card')).toHaveCount(4);
+    await expect(page.locator('[data-action="board-center"]')).toHaveCount(14);
+    await expect(page.getByText('حالت محلی آزمایشی؛ انتخاب تننت جایگزین احراز هویت نیست.')).toBeVisible();
+    const card = page.locator(`[data-board-row="${row.id}"]`);
+    await page.screenshot({ path: `test-results/titan-board-${width}.png` });
+    await card.screenshot({ path: `test-results/titan-contract-${width}.png` });
+    await card.locator('[data-action="contract-detail"]').click();
+    await expect(page.getByRole('dialog')).toBeVisible();
+    await expect(page.getByRole('dialog')).toContainText(row.title);
+    await expect(page.getByRole('dialog')).toContainText('تعیین نشده');
+    await expect(page.locator('[data-action="advance-dialog"]')).toBeVisible();
+    await page.locator('[data-action="detail-tab"][data-tab="document"]').click();
+    await expect(page.locator('.document-paper')).not.toBeEmpty();
+    await page.keyboard.press('Escape');
+    await card.locator('[data-action="template-preview"]').click();
+    await expect(page.getByRole('dialog')).toContainText(row.templateTitle);
+    await page.keyboard.press('Escape');
+    await page.locator('[data-action="board-filter"][data-id="product-scope"]').click();
+    await expect(page.locator('.titan-contract-card')).toHaveCount(0);
+    await expect(page.locator('.titan-scope-card')).toHaveCount(4);
+    await page.locator('[data-action="board-filter"][data-id="all"]').click();
+    await page.locator('[data-board-customer]').selectOption('unresolved');
+    await expect(page.locator('.titan-contract-card')).toHaveCount(board.rows.filter(item => !item.customerId && item.kind !== 'product-scope').length);
+    await page.locator('[data-board-customer]').selectOption('');
+    await page.locator('[data-action="board-center"]').first().click();
+    await expect(page.locator('#breadcrumbCurrent')).toHaveText('کاتالوگ سرویس');
+    await visit(page, 'titan', mobile);
+    expect(await page.evaluate(() => window.originalTitanDocument === document)).toBe(true);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+    expect(documents).toHaveLength(1);
+    expect(errors).toEqual([]);
+  });
+}
+
+test('tenant switch isolates customer data, selected services, wizard and settings drafts', async ({ page, request }) => {
+  const access = await (await request.get('/api/tenants')).json();
+  const other = access.tenants.find(tenant => tenant.id !== titanId);
+  expect(other).toBeTruthy();
+  await page.addInitScript(id => sessionStorage.setItem('neocontract-active-tenant', id), titanId);
+  await page.goto('/');
+  await expect(page.locator('[data-action="new-contract"]').first()).toBeVisible();
+  await visit(page, 'catalog');
+  await page.locator('[data-service="ABR-01"]').check();
+  await page.locator('[data-action="catalog-contract"]').first().click();
+  await page.locator('[data-action="wizard-next"]').click();
+  await page.locator('#wizardForm [name="title"]').fill('پیش‌نویس اختصاصی تایتان');
+  await page.keyboard.press('Escape');
+  await visit(page, 'settings');
+  await page.locator('#settingsForm [name="organizationName"]').fill('نام ذخیره‌نشده تایتان');
+  await selectTenant(page, other.id);
+  console.log('Tenant draft diagnostic', await page.evaluate(() => ({ storage: {...sessionStorage}, selected: document.querySelector('#tenantSelect').value, label: document.querySelector('#workspaceLabel').textContent, errors: [...document.querySelectorAll('.toast.warning,.inline-error')].map(node => node.textContent) })));
+  await expect(page.locator('#settingsForm [name="organizationName"]')).not.toHaveValue('نام ذخیره‌نشده تایتان');
+  await visit(page, 'catalog');
+  await expect(page.locator('[data-service="ABR-01"]')).not.toBeChecked();
+  await visit(page, 'dashboard');
+  await expect(page.locator('[data-action="resume-wizard"]')).toHaveCount(0);
+  await visit(page, 'titan');
+  await expect(page.locator('[data-board-row]')).toHaveCount(0);
+  await expect(page.getByText('در این فضای کاری، ردیفی از برد تایتان وجود ندارد')).toBeVisible();
+  await selectTenant(page, titanId);
+  await expect(page.locator('[data-board-row]')).toHaveCount(10);
+  await visit(page, 'catalog');
+  await expect(page.locator('[data-service="ABR-01"]')).toBeChecked();
+  await visit(page, 'settings');
+  await expect(page.locator('#settingsForm [name="organizationName"]')).toHaveValue('نام ذخیره‌نشده تایتان');
+  await visit(page, 'dashboard');
+  await page.locator('[data-action="resume-wizard"]').click();
+  await expect(page.locator('#wizardForm [name="title"]')).toHaveValue('پیش‌نویس اختصاصی تایتان');
+  expect(await page.evaluate(id => JSON.parse(sessionStorage.getItem('neocontract-wizard-draft:' + id)).tenantId, titanId)).toBe(titanId);
+});

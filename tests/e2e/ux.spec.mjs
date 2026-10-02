@@ -30,7 +30,7 @@ test('wizard Escape and reload preserve the current step and entered contract fi
  await page.locator('#wizardForm [name="title"]').fill(title);await page.locator('#wizardForm [name="owner"]').fill('مالک پیش‌نویس');
  await page.locator('#wizardForm [name="amount"]').fill('۱۵٬۰۰۰');await page.locator('#wizardForm [name="end"]').fill('2027-12-31');
  await page.keyboard.press('Escape');await expect(page.getByRole('dialog')).toHaveCount(0);
- expect(await page.evaluate(()=>sessionStorage.getItem('neocontract-wizard-draft'))).toContain(title);
+ expect(await page.evaluate(()=>sessionStorage.getItem('neocontract-wizard-draft:' + document.querySelector('#tenantSelect').value))).toContain(title);
  await page.reload();await expect(page.locator('[data-action="new-contract"]').first()).toBeVisible();
  await page.locator('[data-action="new-contract"]').first().click();
  await expect(page.locator('[data-action="start-fresh-wizard"]')).toBeVisible();await page.locator('#modalRoot [data-action="resume-wizard"]').click();
@@ -71,9 +71,9 @@ test('catalog keyboard selection retains focus, collapsed centers and editable s
 test('discarding a stored wizard requires confirmation and then starts a clean contract',async({page})=>{
  await startWizard(page);await page.locator('#wizardForm [name="title"]').fill('این پیش‌نویس عمداً حذف می‌شود');await page.keyboard.press('Escape');
  await page.locator('[data-action="discard-wizard"]').first().click();await expect(page.getByRole('alertdialog')).toBeVisible();
- await page.locator('[data-action="keep-editing"]').click();expect(await page.evaluate(()=>sessionStorage.getItem('neocontract-wizard-draft'))).not.toBeNull();
+ await page.locator('[data-action="keep-editing"]').click();expect(await page.evaluate(()=>sessionStorage.getItem('neocontract-wizard-draft:' + document.querySelector('#tenantSelect').value))).not.toBeNull();
  await page.locator('[data-action="discard-wizard"]').first().click();await page.locator('[data-action="discard-changes"]').click();
- expect(await page.evaluate(()=>sessionStorage.getItem('neocontract-wizard-draft'))).toBeNull();
+ expect(await page.evaluate(()=>sessionStorage.getItem('neocontract-wizard-draft:' + document.querySelector('#tenantSelect').value))).toBeNull();
  await startWizard(page);await expect(page.locator('#wizardForm [name="title"]')).toHaveValue('');
 });
 
