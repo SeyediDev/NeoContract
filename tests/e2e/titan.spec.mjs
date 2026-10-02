@@ -106,3 +106,14 @@ test('tenant switch isolates customer data, selected services, wizard and settin
   await expect(page.locator('#wizardForm [name="title"]')).toHaveValue('پیش‌نویس اختصاصی تایتان');
   expect(await page.evaluate(id => JSON.parse(sessionStorage.getItem('neocontract-wizard-draft:' + id)).tenantId, titanId)).toBe(titanId);
 });
+
+test('cancelled Titan drafts remain discoverable through the contract status filter', async ({ page }) => {
+  await page.addInitScript(id => sessionStorage.setItem('neocontract-active-tenant', id), titanId);
+  await page.goto('/');
+  await expect(page.locator('[data-action="new-contract"]').first()).toBeVisible();
+  await page.locator('#sidebar [data-view="contracts"]').click();
+  await page.locator('select[name="contractStatus"]').selectOption('cancelled');
+  await expect(page.locator('.status-tabs [data-status="cancelled"]')).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('.responsive-records')).toContainText('TITAN-DRAFT-04');
+  await expect(page.locator('.responsive-records')).toContainText('لغوشده');
+});
