@@ -40,3 +40,16 @@ for (const width of [1440, 390]) {
   expect(errors).toEqual([]);
  });
 }
+
+test('view routes are deep-linkable and browser history restores the previous SPA view', async ({ page }) => {
+ await page.goto('/#view=catalog');
+ await expect(page.locator('#breadcrumbCurrent')).toHaveText('کاتالوگ سرویس');
+ await expect(page.locator('#viewRoot')).toBeFocused();
+ await page.locator('#sidebar [data-view="contracts"]').click();
+ await expect(page).toHaveURL(/#view=contracts$/);
+ await page.goBack();
+ await expect(page).toHaveURL(/#view=catalog$/);
+ await expect(page.locator('#breadcrumbCurrent')).toHaveText('کاتالوگ سرویس');
+ await page.reload();
+ await expect(page.locator('#breadcrumbCurrent')).toHaveText('کاتالوگ سرویس');
+});
