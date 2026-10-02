@@ -24,8 +24,11 @@ FANASA_SSO_EMAIL_DOMAIN=fanasa.ir
 ```
 
 ```bash
+npm run deploy:check
 docker compose --env-file .env -f docker-compose.production.yml up -d --build
 ```
+
+پیش‌بررسی بالا فقط کامل و HTTPS بودن تنظیمات را بررسی می‌کند و هیچ secretی را نمایش نمی‌دهد. تا زمانی که issuer، client و دامنه واقعی SSO آماده نشده‌اند، سرویس `oauth2-proxy` را عمومی نکنید.
 
 برنامه فقط روی شبکه Docker قابل دسترسی است و oauth2-proxy ورودی عمومی را کنترل می‌کند. `NEOCONTRACT_TRUST_PROXY_AUTH=true` فقط در همین مسیر تنظیم شده است.
 
