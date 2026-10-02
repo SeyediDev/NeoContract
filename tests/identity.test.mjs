@@ -59,5 +59,8 @@ test('contract admin can list users and update status and roles', async () => {
   assert.equal(updated.status, 200);
   const after = await request(api, '/api/users', 'GET', headers);
   assert.deepEqual(after.value.users.find(user=>user.id===viewer.id).roles,['account_manager','viewer']);
+  const audit = await db.query("SELECT action,actor_user_id,target_user_id FROM contracts.app_user_audit");
+  assert.equal(audit.rows.length, 1);
+  assert.equal(audit.rows[0].action, 'access_updated');
   await api.close();
 });
