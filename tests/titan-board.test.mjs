@@ -21,6 +21,7 @@ test('Titan source contracts exercise persistent catalog, published templates an
     assert.equal(board.rows.length,10);
     assert.equal(board.stats.contracts,6);
     assert.equal(board.stats.scopes,4);
+    assert.equal(board.proposalVersion,2);
     assert.equal(board.source.path,undefined,'Authoring paths do not leave the server');
     assert.equal(catalog.centers.length,14);
     assert.deepEqual(customers.map(c=>c.name).sort(),['انتخاب','باسلام'].sort());
@@ -37,13 +38,32 @@ test('Titan source contracts exercise persistent catalog, published templates an
       assert.equal(contract.status,'in_process');
       assert.equal(contract.stages.filter(s=>s.status==='active').length,1);
       assert.equal(contract.stages.find(s=>s.status==='active').id,'scope');
-      assert.equal(contract.document,contract.snapshot.template.body);
+      if(row.proposalStatus){
+        assert.equal(contract.proposalRevision?.revisionNumber,2);
+        assert.equal(contract.proposalRevision?.priceSummary,row.priceSummary);
+        assert.ok(contract.document.includes(row.title));
+        if(row.id==='titan-04'){
+          assert.equal(row.serviceCode,'FCL-01');
+          assert.equal(row.pricingType,'usage');
+          assert.equal(row.quotedAmountIRR,null);
+          assert.equal(row.exampleMonthlyIRR,109242000);
+          assert.equal(contract.originalDocument,null);
+          assert.equal(contract.snapshot.intake.supersedesContractId,row.previousContractId);
+          const old=await store.contract(row.previousContractId);
+          assert.equal(old.status,'cancelled');
+          assert.equal(old.document,old.snapshot.template.body);
+        }else{
+          assert.equal(row.pricingType,'fixed');
+          assert.equal(row.quotedAmountIRR,{'titan-01':36000000000,'titan-02':72000000000,'titan-03':42000000000,'titan-05':24000000000}[row.id]);
+          assert.equal(contract.originalDocument,contract.snapshot.template.body);
+        }
+      }else assert.equal(contract.document,contract.snapshot.template.body);
       assert.equal(contract.services[0].code,row.serviceCode);
       assert.equal(contract.amount,null,'An unknown fee is not a free contract');
       assert.equal(contract.start,'');assert.equal(contract.end,'');
       assert.equal(contract.services[0].slaTier,null);
       assert.ok(contract.document.length>1200);
-      assert.equal(contract.history[0].type,'titan_intake_started');
+      assert.equal(contract.history[0].type,row.id==='titan-04'?'titan_proposal_started':'titan_intake_started');
       if(['سلام پی','سلام‌پی','زودکس'].includes(row.sourceCustomer))assert.equal(contract.customerId,null);
     }
     await t.test('intake retries preserve documents and active steps',async()=>{
