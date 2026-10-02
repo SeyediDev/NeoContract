@@ -116,4 +116,8 @@ test('cancelled Titan drafts remain discoverable through the contract status fil
   await expect(page.locator('.status-tabs [data-status="cancelled"]')).toHaveAttribute('aria-pressed', 'true');
   await expect(page.locator('.responsive-records')).toContainText('TITAN-DRAFT-04');
   await expect(page.locator('.responsive-records')).toContainText('لغوشده');
+  await page.locator('.responsive-records [data-action="contract-detail"]').first().click();
+  await expect(page.getByRole('dialog')).toContainText('این پیش‌نویس لغو شده و قابل پیشروی نیست');
+  await expect(page.locator('[data-action="advance-dialog"]')).toHaveCount(0);
+  await expect(page.locator('[data-action="contract-neo"]')).toHaveCount(0);
 });

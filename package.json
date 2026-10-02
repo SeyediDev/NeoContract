@@ -12,6 +12,7 @@
     "db:seed": "node scripts/database.mjs seed",
     "db:backup": "node scripts/database.mjs backup",
     "db:restore": "node scripts/database.mjs restore",
+    "db:sqlserver": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/sqlserver-provision.ps1 -IntegratedSecurity",
     "test:e2e": "playwright test"
   },
   "engines": {
