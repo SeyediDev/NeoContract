@@ -24,8 +24,10 @@ jobs:
             git fetch --prune origin
             git checkout main
             git reset --hard origin/main
-            docker compose --env-file .env -f docker-compose.production.yml build app
-            docker compose --env-file .env -f docker-compose.production.yml run --rm --no-deps app node scripts/validate-production-env.mjs
-            docker compose -f docker-compose.production.yml pull postgres oauth2-proxy
-            docker compose -f docker-compose.production.yml up -d postgres app oauth2-proxy
-            docker compose -f docker-compose.production.yml ps
+            compose=(docker compose --env-file .env -f docker-compose.production.yml)
+            if [ -f compose.https.yml ]; then compose+=(-f compose.https.yml); fi
+            "${compose[@]}" build app
+            "${compose[@]}" run --rm --no-deps --user 0:0 -v "$PWD/.env:/run/neocontract.env:ro" app node --env-file=/run/neocontract.env scripts/validate-production-env.mjs
+            "${compose[@]}" pull postgres oauth2-proxy
+            "${compose[@]}" up -d --wait --wait-timeout 120 postgres app oauth2-proxy
+            "${compose[@]}" ps
