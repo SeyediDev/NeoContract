@@ -16,3 +16,4 @@
 .pricing-proposal-preview summary{cursor:pointer;font-weight:600;color:var(--brand,#1f4b9a)}
 .pricing-proposal-preview pre{font:inherit;line-height:2;white-space:pre-wrap;overflow-wrap:anywhere;margin-top:18px}
 .pricing-linked{display:flex;flex-direction:column;gap:10px;align-items:flex-start;margin-bottom:16px}
+@media(max-width:600px){.pricing-item-heading>.form-field:nth-child(2){flex:1 1 calc(100% - 48px);min-width:0}.pricing-item-heading>.form-field:nth-child(3){flex:1 1 100%;width:100%;max-width:none}.pricing-item-heading>.form-field input{width:100%;min-width:0}}

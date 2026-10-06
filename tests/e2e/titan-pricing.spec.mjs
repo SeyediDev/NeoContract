@@ -16,6 +16,7 @@ for(const width of [1440,390])test(`five Titan pricing links, live clauses and s
   await page.locator('.pricing-proposal-preview summary').click();
   await expect(page.locator('[data-p-proposal]')).toContainText(new Intl.NumberFormat('fa-IR').format(expected)+' ریال');
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();
+  if(width===390)expect((await page.locator('[data-p-field="items.0.quantity"]').boundingBox()).width).toBeGreaterThan(200);
   await page.screenshot({path:`artifacts/titan-pricing-${width}.png`,fullPage:false});
   await page.locator('[data-p-action="save"]').click();await expect(page.locator('[data-p-dirty]')).toHaveText('');
   await page.locator('.pricing-linked [data-action="contract-detail"]').click();
