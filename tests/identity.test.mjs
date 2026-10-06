@@ -69,6 +69,13 @@ test('contract admin can list users and update status and roles', async () => {
   assert.equal(list.value.users.length, 4);
   assert.ok(list.value.roles.some(role => role.role_key === 'viewer'));
   const viewer = list.value.users.find(user => user.subject === 'demo-viewer');
+  const transaction=db.transaction;
+  db.transaction=work=>transaction(tx=>work({...tx,query:async(sql,params)=>{if(sql.startsWith('INSERT INTO contracts.app_user_audit'))throw Error('Injected audit failure');return tx.query(sql,params);}}));
+  const failed=await request(api,`/api/users/${viewer.id}`,'PATCH',headers,{status:'disabled',roles:['account_manager']});
+  assert.equal(failed.status,500);
+  db.transaction=transaction;
+  const unchanged=(await request(api,'/api/users','GET',headers)).value.users.find(user=>user.id===viewer.id);
+  assert.equal(unchanged.status,viewer.status);assert.deepEqual(unchanged.roles,viewer.roles);
   const updated = await request(api, `/api/users/${viewer.id}`, 'PATCH', headers, {status:'active',roles:['viewer','account_manager']});
   assert.equal(updated.status, 200);
   const after = await request(api, '/api/users', 'GET', headers);
