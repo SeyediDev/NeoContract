@@ -48,6 +48,7 @@ services:
       OAUTH2_PROXY_PASS_ACCESS_TOKEN: "false"
       OAUTH2_PROXY_COOKIE_SECURE: "true"
       OAUTH2_PROXY_COOKIE_SAMESITE: lax
+      OAUTH2_PROXY_COOKIE_CSRF_PER_REQUEST: "true"
       OAUTH2_PROXY_SKIP_PROVIDER_BUTTON: "true"
     depends_on: [app]
     ports: ["${HTTP_PORT:-80}:4180"]

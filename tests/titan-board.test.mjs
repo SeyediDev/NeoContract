@@ -39,7 +39,7 @@ test('Titan source contracts exercise persistent catalog, published templates an
       assert.equal(contract.stages.filter(s=>s.status==='active').length,1);
       assert.equal(contract.stages.find(s=>s.status==='active').id,'scope');
       if(row.proposalStatus){
-        assert.equal(contract.proposalRevision?.revisionNumber,2);
+        assert.equal(contract.proposalRevision?.revisionNumber,3);
         assert.equal(contract.proposalRevision?.priceSummary,row.priceSummary);
         assert.ok(contract.document.includes(row.title));
         if(row.id==='titan-04'){
@@ -47,7 +47,7 @@ test('Titan source contracts exercise persistent catalog, published templates an
           assert.equal(row.pricingType,'usage');
           assert.equal(row.quotedAmountIRR,null);
           assert.equal(row.exampleMonthlyIRR,109242000);
-          assert.equal(contract.originalDocument,null);
+          assert.equal(contract.originalDocument,contract.snapshot.document);
           assert.equal(contract.snapshot.intake.supersedesContractId,row.previousContractId);
           const old=await store.contract(row.previousContractId);
           assert.equal(old.status,'cancelled');
