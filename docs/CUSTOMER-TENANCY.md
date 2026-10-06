@@ -42,9 +42,11 @@ subject. Only active memberships in active workspaces are listed. Roles are read
 from the selected membership, never combined across tenants. Foreign and archived
 workspaces are denied before disclosing their contents.
 
-Tenant isolation is implemented in NeoContract. Central tenant provisioning and
-membership synchronization with Access Management are not implemented by this
-import. Access Management remains the central application registry; this change
+Tenant isolation is implemented in NeoContract. This import does not provision
+central tenants. The optional [central admission connector](CENTRAL-ACCESS.md)
+intersects local memberships with fresh central membership and application-entry
+decisions when enabled after central provisioning. Contract roles remain scoped
+locally. Access Management remains the central application registry; this change
 creates no separate product registry.
 
 ## Verification
