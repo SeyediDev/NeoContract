@@ -3,6 +3,20 @@ import assert from 'node:assert/strict';
 import { createDatabase } from '../lib/database.mjs';
 import { createApi } from '../lib/http-api.mjs';
 
+test('pricing models can be read by viewers but saved only by a contract administrator',async()=>{
+ const previous=process.env.NEOCONTRACT_TRUST_PROXY_AUTH;process.env.NEOCONTRACT_TRUST_PROXY_AUTH='true';
+ const db=await createDatabase({dataDir:'memory://'});const api=await createApi({database:db,authMode:'oidc-proxy'});
+ try{
+  await db.query("UPDATE contracts.app_users SET status='active' WHERE subject IN ('demo-admin','demo-viewer')");
+  const headers=sub=>({'x-auth-request-sub':sub});
+  const model={name:'مدل نقش‌ها',bases:[{id:'a',name:'نرخ',unit:'واحد',amount:100}],items:[{id:'a',title:'آیتم',quantity:1,components:[{baseId:'a',coefficient:1}]}]};
+  assert.equal((await request(api,'/api/pricing-plans','POST',headers('demo-viewer'),{model})).status,403);
+  const saved=await request(api,'/api/pricing-plans','POST',headers('demo-admin'),{model});assert.equal(saved.status,201);
+  assert.equal((await request(api,'/api/pricing-plans/'+saved.value.id,'GET',headers('demo-viewer'))).status,200);
+  assert.equal((await request(api,'/api/pricing-plans/'+saved.value.id,'PUT',headers('demo-viewer'),{model,revision:1})).status,403);
+ }finally{await api.close();if(previous===undefined)delete process.env.NEOCONTRACT_TRUST_PROXY_AUTH;else process.env.NEOCONTRACT_TRUST_PROXY_AUTH=previous;}
+});
+
 async function request(api, url, method = 'GET', headers = {}, payload) {
   let status; let body = '';
   const req={ method, url, headers: { host: 'localhost', ...headers }, socket: { remoteAddress: '127.0.0.1' } };

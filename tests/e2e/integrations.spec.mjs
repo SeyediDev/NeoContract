@@ -61,8 +61,7 @@ test('reviewed source, import readiness and a delayed connection preserve and sa
     expect(body.defaultPaymentTerms).toBe(settingsBefore.defaultPaymentTerms);
     await expect(page.locator('#workspaceLabel')).toHaveText('فضای کاری آزمون تنظیمات');
     await page.reload();
-    await expect(page.locator('[data-action="new-contract"]').first()).toBeVisible();
-    await open(page, 'settings');
+    await expect(page.locator('#breadcrumbCurrent')).toHaveText('تنظیمات و اتصال‌ها');
     await expect(page.locator('#settingsForm [name="organizationName"]')).toHaveValue('فضای کاری آزمون تنظیمات');
   } finally { gate.resolve(); }
 });

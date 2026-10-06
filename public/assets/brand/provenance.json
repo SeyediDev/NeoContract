@@ -36,90 +36,6 @@
       "bytes": 970
     },
     {
-      "path": "brand/center-abrgan-mark-color.svg",
-      "sourceUrl": "https://fanasa.net/brand-assets/center-abrgan-mark-color.svg",
-      "sha256": "0c71f268456dff599ef342867379f0f655616b99a69685650c037af57a312e35",
-      "bytes": 1004
-    },
-    {
-      "path": "brand/center-karavan-mark-color.svg",
-      "sourceUrl": "https://fanasa.net/brand-assets/center-karavan-mark-color.svg",
-      "sha256": "bb07e62b7e87ce29d9f724ff6513ff33e532317e65a817e2413522c3d9c27198",
-      "bytes": 948
-    },
-    {
-      "path": "brand/center-kavan-mark-color.svg",
-      "sourceUrl": "https://fanasa.net/brand-assets/center-kavan-mark-color.svg",
-      "sha256": "081f3bfe96f88621efabffd993b78dec28be0203e99d5e76b4f5284500c2c6bd",
-      "bytes": 860
-    },
-    {
-      "path": "brand/center-peyvand-mark-color.svg",
-      "sourceUrl": "https://fanasa.net/brand-assets/center-peyvand-mark-color.svg",
-      "sha256": "3ee50eebd544a8c3c66266b06cd08ab25206182a21da69bbfaa0db109478acdc",
-      "bytes": 1251
-    },
-    {
-      "path": "brand/center-dana-mark-color.svg",
-      "sourceUrl": "https://fanasa.net/brand-assets/center-dana-mark-color.svg",
-      "sha256": "30e7fb63f4c38e548d5bfa595df7f26e3d998a9f6ff84eb41f85cab8a512307c",
-      "bytes": 933
-    },
-    {
-      "path": "brand/center-bonyan-mark-color.svg",
-      "sourceUrl": "https://fanasa.net/brand-assets/center-bonyan-mark-color.svg",
-      "sha256": "43a192c03876d873b332cb328ed10823f6d2ca2fe57ad4589a2d9f36344528d5",
-      "bytes": 962
-    },
-    {
-      "path": "brand/center-fanasa-cloud-mark-color.svg",
-      "sourceUrl": "https://fanasa.net/brand-assets/center-fanasa-cloud-mark-color.svg",
-      "sha256": "9901f48c45690f4cfc7a233f3a5747a6ad727b0efe5c996781ba723b561a07ff",
-      "bytes": 1116
-    },
-    {
-      "path": "brand/center-asman-mark-color.svg",
-      "sourceUrl": "https://fanasa.net/brand-assets/center-asman-mark-color.svg",
-      "sha256": "841d2f5fd5110e57390d39d13c7ffd3b1bcaba6fa4ca2ed38dc9a4b2e5c45ecf",
-      "bytes": 850
-    },
-    {
-      "path": "brand/center-kerane-mark-color.svg",
-      "sourceUrl": "https://fanasa.net/brand-assets/center-kerane-mark-color.svg",
-      "sha256": "97184c6b75f2d6f17b7cad94875a28596d5a0a823a0b899062ee4f870c1ba598",
-      "bytes": 1053
-    },
-    {
-      "path": "brand/center-rayan-mark-color.svg",
-      "sourceUrl": "https://fanasa.net/brand-assets/center-rayan-mark-color.svg",
-      "sha256": "894a3e258b07af7519d50e73828e133a87c5a7d2d5073e21103d44ebb62d2f5b",
-      "bytes": 930
-    },
-    {
-      "path": "brand/center-dejan-mark-color.svg",
-      "sourceUrl": "https://fanasa.net/brand-assets/center-dejan-mark-color.svg",
-      "sha256": "2fac8d336feceefdb2624958c8f27d3a45af98c26db5b457b836cd4409a5cbf7",
-      "bytes": 901
-    },
-    {
-      "path": "brand/center-ayin-mark-color.svg",
-      "sourceUrl": "https://fanasa.net/brand-assets/center-ayin-mark-color.svg",
-      "sha256": "9db3c0c290245adb426ab94ca98e76f454f550cd3e04b9e1f696f49f9d0540c2",
-      "bytes": 884
-    },
-    {
-      "path": "brand/center-didban-mark-color.svg",
-      "sourceUrl": "https://fanasa.net/brand-assets/center-didban-mark-color.svg",
-      "sha256": "8bd8d45b6d90eff73f9809f7976ab5ec9428f5300a053fcfd9155e26cbf5cd60",
-      "bytes": 1143
-    },
-    {
-      "path": "brand/center-tarazu-mark-color.svg",
-      "sourceUrl": "https://fanasa.net/brand-assets/center-tarazu-mark-color.svg",
-      "sha256": "121ba710bd6cd1f9fcdfd3f16a0b3f8d9ccda8385b1ab058cc3b6e08d1ee1a91",
-      "bytes": 1203
-    },
-    {
       "path": "fonts/Vazirmatn-Fa.woff2",
       "sourceUrl": "https://fanasa.net/_next/static/media/f1d25eabcf1db66d-s.p.21se6xk6bxqs6.woff2",
       "sha256": "07c90f3690c05c7722300d9933824191a77f5eb8367e498a07ffc9552f2c2635",
@@ -142,6 +58,177 @@
       "sourceUrl": "https://raw.githubusercontent.com/google/fonts/main/ofl/vazirmatn/OFL.txt",
       "sha256": "17e355067c8284f47743a1ee3b1ef7ff684ff0601eda357f9353b10b3016ab31",
       "bytes": 4391
+    },
+    {
+      "path": "brand/center-abrgan-lockup-fa-color.svg",
+      "sourceUrl": "https://fanasa.net/brand-assets/center-abrgan-lockup-fa-color.svg",
+      "sha256": "a0d8cc231f6b46450960ea1c0c9dd4e8f0cb303c1ca2433a855d0895d6090bd4",
+      "bytes": 16331
+    },
+    {
+      "path": "brand/center-abrgan-mark-color.svg",
+      "sourceUrl": "https://fanasa.net/brand-assets/center-abrgan-mark-color.svg",
+      "sha256": "0c71f268456dff599ef342867379f0f655616b99a69685650c037af57a312e35",
+      "bytes": 1004
+    },
+    {
+      "path": "brand/center-asman-lockup-fa-color.svg",
+      "sourceUrl": "https://fanasa.net/brand-assets/center-asman-lockup-fa-color.svg",
+      "sha256": "e02341ced4df0ca2b08652a31cfd90a6b7007376fd276d30aa6b3ad77dd99e6d",
+      "bytes": 14320
+    },
+    {
+      "path": "brand/center-asman-mark-color.svg",
+      "sourceUrl": "https://fanasa.net/brand-assets/center-asman-mark-color.svg",
+      "sha256": "841d2f5fd5110e57390d39d13c7ffd3b1bcaba6fa4ca2ed38dc9a4b2e5c45ecf",
+      "bytes": 850
+    },
+    {
+      "path": "brand/center-ayin-lockup-fa-color.svg",
+      "sourceUrl": "https://fanasa.net/brand-assets/center-ayin-lockup-fa-color.svg",
+      "sha256": "563aa0e855cde276bff43279e19ef26b5243469bbb6fa185472e38e6f851080d",
+      "bytes": 7529
+    },
+    {
+      "path": "brand/center-ayin-mark-color.svg",
+      "sourceUrl": "https://fanasa.net/brand-assets/center-ayin-mark-color.svg",
+      "sha256": "9db3c0c290245adb426ab94ca98e76f454f550cd3e04b9e1f696f49f9d0540c2",
+      "bytes": 884
+    },
+    {
+      "path": "brand/center-bonyan-lockup-fa-color.svg",
+      "sourceUrl": "https://fanasa.net/brand-assets/center-bonyan-lockup-fa-color.svg",
+      "sha256": "82a8f9b2cfe1507410876e5f0bcdd3912106efd1619acf07030d18ef1a8aafcf",
+      "bytes": 19461
+    },
+    {
+      "path": "brand/center-bonyan-mark-color.svg",
+      "sourceUrl": "https://fanasa.net/brand-assets/center-bonyan-mark-color.svg",
+      "sha256": "43a192c03876d873b332cb328ed10823f6d2ca2fe57ad4589a2d9f36344528d5",
+      "bytes": 962
+    },
+    {
+      "path": "brand/center-dana-lockup-fa-color.svg",
+      "sourceUrl": "https://fanasa.net/brand-assets/center-dana-lockup-fa-color.svg",
+      "sha256": "bb85301e2c4640a85111b3506dbf6c76af8c50c0d1669dc7e1186bf624d0360c",
+      "bytes": 10733
+    },
+    {
+      "path": "brand/center-dana-mark-color.svg",
+      "sourceUrl": "https://fanasa.net/brand-assets/center-dana-mark-color.svg",
+      "sha256": "30e7fb63f4c38e548d5bfa595df7f26e3d998a9f6ff84eb41f85cab8a512307c",
+      "bytes": 933
+    },
+    {
+      "path": "brand/center-dejan-lockup-fa-color.svg",
+      "sourceUrl": "https://fanasa.net/brand-assets/center-dejan-lockup-fa-color.svg",
+      "sha256": "4abad77eaa84aba6815942fe2d25860e820b333a60f4c383caf4b3177eea591e",
+      "bytes": 10089
+    },
+    {
+      "path": "brand/center-dejan-mark-color.svg",
+      "sourceUrl": "https://fanasa.net/brand-assets/center-dejan-mark-color.svg",
+      "sha256": "2fac8d336feceefdb2624958c8f27d3a45af98c26db5b457b836cd4409a5cbf7",
+      "bytes": 901
+    },
+    {
+      "path": "brand/center-didban-lockup-fa-color.svg",
+      "sourceUrl": "https://fanasa.net/brand-assets/center-didban-lockup-fa-color.svg",
+      "sha256": "de5b8d1895cf35a5a730504b160a1fbfd11304b341fa9b744e2249dae24a10bf",
+      "bytes": 10194
+    },
+    {
+      "path": "brand/center-didban-mark-color.svg",
+      "sourceUrl": "https://fanasa.net/brand-assets/center-didban-mark-color.svg",
+      "sha256": "8bd8d45b6d90eff73f9809f7976ab5ec9428f5300a053fcfd9155e26cbf5cd60",
+      "bytes": 1143
+    },
+    {
+      "path": "brand/center-fanasa-cloud-lockup-fa-color.svg",
+      "sourceUrl": "https://fanasa.net/brand-assets/center-fanasa-cloud-lockup-fa-color.svg",
+      "sha256": "dc6f018b330d983f3b3786b3eb05db909ca7c1b2aece30605176bd9d32ffe411",
+      "bytes": 15339
+    },
+    {
+      "path": "brand/center-fanasa-cloud-mark-color.svg",
+      "sourceUrl": "https://fanasa.net/brand-assets/center-fanasa-cloud-mark-color.svg",
+      "sha256": "9901f48c45690f4cfc7a233f3a5747a6ad727b0efe5c996781ba723b561a07ff",
+      "bytes": 1116
+    },
+    {
+      "path": "brand/center-karavan-lockup-fa-color.svg",
+      "sourceUrl": "https://fanasa.net/brand-assets/center-karavan-lockup-fa-color.svg",
+      "sha256": "29bc53c24489e5d8c41be59a825097987304c887365a577b6098ffcebb9e03dc",
+      "bytes": 16019
+    },
+    {
+      "path": "brand/center-karavan-mark-color.svg",
+      "sourceUrl": "https://fanasa.net/brand-assets/center-karavan-mark-color.svg",
+      "sha256": "bb07e62b7e87ce29d9f724ff6513ff33e532317e65a817e2413522c3d9c27198",
+      "bytes": 948
+    },
+    {
+      "path": "brand/center-kavan-lockup-fa-color.svg",
+      "sourceUrl": "https://fanasa.net/brand-assets/center-kavan-lockup-fa-color.svg",
+      "sha256": "b7d1423992fa919b44a674e49aee53209f224c01eb9dc5d9a75b54f527b2dd4a",
+      "bytes": 12754
+    },
+    {
+      "path": "brand/center-kavan-mark-color.svg",
+      "sourceUrl": "https://fanasa.net/brand-assets/center-kavan-mark-color.svg",
+      "sha256": "081f3bfe96f88621efabffd993b78dec28be0203e99d5e76b4f5284500c2c6bd",
+      "bytes": 860
+    },
+    {
+      "path": "brand/center-kerane-lockup-fa-color.svg",
+      "sourceUrl": "https://fanasa.net/brand-assets/center-kerane-lockup-fa-color.svg",
+      "sha256": "e4f1ec1d666f777b836ad9805862e1c1a562815c0dad8ac27eab28bb54597768",
+      "bytes": 10093
+    },
+    {
+      "path": "brand/center-kerane-mark-color.svg",
+      "sourceUrl": "https://fanasa.net/brand-assets/center-kerane-mark-color.svg",
+      "sha256": "97184c6b75f2d6f17b7cad94875a28596d5a0a823a0b899062ee4f870c1ba598",
+      "bytes": 1053
+    },
+    {
+      "path": "brand/center-peyvand-lockup-fa-color.svg",
+      "sourceUrl": "https://fanasa.net/brand-assets/center-peyvand-lockup-fa-color.svg",
+      "sha256": "4396c34591d0c735f742a72ca414ca29352e49ecd62a696d51c36e001a6ed79b",
+      "bytes": 16346
+    },
+    {
+      "path": "brand/center-peyvand-mark-color.svg",
+      "sourceUrl": "https://fanasa.net/brand-assets/center-peyvand-mark-color.svg",
+      "sha256": "3ee50eebd544a8c3c66266b06cd08ab25206182a21da69bbfaa0db109478acdc",
+      "bytes": 1251
+    },
+    {
+      "path": "brand/center-rayan-lockup-fa-color.svg",
+      "sourceUrl": "https://fanasa.net/brand-assets/center-rayan-lockup-fa-color.svg",
+      "sha256": "f11397412b8ec5422472186d3ef95ff9634818f5d699e72d3ce9e7a0362ccd97",
+      "bytes": 12459
+    },
+    {
+      "path": "brand/center-rayan-mark-color.svg",
+      "sourceUrl": "https://fanasa.net/brand-assets/center-rayan-mark-color.svg",
+      "sha256": "894a3e258b07af7519d50e73828e133a87c5a7d2d5073e21103d44ebb62d2f5b",
+      "bytes": 930
+    },
+    {
+      "path": "brand/center-tarazu-lockup-fa-color.svg",
+      "sourceUrl": "https://fanasa.net/brand-assets/center-tarazu-lockup-fa-color.svg",
+      "sha256": "3b409b867ec0b75acf3605829661ccbd63736d49686afea2460a88e08f1937f3",
+      "bytes": 9147
+    },
+    {
+      "path": "brand/center-tarazu-mark-color.svg",
+      "sourceUrl": "https://fanasa.net/brand-assets/center-tarazu-mark-color.svg",
+      "sha256": "121ba710bd6cd1f9fcdfd3f16a0b3f8d9ccda8385b1ab058cc3b6e08d1ee1a91",
+      "bytes": 1203
     }
-  ]
+  ],
+  "centersObservedAt": "2026-10-06T12:42:56.249Z",
+  "centersSource": "https://fanasa.net/fa/brand",
+  "parentObservedAt": "2026-10-06T13:20:46.648Z"
 }

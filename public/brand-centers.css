@@ -1,0 +1,16 @@
+/* Official center artwork is preserved. Zone colors only style its surrounding UI. */
+:root{--fanasa-ink:#141c33;--fanasa-turquoise-on-light:#149a8e;--bg:#f6f1e7;--text:#141c33;--ink:#141c33;--muted:#60697a;--ui-soft:#f8f5ee}
+[data-center-id]{--center-dark:#1f4b9a;--center-mid:#5b7fce;--center-light:#86a3ea}
+[data-center-id="abrgan"],[data-center-id="karavan"]{--center-dark:#a8365e;--center-mid:#c9587a;--center-light:#e27a9e}
+[data-center-id="kavan"],[data-center-id="peyvand"],[data-center-id="dana"]{--center-dark:#066c66;--center-mid:#149a8e;--center-light:#3cc4b6}
+[data-center-id="bonyan"],[data-center-id="fanasa-cloud"],[data-center-id="asman"],[data-center-id="kerane"]{--center-dark:#2f4f93;--center-mid:#5b7fce;--center-light:#86a3ea}
+[data-center-id="rayan"]{--center-dark:#8f5b08;--center-mid:#b27812;--center-light:#e2a330}
+[data-center-id="dejan"],[data-center-id="ayin"],[data-center-id="didban"],[data-center-id="tarazu"]{--center-dark:#6b4bb5;--center-mid:#8f73d6;--center-light:#b79cf0}
+.center-lockup{display:inline-flex;align-items:center;flex-shrink:0;padding:10px 12px;background:#fffefa;border-radius:8px;max-width:100%}.center-lockup img{display:block;width:150px;height:auto;min-height:24px;max-width:100%;object-fit:contain;transform:none;filter:none;box-shadow:none}
+.center-identity{display:inline-flex;align-items:center;gap:8px}.center-identity img{display:block;width:28px;height:28px;object-fit:contain;padding:7px;box-sizing:content-box;background:#fffefa;border-radius:8px;transform:none;filter:none;box-shadow:none}
+.catalog-center{border-inline-start:3px solid var(--center-dark)}.catalog-center>summary .center-lockup{margin-inline-end:auto}.catalog-center>summary>.center-count{margin-inline-start:0}.catalog-center>summary .center-symbol{background:#fffefa}
+.titan-center-list>button{display:flex;align-items:center;gap:4px;background:#fffefa;border-color:var(--line)}.titan-center-list>button img{width:24px;height:24px;object-fit:contain;padding:6px;box-sizing:content-box}.titan-catalog-strip{border-color:#d8dfeb}
+.service-info-meta .center-lockup{border:1px solid var(--line)}.snapshot-service .center-identity{margin-top:6px}
+.fanasa-logo{transform:none!important;filter:none!important;box-shadow:none!important;object-fit:contain}
+input[readonly]{background:var(--surface-soft);color:var(--primary)}
+@media(max-width:600px){.center-lockup{padding:8px}.center-lockup img{width:128px}.catalog-center>summary{flex-wrap:wrap}.catalog-center>summary .center-lockup{max-width:60%}.titan-center-list>button{font-size:12px}}
