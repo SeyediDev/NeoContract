@@ -93,7 +93,8 @@ export function createStaticServer({ publicRoot = defaultPublicRoot, apiHandler 
 
 if (process.argv[1] && pathToFileURL(resolve(process.argv[1])).href === import.meta.url) {
   const { createApi } = await import('./lib/http-api.mjs');
-  const app = await createApi({ dataDir: process.env.NEOCONTRACT_DATA_DIR, connectionString: process.env.NEOCONTRACT_DATABASE_URL });
+  const customerTenants=process.env.NEOCONTRACT_CUSTOMER_TENANTS!=='false';
+  const app = await createApi({ dataDir: process.env.NEOCONTRACT_DATA_DIR, connectionString: process.env.NEOCONTRACT_DATABASE_URL,customerTenants });
   const server = createStaticServer({ apiHandler: app.handler });
   for (const signal of ['SIGINT', 'SIGTERM']) process.once(signal, () => server.close(async () => { await app.close(); process.exit(0); }));
   const port = Number(process.env.PORT || 4173);

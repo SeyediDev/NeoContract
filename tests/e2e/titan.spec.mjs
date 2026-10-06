@@ -33,7 +33,7 @@ for (const width of [1440, 390]) {
     await expect(page.locator('[data-action="new-contract"]').first()).toBeVisible();
     await page.evaluate(() => { window.originalTitanDocument = document; });
     await visit(page, 'titan', mobile);
-    await expect(page.getByRole('heading', { name: 'برد تایتان', exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'پرونده‌های قرارداد', exact: true })).toBeVisible();
     await expect(page.locator('[data-board-row]')).toHaveCount(10);
     await expect(page.locator('.titan-contract-card')).toHaveCount(6);
     await expect(page.locator('.titan-scope-card')).toHaveCount(4);
@@ -94,7 +94,7 @@ test('tenant switch isolates customer data, selected services, wizard and settin
   await expect(page.locator('[data-action="resume-wizard"]')).toHaveCount(0);
   await visit(page, 'titan');
   await expect(page.locator('[data-board-row]')).toHaveCount(0);
-  await expect(page.getByText('در این فضای کاری، ردیفی از برد تایتان وجود ندارد')).toBeVisible();
+  await expect(page.getByText('در این فضای کاری، پرونده‌ای برای پیگیری ثبت نشده است')).toBeVisible();
   await selectTenant(page, titanId);
   await expect(page.locator('[data-board-row]')).toHaveCount(10);
   await visit(page, 'catalog');
