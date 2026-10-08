@@ -80,7 +80,7 @@ async function loadUsers(){
  finally{if(users===state.users&&tenantId===state.tenantId&&generation===users.generation){users.loading=false;renderUserPanel();}}
 }
 function renderUserPanel(){if(state.view!=='settings')return;const panel=$('#userAdministrationPanel');if(panel)panel.outerHTML=usersPanel();}
-function renderIntegrationPanels(){if(state.view!=='settings'||!state.data)return;const neo=$('#neoIntegrationPanel'),fanasa=$('#fanasaIntegrationPanel');if(neo)neo.outerHTML=neoIntegrationPanel();if(fanasa)fanasa.outerHTML=fanasaIntegrationPanel();}
+function renderIntegrationPanels(){if(state.view!=='settings'||!state.data)return;const neo=$('#neoIntegrationPanel'),fanasa=$('#fanasaIntegrationPanel');if(neo)neo.outerHTML=neoIntegrationPanel();if(fanasa)fanasa.outerHTML=fanasaIntegrationPanel();syncActionPermissions();}
 async function integrationAction(kind,work){const integration=state.integration;if(integration.busy)return;integration.generation++;integration.loading=false;integration.error='';integration.busy=kind;renderIntegrationPanels();try{return await work();}catch(error){integration.error=error.message;throw error;}finally{integration.busy='';renderIntegrationPanels();}}
 function rememberImport(row){const integration=state.integration;const data=integration.data||{};const sync=data.sync||data.fanasa||{};const imports=(sync.imports||sync.runs||[]).filter(r=>r.id!==row.id);integration.data={...data,sync:{...sync,imports:[row,...imports].slice(0,20)}};}
 

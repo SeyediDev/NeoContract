@@ -58,6 +58,8 @@ npm start
 
 ## آزمون
 
+[جدول پوشش قابلیت‌ها](docs/COVERAGE.md) و [نتیجه پذیرش ۹ اکتبر](docs/RELEASE-2026-10-09-COVERAGE.md) رفتارهای آزموده‌شده و وابستگی‌های باز را مشخص می‌کنند.
+
 ```powershell
 npm test
 npm run test:e2e

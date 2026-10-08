@@ -11,6 +11,7 @@ async function identityRoutes(page,request,roles){
 for(const width of [1440,390])test(`viewer actions are read-only at ${width}px`,async({page,request})=>{
  await page.setViewportSize({width,height:width===390?844:1000});
  await identityRoutes(page,request,['viewer']);
+ await page.route('**/api/integrations',r=>r.fulfill({json:{sync:{imports:[{id:'ready-import',status:'pending',counts:{centers:14,services:87}}]}}}));
  await page.goto('/#view=contracts');
  await expect(page.locator('[data-action="new-contract"]').first()).toBeDisabled();
  await page.locator('[data-action="contract-detail"]').first().click();
@@ -21,6 +22,7 @@ for(const width of [1440,390])test(`viewer actions are read-only at ${width}px`,
  await page.locator('[data-action="close-modal"]').click();
  await page.goto('/#view=settings');
  await expect(page.locator('[data-action="save-settings"]')).toBeDisabled();
+ await expect(page.locator('[data-action="approve-import"]')).toBeDisabled();
  await expect(page.locator('#settingsForm input').first()).toHaveAttribute('readonly','');
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();
 });

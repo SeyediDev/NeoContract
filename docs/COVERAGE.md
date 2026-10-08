@@ -1,0 +1,46 @@
+# پوشش قابلیت‌ها و پذیرش سامانه
+
+این جدول پوشش رفتارهای پیاده‌شده را نشان می‌دهد؛ درصد پوشش خطوط کد نیست.
+اجرای آزمون‌ها از تغییر قراردادها و تنظیمات زنده مستقل است.
+
+| حوزه | رفتار تحت پوشش | شاهد |
+| --- | --- | --- |
+| مشتری و مدیر حساب | ثبت، ویرایش، سلسله‌مراتب، منع چرخه و ارجاع بین تننت‌ها | `api.test.mjs`، `workflow.spec.mjs` |
+| کاتالوگ رسمی | ۱۴ مرکز، ۸۷ سرویس، منبع، SLA، نرخ‌های چندبخشی، شکست دریافت و بازبینی اپراتور | `fanasa-importer.test.mjs`، `integrations.test.mjs`، `integrations.spec.mjs` |
+| الگوی قرارداد | نسخه ثابت، انتشار با revision، تعارض هم‌زمان، متغیرهای معتبر و مراحل الزامی | `api.test.mjs`، `domain.test.mjs`، `contract-routing.spec.mjs` |
+| ساخت و پرونده قرارداد | ویزارد، پیش‌نویس قابل ادامه، اعتبارسنجی، idempotency، سند، snapshot و الحاقیه | `api.test.mjs`، `workflow.spec.mjs`، `ux.spec.mjs` |
+| قیمت‌گذاری پویا | چند نرخ مبنا، چند ضریب، محاسبه دقیق ریالی، نسخه‌ها، اتصال به پنج پیشنهاد و ثبات سند گذشته | `pricing.test.mjs`، `titan-pricing.test.mjs`، `pricing.spec.mjs`، `titan-pricing.spec.mjs` |
+| اجرای گردش | نسخه مستقل هر قرارداد، ترتیب مراحل، جلوگیری از پیشروی تکراری و امضای پیش‌نویس ناقص | `workflow.test.mjs`، `titan-board.test.mjs`، `contract-routing.spec.mjs` |
+| نقش‌ها و کاربران | نقش مرحله جاری، منع ارتقای مدیر قرارداد به مدیر سامانه، حفظ آخرین مدیر، audit تراکنشی، سوابق قابل مشاهده | `identity.test.mjs`، `workflow-authorization.test.mjs`، `permissions.spec.mjs` |
+| مرز تننت | جداسازی چهار مشتری، آرشیو تاریخی، منع خواندن/نوشتن خارجی، تنظیمات و پیش‌نویس‌های مستقل، رد پاسخ دیرهنگام کاربران | `tenancy.test.mjs`، `customer-tenancy.test.mjs`، `customer-tenancy.spec.mjs`، `permissions.spec.mjs` |
+| تجربه کاربری | RTL، دسکتاپ/موبایل، نشان مراکز، فوکوس و صفحه‌کلید، SPA/history، حفظ فرم و پاسخ‌های دیرهنگام | `ux.spec.mjs`، `spa.spec.mjs`، `settings-draft.spec.mjs`، `permissions.spec.mjs` |
+| ذخیره‌سازی و بازیابی | migration، تراکنش، قیدها، ماندگاری پس از بازگشایی، backup/restore و رد دست‌کاری | `database.test.mjs`، `backup.test.mjs` |
+| مرز HTTP | روش‌ها، MIME، HEAD، JSON، origin، مسیر فایل و symlink | `server.test.mjs`، `api.test.mjs` |
+| اتصال مرکزی | عضویت و admission تازه، revocation بدون کش مجوز، token مشترک، TLS و منع fallback هنگام خطا | `central-access.test.mjs`؛ فعال‌سازی زنده وابسته به provisioning مرکزی |
+
+نام‌های `.test.mjs` در `tests/` و `.spec.mjs` در `tests/e2e/` هستند.
+
+## اجرای قابل تکرار
+
+```powershell
+npm test
+npm run test:e2e
+```
+
+فرمان دوم هر دو پیکربندی قدیمی و چهار مشتری را اجرا می‌کند. برای اجراهای مستقل
+می‌توان از `test:e2e:legacy` و `test:e2e:customers` و پورت اختصاصی
+`NEOCONTRACT_E2E_PORT` استفاده کرد. متغیرهای اتصال پایگاه و مجوز مرکزی محیط کاری
+در سرور E2E اعمال نمی‌شوند. هر دو مجموعه مرورگر در CI تعریف شده‌اند.
+
+## مرز ادعای تکمیل
+
+- تا ثبت محصول `neocontract` زیر `fanasa.rayan`، چهار UUID مرکزی، عضویت‌ها، مجوز
+  ورود و scope/policy سرویس اختصاصی تأیید نشوند، اتصال مرکزی فعال نمی‌شود.
+- پنج متن تاریخی پیشنهاد هستند؛ امضای معتبر، شرایط نهایی و entitlement تجاری
+  از آن‌ها استنتاج نمی‌شود.
+- ثبت مرحله امضا، اتصال به ارائه‌دهنده امضای دیجیتال نیست.
+- نرخ‌های نمونه، استعلام روز بازار نیستند؛ نرخ واقعی زودکس باید از استعلام
+  اپراتور وارد و منبع آن در مدل نگهداری شود.
+- نتیجه محلی آزمون‌ها، جای نتیجه اجرای GitHub Actions یا پذیرش عملیاتی هر
+  محیط را نمی‌گیرد. [گزارش پذیرش ۹ اکتبر](RELEASE-2026-10-09-COVERAGE.md) نتیجه
+  اجرای این نوبت را ثبت می‌کند.
