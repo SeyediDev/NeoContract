@@ -30,6 +30,12 @@ docker compose --env-file .env -f docker-compose.production.yml up -d --build
 
 پیش‌بررسی بالا فقط کامل و HTTPS بودن تنظیمات را بررسی می‌کند و هیچ secretی را نمایش نمی‌دهد. تا زمانی که issuer، client و دامنه واقعی SSO آماده نشده‌اند، سرویس `oauth2-proxy` را عمومی نکنید.
 
+برای پذیرش اتصال مدیریت دسترسی، فرمان `npm run access:check -- <private-case-file>`
+را با محیط واقعی برنامه اجرا کنید. این فرمان عضویت‌ها را فقط از PostgreSQL
+می‌خواند و توکن، scope، policy، نگاشت چهار مشتری و ثبت سامانه زیر رایان را
+بررسی می‌کند؛ تنظیمات و داده را تغییر نمی‌دهد.
+[قالب پرونده و محدودیت‌های پذیرش](CENTRAL-ACCESS.md#read-only-activation-preflight).
+
 برنامه فقط روی شبکه Docker قابل دسترسی است و oauth2-proxy ورودی عمومی را کنترل می‌کند. `NEOCONTRACT_TRUST_PROXY_AUTH=true` فقط در همین مسیر تنظیم شده است.
 
 ## SSO و نقش‌ها

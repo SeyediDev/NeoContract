@@ -16,7 +16,7 @@
 | تجربه کاربری | RTL، دسکتاپ/موبایل، نشان مراکز، فوکوس و صفحه‌کلید، SPA/history، حفظ فرم و پاسخ‌های دیرهنگام | `ux.spec.mjs`، `spa.spec.mjs`، `settings-draft.spec.mjs`، `permissions.spec.mjs` |
 | ذخیره‌سازی و بازیابی | migration، تراکنش، قیدها، ماندگاری پس از بازگشایی، backup/restore و رد دست‌کاری | `database.test.mjs`، `backup.test.mjs` |
 | مرز HTTP | روش‌ها، MIME، HEAD، JSON، origin، مسیر فایل و symlink | `server.test.mjs`، `api.test.mjs` |
-| اتصال مرکزی | عضویت و admission تازه، revocation بدون کش مجوز، token مشترک، TLS و منع fallback هنگام خطا | `central-access.test.mjs`؛ فعال‌سازی زنده وابسته به provisioning مرکزی |
+| اتصال مرکزی | عضویت و admission تازه، revocation بدون کش مجوز، token مشترک، TLS، منع fallback، پیش‌بررسی چهار نگاشت/کاربر/ثبت محصول و تفکیک خطای توکن از policy | `central-access.test.mjs`، `central-access-preflight.test.mjs`؛ فعال‌سازی زنده وابسته به provisioning مرکزی |
 
 نام‌های `.test.mjs` در `tests/` و `.spec.mjs` در `tests/e2e/` هستند.
 

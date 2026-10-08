@@ -13,6 +13,7 @@
     "db:backup": "node scripts/database.mjs backup",
     "db:restore": "node scripts/database.mjs restore",
     "deploy:check": "node scripts/validate-production-env.mjs",
+    "access:check": "node scripts/check-central-access.mjs",
     "test:e2e": "npm run test:e2e:legacy && npm run test:e2e:customers",
     "test:e2e:legacy": "playwright test",
     "test:e2e:customers": "playwright test --config=playwright.customer.config.mjs"
