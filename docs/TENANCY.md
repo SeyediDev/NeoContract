@@ -18,6 +18,14 @@ only from the selected tenant. A viewer cannot mutate data, including pricing.
 An archived or foreign tenant is denied before returning its contents. This does
 not yet synchronize memberships with the central Access Management registry.
 
+Workflow completion also requires the role of the current saved stage; reviewers
+cannot advance another department's stage or a signature step. See
+[workflow permissions](WORKFLOW.md). User administration cannot grant
+`platform_admin` from `contract_admin`, remove the current administrator's own
+administrative role, or disable/demote the last active administrator. These
+changes are serialized per workspace and committed with their audit record.
+Late user-list replies are discarded after a workspace change.
+
 ### Tenant API credentials
 
 `NODE_ENV=production` requires authentication and cannot enable local-demo mode. Configure `NEOCONTRACT_TENANT_TOKENS` as a JSON object mapping tenant UUIDs to different random secrets of at least 32 characters. Keep this environment value in the deployment secret manager; do not commit it. Supplying credentials also enables authentication outside production. Each request must supply `Authorization: Bearer <tenant-secret>` and may select only the tenant authorized by that secret. Missing or invalid secrets receive 401; selecting a different tenant receives 403. No credentials means all API requests remain denied. Tenant lists never reveal other tenants to that credential. Secrets are compared using constant-time hash comparison and never returned by the API.

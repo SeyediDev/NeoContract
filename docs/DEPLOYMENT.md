@@ -14,7 +14,7 @@
 
 ```env
 POSTGRES_PASSWORD=<random-long-secret>
-NEOCONTRACT_DEFAULT_TENANT=00000000-0000-0000-0000-000000000002
+NEOCONTRACT_DEFAULT_TENANT=00000000-0000-0000-0000-000000000001
 FANASA_SSO_ISSUER=https://<fanasa-issuer>
 FANASA_SSO_CLIENT_ID=<client-id>
 FANASA_SSO_CLIENT_SECRET=<client-secret>
@@ -48,6 +48,6 @@ DNS عمومی برای این نام‌ها وجود ندارد؛ هر دستگ
 
 ## CI/CD
 
-- `.github/workflows/ci.yml`: نصب، تست، بررسی syntax و build تصویر.
+- `.github/workflows/ci.yml`: نصب، تست backend، بررسی syntax، build تصویر و دو مجموعه تست مرورگر شامل پیکربندی چهار تننت؛ trace و تصویر شکست مرورگر هفت روز نگهداری می‌شود.
 - `.github/workflows/deploy.yml`: اجرای دستی staging/production از طریق SSH و Compose.
 - GitHub Environmentهای staging و production باید secretهای `VPS_HOST`، `VPS_USER`، `VPS_SSH_KEY` و `VPS_APP_DIR` جداگانه داشته باشند.
