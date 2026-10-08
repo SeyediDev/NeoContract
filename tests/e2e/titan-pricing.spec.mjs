@@ -13,6 +13,8 @@ for(const width of [1440,390])test(`five Titan pricing links, live clauses and s
   await page.locator('[data-p-field="bases.0.amount"]').fill(String(plan.model.bases[0].amount*2));
   await expect(page.locator('[data-p-line="0"]')).toContainText(new Intl.NumberFormat('fa-IR').format(plan.model.items[0].amount*2));
   await expect(page.locator('[data-p-line="1"]')).toContainText(new Intl.NumberFormat('fa-IR').format(plan.model.items[1].amount*2));
+  await expect(page.locator('[data-p-delta]')).toContainText(new Intl.NumberFormat('fa-IR').format(plan.model.bases[0].amount));
+  await expect(page.locator('[data-p-impact="item"]')).toHaveCount(2);
   await page.locator('.pricing-proposal-preview summary').click();
   await expect(page.locator('[data-p-proposal]')).toContainText(new Intl.NumberFormat('fa-IR').format(expected)+' ریال');
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();
