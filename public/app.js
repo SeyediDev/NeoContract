@@ -313,6 +313,14 @@ async function saveAmendmentDecision(){
  await refresh(false);renderView();toast('تصمیم بررسی الحاقیه ثبت شد.');
 }
 async function printDocument(){const c=state.detail;const response=await fetch('/api/contracts/'+encodeURIComponent(c.id)+'/document',{headers:{'X-Tenant-Id':state.tenantId},signal:AbortSignal.timeout(30000)});if(!response.ok)throw new Error('دریافت سند چاپی انجام نشد.');const html=await response.text();const frame=document.createElement('iframe');frame.className='print-frame';frame.title='چاپ قرارداد';frame.srcdoc=html;frame.onload=async()=>{await frame.contentDocument.fonts.ready;frame.contentWindow.focus();frame.contentWindow.print();setTimeout(()=>frame.remove(),60000);};document.body.append(frame);}
+async function amendmentDocument(id,print=false){
+ const c=state.detail,a=c.amendments.find(a=>a.id===id),tenant=state.tenantId,revision=state.modalRevision;if(!a)throw new Error('الحاقیه در این پرونده یافت نشد.');
+ const response=await fetch('/api/contracts/'+encodeURIComponent(c.id)+'/amendments/'+encodeURIComponent(id)+'/document',{headers:{'X-Tenant-Id':state.tenantId},signal:AbortSignal.timeout(30000)});
+ if(!response.ok)throw new Error('دریافت سند الحاقیه انجام نشد.');const html=await response.text();if(state.tenantId!==tenant||state.modalRevision!==revision)return;
+ if(!print){download(c.number+'-amendment-'+a.number+'.html',html,'text/html;charset=utf-8');return;}
+ const frame=document.createElement('iframe');frame.className='print-frame';frame.title='چاپ الحاقیه';frame.srcdoc=html;
+ frame.onload=async()=>{await frame.contentDocument.fonts.ready;if(state.tenantId!==tenant||state.modalRevision!==revision){frame.remove();return;}frame.contentWindow.focus();frame.contentWindow.print();setTimeout(()=>frame.remove(),60000);};document.body.append(frame);
+}
 function savedWorkspaceName(){const settings=state.data?.settings||{};return settings.workspaceName||settings.organizationName||'گروه انتخاب';}
 function hasSettingsDraft(){return state.settingsDraft!==null&&state.settingsDraft.organizationName!==savedWorkspaceName();}
 function captureSettingsDraft(value){if(state.switchingTenant)return;state.settingsDraft=state.savingSettings||value!==savedWorkspaceName()?{organizationName:value}:null;persistSettingsDraft();updateSettingsDraftStatus();}
@@ -405,6 +413,8 @@ async function handleAction(a,b){
  else if(a==='save-amendment')await saveAmendment();
  else if(a==='amendment-decision')amendmentDecisionDialog(id,b.dataset.decision);
  else if(a==='save-amendment-decision')await saveAmendmentDecision();
+ else if(a==='download-amendment-document')await amendmentDocument(id);
+ else if(a==='print-amendment-document')await amendmentDocument(id,true);
  else if(a==='amendment-detail-back')requestCloseModal(()=>showContract(state.detail.id,'document'));
  else if(a==='download-document')download((state.detail.number||state.detail.id)+'.txt',state.detail.document||'');
  else if(a==='download-snapshot')download((state.detail.number||state.detail.id)+'-snapshot.json',JSON.stringify(state.detail.snapshot,null,2),'application/json;charset=utf-8');
