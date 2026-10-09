@@ -9,6 +9,7 @@
 | کاتالوگ رسمی | ۱۴ مرکز، ۸۷ سرویس، منبع، SLA، نرخ‌های چندبخشی، شکست دریافت و بازبینی اپراتور | `fanasa-importer.test.mjs`، `integrations.test.mjs`، `integrations.spec.mjs` |
 | الگوی قرارداد | نسخه ثابت، انتشار با revision، تعارض هم‌زمان، متغیرهای معتبر و مراحل الزامی | `api.test.mjs`، `domain.test.mjs`، `contract-routing.spec.mjs` |
 | ساخت و پرونده قرارداد | ویزارد، پیش‌نویس قابل ادامه، اعتبارسنجی، idempotency، سند، snapshot و الحاقیه | `api.test.mjs`، `workflow.spec.mjs`، `ux.spec.mjs` |
+| ثبت الحاقیه | جلوگیری از تکرار پس از قطع پاسخ و درخواست هم‌زمان، شماره مستقل، هویت معتبر، rollback رویداد، نمایش پیش‌نویس و ثبات مفاد اصلی | `amendments.test.mjs`، `amendments.spec.mjs` |
 | قیمت‌گذاری پویا | چند نرخ مبنا، چند ضریب، محاسبه دقیق ریالی، نسخه‌ها، مقایسه اثر تغییر با تاریخچه، اتصال به پنج پیشنهاد و ثبات سند گذشته | `pricing.test.mjs`، `pricing-comparison.test.mjs`، `titan-pricing.test.mjs`، `pricing.spec.mjs`، `pricing-comparison.spec.mjs`، `titan-pricing.spec.mjs` |
 | اجرای گردش | نسخه مستقل هر قرارداد، ترتیب مراحل، جلوگیری از پیشروی تکراری و امضای پیش‌نویس ناقص | `workflow.test.mjs`، `titan-board.test.mjs`، `contract-routing.spec.mjs` |
 | نقش‌ها و کاربران | نقش مرحله جاری، منع ارتقای مدیر قرارداد به مدیر سامانه، حفظ آخرین مدیر، audit تراکنشی، سوابق قابل مشاهده | `identity.test.mjs`، `workflow-authorization.test.mjs`، `permissions.spec.mjs` |
