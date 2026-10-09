@@ -45,5 +45,5 @@ test('stale basis error preserves text and prevents financial save until attachm
  await page.route(`**/api/contracts/${c.id}/amendments/preview`,route=>route.fulfill({status:409,contentType:'application/json',body:JSON.stringify({error:'مبنای مالی پرونده تغییر کرده است؛ آخرین جزئیات را بازبینی کنید.'})}));
  await page.locator('[data-amendment-plan]').selectOption(plan.id);await expect(page.locator('#amendmentPricingPreview [role="alert"]')).toContainText('مبنای مالی پرونده تغییر');await expect(page.locator('[data-action="save-amendment"]')).toBeDisabled();
  await expect(page.locator('#amendmentForm [name="body"]')).toHaveValue('برای بررسی و توافق طرفین');await page.locator('[data-amendment-plan]').selectOption('');await expect(page.locator('[data-action="save-amendment"]')).toBeEnabled();
- await page.locator('[data-action="save-amendment"]').click();await expect(page.locator('[data-amendment-id]')).toHaveCount(1);const stored=await(await request.get('/api/contracts/'+c.id)).json();expect(stored.amendments[0].financial).toBeNull();
+ await page.locator('[data-action="save-amendment"]').click();await expect(page.locator('[data-amendment-id]')).toHaveCount(1);const stored=await(await request.get('/api/contracts/'+c.id,{maxRetries:1})).json();expect(stored.amendments[0].financial).toBeNull();
 });

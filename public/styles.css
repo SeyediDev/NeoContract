@@ -370,3 +370,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-
   .toast-root { left: 12px; right: 12px; bottom: 12px; }
   .toast { min-width: 0; width: 100%; }
 }
+:where(.amendment-decisions) {padding-inline-start:24px;}
+:where(.amendment-decisions) li {margin-block:12px;overflow-wrap:anywhere;}
+:where(.amendment-decisions) p {margin-block:6px;}
+:where(.amendment-comment) {white-space:pre-wrap;}

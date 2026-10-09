@@ -48,5 +48,5 @@ test('editing an unsubmitted amendment after transport failure uses a new reques
  await page.locator('[data-action="save-amendment"]').click();await expect(page.locator('#modalError')).toBeVisible();
  await page.locator('#amendmentForm [name="body"]').fill('متن بازبینی‌شده');await page.locator('[data-action="save-amendment"]').click();
  await expect(page.locator('[data-amendment-id]')).toHaveCount(1);expect(keys).toHaveLength(2);expect(keys[0]).not.toBe(keys[1]);
- const saved=await(await request.get(`/api/contracts/${c.id}`)).json();expect(saved.amendments).toHaveLength(1);expect(saved.amendments[0].body).toBe('متن بازبینی‌شده');
+ const saved=await(await request.get(`/api/contracts/${c.id}`,{maxRetries:1})).json();expect(saved.amendments).toHaveLength(1);expect(saved.amendments[0].body).toBe('متن بازبینی‌شده');
 });
