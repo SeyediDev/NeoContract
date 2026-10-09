@@ -56,6 +56,7 @@ test('internal amendment review permissions, fixed content, receipts and concurr
    assert.equal((await post(api,`/api/contracts/${c.id}/amendments/${randomUUID()}/review`,{})).status,404);
    assert.equal((await post(api,'/api/amendments/unexpected',{contractId:c.id})).status,404);
    const x=await make(),before=await store.contract(c.id);
+   await assert.rejects(store.reviewAmendment(c.id,x.id,input(x,'submit'),{tenantId:TITAN_TENANT_ID,subject:'no-role'}),e=>e.status===403);
    for(const extra of [{idempotencyKey:null},{idempotencyKey:1},{expectedRevision:-1},{expectedRevision:'0'},{expectedStatus:null},{action:'signed'}])assert.equal((await post(api,path(x),input(x,'submit',extra))).status,400);
    const transaction=db.transaction;db.transaction=work=>transaction(tx=>work({...tx,query:async(sql,p)=>{if(sql.startsWith('INSERT INTO contracts.contract_events'))throw Error('Audit failure');return tx.query(sql,p);}}));
    try{await assert.rejects(store.reviewAmendment(c.id,x.id,input(x,'submit')),/Audit failure/);}finally{db.transaction=transaction;}
