@@ -45,6 +45,7 @@ test('amendment retries, numbering, verified actors and immutable contract terms
    const foreignStore=createStore(db,DEMO_TENANT_ID),foreignData=await foreignStore.bootstrap();
    const foreign=await foreignStore.createContract({templateId:foreignData.templates.find(x=>x.currentPublishedVersion).id,customerId:foreignData.customers[0].id,title:'قرارداد تننت دیگر',owner:'آزمون',amount:100,start:'2026-10-01',end:'2027-10-01',paymentTerms:'توافقی',services:[]});
    assert.equal((await call(api,`/api/contracts/${foreign.id}/amendments`,body)).status,404);
+   assert.equal((await call(api,`/api/contracts/${foreign.id}/amendments`,{})).status,404);
    const before=await store.contract(c.id);
    for(const subject of ['demo-viewer','demo-legal','demo-finance'])assert.equal((await call(api,path,body,subject)).status,403);
    assert.deepEqual(await store.contract(c.id),before);
