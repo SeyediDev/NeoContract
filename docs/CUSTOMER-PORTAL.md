@@ -22,6 +22,12 @@
 
 ## دریافت داده واقعی
 
+شاخص محتوا و نحو جست‌وجو مطابق مستندات رسمی
+[شاخص متن PostgreSQL](https://www.postgresql.org/docs/16/textsearch-indexes.html)
+و [کنترل جست‌وجو](https://www.postgresql.org/docs/16/textsearch-controls.html) است.
+آزمون synthetic تک‌سرویس، نتیجه همان محیط را ثبت می‌کند و تضمین ظرفیت ترافیک
+هم‌زمان تولید نیست.
+
 `POST /api/telemetry/ingest` پیش‌فرض غیرفعال است. فعال‌سازی فقط پس از ثبت و
 پذیرش producer واقعی Gateway/backend، نگاشت تننت و بررسی پاک‌سازی بدنه‌ها:
 
