@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import {createDatabase,TITAN_TENANT_ID} from '../lib/database.mjs';
 import {createStore} from '../lib/store.mjs';
 import {createApi} from '../lib/http-api.mjs';
+import {randomUUID} from 'node:crypto';
 
 async function request(api,url,subject,payload,method='POST'){
  let status,body;
@@ -45,6 +46,25 @@ test('SSO stage permissions, actor audit and administrator safeguards',{timeout:
    assert.equal(event.actor.subject,'demo-legal');assert.equal(event.actor.id,bySubject('demo-legal').id);
    const step=(await db.query('SELECT completed_by_label FROM contracts.contract_process_steps WHERE id=$1',[event.completedStep.stepId])).rows[0];
    assert.equal(step.completed_by_label,bySubject('demo-legal').display_name);
+  });
+  await t.test('service capacity uses verified SSO roles and signed evidence',async()=>{
+   const quote='TPS: 5; burst: 10; monthly quota: 1000';
+   await db.query("INSERT INTO contracts.contract_documents(tenant_id,contract_id,document_type,file_name,storage_key,mime_type,metadata) VALUES($1,$2,'proposal_revision','test.md','test-capacity','text/plain',$3)",[TITAN_TENANT_ID,c.id,JSON.stringify({body:quote})]);
+   const base=`/api/contracts/${c.id}/service-limits`;
+   for(const subject of ['demo-viewer','demo-finance']){
+    assert.equal((await request(api,base,subject,undefined,'GET')).status,200);
+    assert.equal((await request(api,base+'/extract',subject,{})).status,403);
+    assert.equal((await request(api,base+'/commands',subject,{action:'sign',actor:{roles:['platform_admin']}})).status,403);
+   }
+   const extracted=await request(api,base+'/extract','demo-legal',{});assert.equal(extracted.status,200);
+   const payload={serviceKey:'test-api',title:'Test API',productKey:'test-product',environment:'development',operationGroup:'test',requestsPerSecond:5,burstCapacity:10,monthlyRequests:1000,validFrom:'2026-10-01T00:00:00.000Z',validTo:'2027-10-01T00:00:00.000Z',effectiveAt:'2026-10-01T00:00:00.000Z',sourceKind:'contract',sourceHash:extracted.value.source.sha256,clauseQuote:quote,confirmRequestMeter:true};
+   const draft={action:'draft',expectedRevision:0,idempotencyKey:randomUUID(),payload,actor:{roles:['platform_admin']}};
+   assert.equal((await request(api,base+'/commands','demo-legal',draft)).status,403);
+   const saved=await request(api,base+'/commands','demo-admin',draft);assert.equal(saved.status,200);assert.equal(saved.value.outbox.length,0);
+   const sign={action:'sign',expectedRevision:1,idempotencyKey:randomUUID(),payload:{versionId:saved.value.versions[0].id,confirmSigned:true,reference:'TEST-SIGNED-LIMITS',counterparties:'طرفین آزمون',signedDate:'2026-10-01'}};
+   assert.equal((await request(api,base+'/commands','demo-legal',sign)).status,409);
+   await store.execution.command(c.id,{action:'start',payload:{reference:'TEST-SIGNED-CONTRACT',counterparties:'طرفین آزمون',confirmSigned:true,signedDate:'2026-10-01',startDate:c.start,endDate:c.end,amount:100,advanceLimit:0,direction:'receivable'},expectedRevision:0,idempotencyKey:randomUUID()});
+   const signed=await request(api,base+'/commands','demo-legal',sign);assert.equal(signed.status,200);assert.equal(signed.value.versions[0].signature.actor.subject,'demo-legal');assert.equal(signed.value.outbox.length,1);assert.equal(signed.value.gatewayApplied,false);
   });
   await t.test('contract administrators cannot elevate to platform admin or demote themselves',async()=>{
    const patch=(user,body)=>request(api,'/api/users/'+user.id,'demo-admin',body,'PATCH');

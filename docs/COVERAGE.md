@@ -38,6 +38,15 @@ npm run test:e2e
 
 ## مرز ادعای تکمیل
 
+ظرفیت سرویس: استخراج مستند TPS/burst/quota، ابهام قیمت/بازه/چند مقدار، مدرک
+امضای مستقل، نسخه ثابت، الحاقیه تأییدشده و تاریخ اثر، منع تاریخ امضای آینده،
+outbox تراکنشی، idempotency و receipt تطبیق‌یافته؛ migration/backup و رابط RTL
+دسکتاپ/موبایل/مشاهده‌گر. آزمون‌های `service-limits.test.mjs` و
+`service-limits.spec.mjs` و `check-service-limit-database.mjs` آن را پوشش می‌دهند.
+ابزارهای compatibility کد واقعی مالک policy و Lua limiter را با fixture می‌سنجند؛
+native APISIX/Redis زنده نیست. receiver، producer، binding مصوب، lifecycle و
+invalidation پیش‌نیازهای مرکزی‌اند. [راهنمای اتصال](SERVICE-CAPACITY.md).
+
 - تا ثبت محصول `neocontract` زیر `fanasa.rayan`، چهار UUID مرکزی، عضویت‌ها، مجوز
   ورود و scope/policy سرویس اختصاصی تأیید نشوند، اتصال مرکزی فعال نمی‌شود.
 - پنج متن تاریخی پیشنهاد هستند؛ امضای معتبر، شرایط نهایی و entitlement تجاری

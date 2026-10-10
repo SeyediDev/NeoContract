@@ -8,6 +8,36 @@
 
 ## مسیرها
 
+### ظرفیت نسخه‌دار سرویس
+
+| مسیر | ورودی / خروجی |
+| --- | --- |
+| `GET /api/contracts/:id/service-limits` | `revision/versions/current/executionStatus/outbox/gatewayApplied` |
+| `POST /api/contracts/:id/service-limits/extract` | `sourceKind=contract|amendment` و `amendmentId`؛ پیشنهاد، ابهام، بند و hash منبع؛ بدون write |
+| `POST /api/contracts/:id/service-limits/commands` | `action=draft|sign|cancel`, `expectedRevision`, `idempotencyKey`, `payload` |
+
+پیش‌نویس: `serviceKey/title/productKey/environment/operationGroup`، سه مقدار مستقل
+`requestsPerSecond/burstCapacity/monthlyRequests`، بازه UTC کامل
+`validFrom/validTo/effectiveAt`، `sourceKind/amendmentId/sourceHash/clauseQuote` و
+`confirmRequestMeter=true`. TPS مثبت، burst صحیح مثبت و quota صحیح نامنفی الزامی‌اند؛
+صفر سهمیه منع مصرف است. پارامتر ناشناخته رد می‌شود.
+
+امضا: `versionId/reference/counterparties/signedDate/confirmSigned=true`؛ تاریخ امضا
+روز میلادی تهران، حداکثر امروز و حداکثر روز اثر است. اجرای running و بازه داخل
+قرارداد امضاشده لازم است. اصلاح نسخه signed، الحاقیه تازه approved/signed لازم
+دارد؛ امضای محدودیت وضعیت حقوقی کل الحاقیه را بازنویسی نمی‌کند. لغو فقط پیش‌نویس
+با `versionId/reference/comment` مجاز است.
+
+مدیر قرارداد/سامانه همه فرمان‌ها؛ مدیر حساب پیش‌نویس/لغو؛ بازبین حقوقی امضا؛
+مشاهده‌گر و بازبین مالی فقط GET. استخراج برای مدیر قرارداد/سامانه، مدیر حساب و
+بازبین حقوقی مجاز است. تننت غیرمجاز ۴۰۳، قرارداد تننت دیگر ۴۰۴، تعارض نسخه/منبع/
+مبنای امضا ۴۰۹ و داده نامعتبر ۴۰۰ است. retry با کلید/محتوای یکسان تکرار نمی‌شود.
+`current` نسخه مؤثر معتبر را فقط در اجرای running می‌دهد؛ `gatewayApplied` به
+receipt معتبر همه نسخه‌های جاری نیاز دارد. ارسال Gateway در API مرورگر وجود
+ندارد. [قرارداد اتصال مرکزی](SERVICE-CAPACITY.md) را ببینید.
+
+### مسیرهای عمومی
+
 | روش و مسیر پس از `/api` | ورودی / خروجی |
 | --- | --- |
 | `GET /tenants` | `tenants`, `activeTenant`, `mode`, `requiresTenantCredential`؛ فقط تننت‌های مجاز |

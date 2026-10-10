@@ -19,7 +19,7 @@ test('PostgreSQL migrations, seed integrity, tenant constraints, transaction rol
     assert.equal(health.durable,true);
     assert.deepEqual(health.counts,{tenants:2,templates:37,zones:10,centers:28,services:174,customers:6,managers:3,contracts:7});
     assert.deepEqual((await db.health(tenant)).counts,{tenants:1,templates:15,zones:5,centers:14,services:87,customers:4,managers:3,contracts:0});
-    assert.deepEqual(health.migrations.map(m=>m.version),[1,2,3,4,5,6,7]);
+    assert.deepEqual(health.migrations.map(m=>m.version),[1,2,3,4,5,6,7,8]);
     await migrateDatabase(db);
     await seedDatabase(db);
     assert.deepEqual((await db.health()).counts,health.counts);

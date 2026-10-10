@@ -1,5 +1,18 @@
 # PostgreSQL storage
 
+Version 008 adds `contract_service_limits`, append-only `service_limit_commands`
+and immutable-payload `service_limit_outbox`. Contract locks serialize revisions,
+signed evidence, audit and outbox in one transaction. Signed versions cannot be
+rewritten; amendments append a later-effective version. All three tables are in
+JSON backup/restore. Seeds do not infer TPS from prices or create signed limits.
+See [service capacity](../docs/SERVICE-CAPACITY.md).
+
+`node scripts/check-service-limit-database.mjs` requires an explicitly supplied
+`NEOCONTRACT_SERVICE_LIMIT_ACCEPTANCE_URL`, with an empty database named
+`neocontract_capacity_acceptance_<digits>`. It verifies migration 008, signed
+amendments, rollback, retries, tenant/role isolation, SQL immutability and receipt
+validation through a test transport. The operator creates/removes the scratch DB.
+
 `lib/database.mjs` opens standard PostgreSQL through `connectionString`, or durable PGlite PostgreSQL at `.data/postgres` by default. PGlite is the PostgreSQL engine compiled to WASM, not a JSON or SQLite fallback. The default local demo should have one server process per data directory.
 
 ```js

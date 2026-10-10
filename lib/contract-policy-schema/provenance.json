@@ -1,0 +1,11 @@
+{
+  "source": "E:\\SJVS\\Projects\\Neo\\docs\\fanasa-platform-control-center\\workstreams\\contract-policy",
+  "schemaVersion": "2.0.0",
+  "purpose": "Validation only; no policy evaluator or registry",
+  "files": {
+    "schemas/contract-access-projection.v2.schema.json": "59621609f0d0199a45ac2a903b8f04b032377024bffe9617daf1f9d6374c3d5c",
+    "schemas/limits.v2.schema.json": "1934b6281a20e144dca7762c4342f131bcde49e6547e018a6ca0c11de9e6981c",
+    "schemas/projection-event.v2.schema.json": "fd941be3728c061b4fac2d6de61a1079feac5bee811ca86c9a356862d1d8a37c",
+    "sample/schema-validator.cjs": "6b69d3d1586d2021b68448fff2e159826725fd7234a8b55779b60c5142f1c6f1"
+  }
+}
