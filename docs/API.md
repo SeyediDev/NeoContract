@@ -302,6 +302,17 @@
 
 [راهنمای کامل قواعد اجرا، نقش‌ها و محدودیت‌ها](CONTRACT-EXECUTION.md)
 
+### پیگیری اجرا
+
+پاسخ خواندن اجرا و contract/bootstrap در `execution.summary.followups` این داده
+محاسبه‌شده را دارد: `asOf` (روز تهران)، `until` (۱۴ روز بعد)، `counts` و `rows`.
+شمارنده‌ها `total/overdue/near/review/finance` هستند و تعداد ردیف، نه تعداد اسناد یکتا.
+هر ردیف `key/kind/recordId/title/category/section/dueDate/owner/urgency/daysLate/review`
+و `detail/amount/action/actionId/blockedReason` دارد. `amount` ممکن است null باشد؛
+مبالغ موضوعات مستقل ردیف‌ها، جمع یک صورت‌وضعیت جدید نیستند. `dueDate=null` یعنی
+موعد در داده ثبت نشده است. Action پیشنهادی مجوز نیست؛ API همچنان نقش و وضعیت
+را برای هر فرمان بررسی می‌کند. این محاسبات write یا migration تازه ندارند.
+
 ### گزارش اجرای قرارداد
 
 `GET /api/contracts/:id/execution/document?revision=<نسخه>` گزارش HTML مستقل RTL
