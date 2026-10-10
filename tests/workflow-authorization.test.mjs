@@ -66,6 +66,26 @@ test('SSO stage permissions, actor audit and administrator safeguards',{timeout:
    await store.execution.command(c.id,{action:'start',payload:{reference:'TEST-SIGNED-CONTRACT',counterparties:'طرفین آزمون',confirmSigned:true,signedDate:'2026-10-01',startDate:c.start,endDate:c.end,amount:100,advanceLimit:0,direction:'receivable'},expectedRevision:0,idempotencyKey:randomUUID()});
    const signed=await request(api,base+'/commands','demo-legal',sign);assert.equal(signed.status,200);assert.equal(signed.value.versions[0].signature.actor.subject,'demo-legal');assert.equal(signed.value.outbox.length,1);assert.equal(signed.value.gatewayApplied,false);
   });
+  await t.test('generic parameters and definition changes obey verified SSO roles',async()=>{
+   const base=`/api/contracts/${c.id}/parameters`;
+   for(const subject of ['demo-viewer','demo-finance']){
+    assert.equal((await request(api,base,subject,undefined,'GET')).status,200);
+    assert.equal((await request(api,base+'/extract',subject,{})).status,403);
+    assert.equal((await request(api,base+'/commands',subject,{action:'sign',actor:{roles:['platform_admin']}})).status,403);
+   }
+   assert.equal((await request(api,base+'/extract','demo-legal',{})).status,200);
+   assert.equal((await request(api,'/api/contract-parameters/definitions','demo-legal',{definition:{},expectedRevision:0,idempotencyKey:randomUUID()})).status,403);
+   assert.equal((await request(api,base+'/commands','demo-legal',{action:'draft',payload:{},expectedRevision:0,idempotencyKey:randomUUID()})).status,403);
+  });
+  await t.test('economic and provider actions cannot use forged finance or legal roles',async()=>{
+   const base=`/api/contracts/${c.id}/economics`;
+   assert.equal((await request(api,base,'demo-viewer',undefined,'GET')).status,200);
+   assert.equal((await request(api,base+'/commands','demo-viewer',{action:'draft',actor:{roles:['platform_admin']}})).status,403);
+   assert.equal((await request(api,base+'/commands','demo-finance',{action:'sign',actor:{roles:['platform_admin']}})).status,403);
+   assert.equal((await request(api,base+'/settlements','demo-legal',{})).status,403);
+   assert.equal((await request(api,'/api/providers','demo-legal',{action:'create',expectedRevision:0,idempotencyKey:randomUUID(),actor:{roles:['platform_admin']}})).status,403);
+   assert.equal((await request(api,'/api/client/report','demo-viewer',undefined,'GET')).status,200);
+  });
   await t.test('contract administrators cannot elevate to platform admin or demote themselves',async()=>{
    const patch=(user,body)=>request(api,'/api/users/'+user.id,'demo-admin',body,'PATCH');
    assert.equal((await patch(bySubject('demo-viewer'),{status:'active',roles:['platform_admin']})).status,403);

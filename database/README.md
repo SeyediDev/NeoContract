@@ -1,5 +1,14 @@
 # PostgreSQL storage
 
+Version 009 adds typed commercial definitions/history, versioned contract parameters,
+immutable commands and an awaiting-mapping outbox. Version 010 adds redacted API
+telemetry with GIN content search, tenant/time indexes and transactional hourly
+rollups; this is operational evidence, not financial metering. Version 011 adds
+versioned economic terms, immutable commercial events and allocation proposals,
+provider applications and append-only review commands. Customer credits default
+off. No wallet balances or parallel financial ledger are created. All new tables
+are covered by backup/restore. Operational retention is a separate bounded job.
+
 Version 008 adds `contract_service_limits`, append-only `service_limit_commands`
 and immutable-payload `service_limit_outbox`. Contract locks serialize revisions,
 signed evidence, audit and outbox in one transaction. Signed versions cannot be

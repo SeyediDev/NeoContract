@@ -8,6 +8,66 @@
 
 ## مسیرها
 
+### پارامترهای توسعه‌پذیر، پنل مشتری و اقتصاد دیجیتال
+
+| مسیر | ورودی / خروجی |
+| --- | --- |
+| `GET /api/contract-parameters/definitions` | تعریف‌های داخلی و سفارشی همان تننت با type/unit/target/revision/حدود/aliases/options |
+| `POST /api/contract-parameters/definitions` | definition، expectedRevision، idempotencyKey؛ فقط مدیر |
+| `GET /api/contracts/:id/parameters` | revision/versions/current/definitions/outbox/executionStatus |
+| `POST /api/contracts/:id/parameters/extract` | sourceKind/amendmentId؛ candidate، ابهام، بند و hash، بدون write |
+| `POST /api/contracts/:id/parameters/commands` | action=draft/sign/cancel، payload، expectedRevision، idempotencyKey |
+| `GET /api/client/calls` | query: from/to/service/status/q/limit/cursor؛ filters/rows/nextCursor |
+| `GET /api/client/calls/:eventId` | بدنه‌های پاک‌سازی‌شده، redacted=true و financialUsage=false |
+| `GET /api/client/report` | همان فیلترها؛ تعداد، نرخ خطا، میانگین latency، p95UpperMs، حجم، statusCounts، histogram و timeline |
+| `POST /api/telemetry/ingest` | events؛ Bearer مستقل producer محدود به UUIDهای صریح؛ پیش‌فرض غیرفعال |
+| `GET /api/contracts/:id/economics` | revision/versions/current/schedule/settlements؛ walletPosted=false |
+| `GET /api/contracts/:id/economics/source` | query: sourceKind/amendmentId؛ سند و hash |
+| `POST /api/contracts/:id/economics/commands` | draft/sign/cancel، payload، expectedRevision، idempotencyKey |
+| `POST /api/contracts/:id/economics/settlements` | پیشنهاد تخصیص با نسخه، دوره بسته‌شده و مدارک مالی |
+| `GET /api/contracts/:id/economics/document?proposalId=:uuid` | HTML آفلاین پیشنهاد تسویه با نشان و فونت رسمی |
+| `GET /api/providers` | درخواست‌های همان تننت با revision/status/stage/decisions |
+| `POST /api/providers` | create/submit/review/reject/cancel/prepare، applicationId، expectedRevision، idempotencyKey، payload |
+
+پیش‌نویس پارامتر: values=[{key,value,definitionRevision,clauseQuote}]، منبع
+sourceKind/amendmentId/sourceHash و validFrom/validTo/effectiveAt در UTC کامل.
+امضا و نقش‌ها مشابه ظرفیت‌اند؛ مقدار تغییرنکرده با تعریف و منبع تاریخی حفظ
+می‌شود. نام مقصد دسترسی یا سیاست نمی‌سازد؛ outbox تا نگاشت awaiting-mapping است.
+
+زمان query به‌شکل YYYY-MM-DDTHH:mm:ss.sssZ، بازه نیمه‌باز حداکثر ۳۱ روز و
+پیش‌فرض ۲۴ ساعت؛ برای صفحه بعد filters.from/to پاسخ را همراه nextCursor
+بفرستید. limit یک تا ۱۰۰، پیش‌فرض ۵۰. q جست‌وجوی واژه/عبارت است؛ P95 کران
+سطل زمانی و service breakdown حداکثر ۱۰۰ سرویس برتر است. همه پاسخ‌های پایش
+financialUsage=false دارند.
+
+هر event: eventId/requestId/serviceKey/occurredAt/method/path/statusCode/durationMs/
+requestBytes/responseBytes/requestBody/responseBody؛ بدنه JSON و مسیر بدون query.
+ثبت raw/rollup تراکنشی؛ replay همسان duplicate، محتوای دیگر ۴۰۹؛ producer
+نامعتبر ۴۰۱، تننت نامجاز ۴۰۳ و دریافت غیرفعال ۵۰۳. اعتبار SSO اجازه ingest نیست.
+[تعریف دقیق دریافت، retention و فیلترها](CUSTOMER-PORTAL.md).
+
+draft اقتصاد: terms و sourceKind/amendmentId/sourceHash/clauseQuote، بازه UTC.
+terms: serviceKey/actors/revenueBase/periodDays/holdDays/anchor/minimumPayout/
+disputePolicy/customerCredit. actor: key/name/role/percent/agreementReference؛
+role=infrastructure/provider/distributor/partner؛ percent رشته اعشاری حداکثر
+چهار رقم و مجموع دقیق ۱۰۰. revenueBase=net_collected/gross_collected؛
+disputePolicy=hold-disputed/hold-all. customerCredit پیش‌فرض {enabled:false}؛
+با enabled=true، fundingSource=prepayment/rebate/sponsor، ceiling، periodDays و
+reference لازم‌اند. همه مبلغ‌ها رشته صحیح IRR هستند.
+
+settlement: versionId/periodStart/periodEnd/collected/refunds/tax/disputed/
+evidenceReference/confirmEvidence=true/expectedRevision/idempotencyKey؛ فقط مالی
+یا مدیر. دوره باید کامل، سررسید و داخل نسخه signed باشد؛ عبور از اصلاحیه رد
+می‌شود. خروجی awaiting-central-accounting پیشنهاد است و ledger ثبت نمی‌کند.
+مدیر همه اقدامات؛ مدیر حساب draft/cancel؛ حقوقی sign؛ مالی settlement.
+
+create ارائه‌دهنده: providerName/actorKey/serviceKey/legalReference/
+financialReference/technicalReference؛ review/reject: comment/reference؛ cancel:
+comment؛ prepare: contractId/versionId/reference. مدیر حساب create/submit/cancel،
+بازبین حقوقی/مالی review همان مرحله، مدیر فنی/prepare. نسخه signed باید سهم
+provider همان بازیگر/سرویس را داشته باشد؛ awaiting-central-provisioning دسترسی
+اجرایی نمی‌سازد. [شرح شرایط، اصلاحیه و مرز اتصال](CONTRACT-PARAMETERS.md).
+
 ### ظرفیت نسخه‌دار سرویس
 
 | مسیر | ورودی / خروجی |

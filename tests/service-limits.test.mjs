@@ -32,7 +32,7 @@ test('signed TPS amendments, transactional outbox, authorization, retry and obse
  if(connectionString)assert.match(decodeURIComponent(new URL(connectionString).pathname.slice(1)),/^neocontract_capacity_acceptance_\d+$/);
  const db=await createDatabase(connectionString?{connectionString}:{dataDir:'memory://'}),store=createStore(db,DEMO_TENANT_ID);let s;
  try{
-  assert.equal((await db.health()).migrations.length,8);
+  assert.equal((await db.health()).migrations.length,11);
   if(connectionString)assert.equal(db.backend,'postgresql');
   const data=await store.bootstrap();let c=await store.createContract({templateId:data.templates.find(t=>t.currentPublishedVersion).id,customerId:data.customers[0].id,title:'TPS contract',owner:'آزمون',amount:10000,start:'2026-10-01',end:'2026-11-01',paymentTerms:'آزمون',services:[]});
   await db.query("INSERT INTO contracts.contract_documents(tenant_id,contract_id,document_type,file_name,storage_key,mime_type,metadata) VALUES($1,$2,'proposal_revision','fixture.md','fixture','text/plain',$3)",[DEMO_TENANT_ID,c.id,JSON.stringify({body:quote})]);

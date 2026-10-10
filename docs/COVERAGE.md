@@ -19,6 +19,9 @@
 | مرز تننت | جداسازی چهار مشتری، آرشیو تاریخی، منع خواندن/نوشتن خارجی، تنظیمات و پیش‌نویس‌های مستقل، رد پاسخ دیرهنگام کاربران | `tenancy.test.mjs`، `customer-tenancy.test.mjs`، `customer-tenancy.spec.mjs`، `permissions.spec.mjs` |
 | تجربه کاربری | RTL، دسکتاپ/موبایل، نشان مراکز، فوکوس و صفحه‌کلید، SPA/history، حفظ فرم و پاسخ‌های دیرهنگام | `ux.spec.mjs`، `spa.spec.mjs`، `settings-draft.spec.mjs`، `permissions.spec.mjs` |
 | ذخیره‌سازی و بازیابی | migration، تراکنش، قیدها، ماندگاری پس از بازگشایی، backup/restore و رد دست‌کاری | `database.test.mjs`، `backup.test.mjs` |
+| پارامترهای عمومی | تعریف سفارشی تننت، انواع و حدود، استخراج بند، نسخه تاریخی واحد، امضا و الحاقیه، rollback و تاریخچه immutable | `contract-parameters.test.mjs`، `workflow-authorization.test.mjs`، `contract-parameters.spec.mjs` |
+| پنل مشتری | producer مستقل، redaction/replay، مرز تننت، جست‌وجو و keyset، rollup و ساعات مرزی، نمودار/status و موبایل | `customer-economy.test.mjs`، `customer-economy.spec.mjs` |
+| اقتصاد و ارائه‌دهنده | سهم دقیق، اعتبار اختیاری خاموش، مدرک امضا، اصلاحیه/rollback، پیشنهاد تسویه بدون write کیف پول و بررسی مرحله‌ای | `customer-economy.test.mjs`، `customer-economy.spec.mjs` |
 | مرز HTTP | روش‌ها، MIME، HEAD، JSON، origin، مسیر فایل و symlink | `server.test.mjs`، `api.test.mjs` |
 | اتصال مرکزی | عضویت و admission تازه، revocation بدون کش مجوز، token مشترک، TLS، منع fallback، پیش‌بررسی چهار نگاشت/کاربر/ثبت محصول و تفکیک خطای توکن از policy | `central-access.test.mjs`، `central-access-preflight.test.mjs`؛ فعال‌سازی زنده وابسته به provisioning مرکزی |
 
@@ -37,6 +40,11 @@ npm run test:e2e
 در سرور E2E اعمال نمی‌شوند. هر دو مجموعه مرورگر در CI تعریف شده‌اند.
 
 ## مرز ادعای تکمیل
+
+پارامترهای عمومی تا نگاشت مقصد و اقتصاد/تسویه تا پذیرش حسابداری مرکزی
+در انتظار اتصال‌اند. پنل مشتری داده producer مجاز را می‌خواند؛ دریافت تولید
+پیش‌فرض غیرفعال است و پنج قرارداد با مصرف یا امضای فرضی پر نمی‌شوند. بسته
+درخواست ثبت سرویس پنل در سبد مرکزی آماده است؛ رسید ثبت مرکزی هنوز ندارد.
 
 ظرفیت سرویس: استخراج مستند TPS/burst/quota، ابهام قیمت/بازه/چند مقدار، مدرک
 امضای مستقل، نسخه ثابت، الحاقیه تأییدشده و تاریخ اثر، منع تاریخ امضای آینده،

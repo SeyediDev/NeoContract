@@ -1,0 +1,14 @@
+{
+  "status": "awaiting-central-registration",
+  "parentProductKey": "neocontract",
+  "serviceKey": "neocontract.customer-portal",
+  "displayName": "پنل مشتری؛ مدیریت مصرف و سلامت سرویس",
+  "primaryCenter": "fanasa.rayan",
+  "canonicalUrl": "https://contracts.fanasa.net.local/#view=client",
+  "providerEntryPoint": "https://contracts.fanasa.net.local/#view=providers",
+  "ownerSource": "existing verified central neocontract registration",
+  "audienceSource": "existing verified neocontract client; do not grant from display links",
+  "pricingStatus": "requires-approved-commercial-offer",
+  "capabilities": ["api-call-search", "request-response-review", "status-dashboard", "hourly-usage-reports", "provider-commercial-onboarding"],
+  "activationRequirements": ["durable central registry receipt", "approved offer and owner", "explicit tenant and product admission", "trusted telemetry producer", "central financial receiver and developer provisioning"]
+}
