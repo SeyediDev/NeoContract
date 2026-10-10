@@ -238,3 +238,66 @@
 برای مسیرهای مدل قیمت‌گذاری، قواعد فرمول و اتصال به سند، [قیمت‌گذاری پویا](PRICING.md) را ببینید.
 
 شکل خطا `{ "error": "پیام قابل نمایش", "code": "validation" }` است؛ `code` می‌تواند `not_found`, `internal` یا `neo_unavailable` نیز باشد. `400` ورودی نامعتبر، `403` مبدأ نامعتبر، `404` رکورد/مسیر ناموجود، `409` تعارض نسخه/وضعیت یا وابستگی داده، `413` بدنه بزرگ، `502` خطای دریافت/اتصال، `503` نبود توکن لازم و `500` خطای داخلی را نشان می‌دهد. برای تنظیم اجرا و نگهداری داده، [راهنمای عملیات](OPERATIONS.md) را ببینید.
+
+### اجرای پس از امضای قرارداد
+
+`GET /contracts/:id/execution` پرونده اجرا یا `null` را برمی‌گرداند. جزئیات قرارداد
+و bootstrap نیز `execution` را دارند. مسیرهای اضافه زیر execution خطای ۴۰۴ دارند.
+`POST /contracts/:id/execution/commands` فرمان را با ساختار زیر ثبت می‌کند:
+
+```json
+{
+  "action":"start",
+  "expectedRevision":0,
+  "idempotencyKey":"<کلید یکتای همان فرمان>",
+  "payload":{
+    "reference":"<مرجع نسخه امضاشده>",
+    "counterparties":"<امضاکنندگان دو طرف>",
+    "confirmSigned":true,
+    "signedDate":"2026-10-10",
+    "startDate":"2026-10-10",
+    "endDate":"2027-10-10",
+    "amount":100000,
+    "advanceLimit":20000,
+    "direction":"receivable"
+  }
+}
+```
+
+فرمان `start` فقط روی قرارداد active، توسط مدیر قرارداد/سامانه و بدون پرونده
+اجرای موجود قابل ثبت است. direction یکی از receivable/payable است. تاریخ‌ها
+روز معتبر میلادی، پول نامنفی safe integer ریالی و مقدار مثبت با سه رقم اعشار است.
+
+| action | فیلدهای payload |
+| --- | --- |
+| milestone | title, gross, dueDate, condition |
+| item | milestoneId, title, unit, quantity, unitPrice, dueDate, owner, criteria |
+| delivery | itemId, quantity, deliveredAt, reference, note اختیاری |
+| accept / reject | id تحویل، reference, comment |
+| invoice | kind: advance/progress/final، number, milestoneId برای کارکرد، lines با itemId/quantity، gross فقط پیش‌پرداخت، tax, retention, withholding, insurance, penalty, advanceRecovery, dueDate, reference, basis برای کسور/مالیات |
+| invoice-approve / invoice-reject / invoice-dispute / invoice-resolve / invoice-cancel | id صورت‌وضعیت، reference, comment |
+| payment | invoiceId, amount, paidAt, reference یکتا، method, note اختیاری |
+| payment-reverse | id پرداخت، reference, comment |
+| deduction-settle | invoiceId, kind: withholding/insurance، amount, settledAt, reference یکتا، recipient, comment |
+| deduction-reverse | id رسید کسور، reference, comment |
+| retention-release | amount, dueDate, reference, comment |
+| obligation | title, owner, dueDate, condition |
+| obligation-complete | id تعهد، reference, comment |
+| guarantee | kind: performance/advance/insurance/other، amount, reference, issuer, beneficiary, expiryDate, condition |
+| guarantee-extend | id تضمین، expiryDate, reference, comment |
+| guarantee-release | id تضمین، reference, comment |
+| issue | kind: delay/dispute/risk/dependency، title, owner, dueDate, impact |
+| issue-resolve | id رویداد، reference, comment |
+| change | effectiveAmount, endDate, reference, comment؛ milestoneId/gross اختیاری برای سقف مرحله و itemId/quantity/dueDate/unitPrice اختیاری برای مقدار/موعد/نرخ آینده قلم |
+| pause / resume / close | reference, comment |
+
+پاسخ، state تازه همراه revision، summary محاسبه‌شده و history است. receipt key/hash
+در پاسخ عمومی نیست. تاریخچه payload ثبت‌شده و هویت معتبر سمت سرور را دارد.
+فرمان و نسخه با actor تأییدشده، قفل قرارداد و رویداد execution_updated تراکنشی‌اند.
+`expectedRevision` ابتدا صفر و سپس نسخه دریافت‌شده است. کلید حداکثر ۱۲۰ نویسه
+الزامی است؛ تکرار همان فرمان و هویت پیش از بررسی نسخه فعلی رسید قبلی را می‌یابد
+و state جاری را برمی‌گرداند. محتوای متفاوت/نسخه قدیمی ۴۰۹، نقش نامجاز ۴۰۳ و
+قرارداد خارجی/رکورد فرعی ناموجود ۴۰۴ است. اطلاعات actor/status/net ارسالی مجوز،
+هویت یا جمع مالی را جایگزین نمی‌کنند. تاریخ‌ها و پول فقط از فیلدهای مجاز خوانده می‌شوند.
+
+[راهنمای کامل قواعد اجرا، نقش‌ها و محدودیت‌ها](CONTRACT-EXECUTION.md)

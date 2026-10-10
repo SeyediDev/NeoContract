@@ -11,6 +11,7 @@
 | ساخت و پرونده قرارداد | ویزارد، پیش‌نویس قابل ادامه، اعتبارسنجی، idempotency، سند، snapshot و الحاقیه | `api.test.mjs`، `workflow.spec.mjs`، `ux.spec.mjs` |
 | ثبت الحاقیه | جلوگیری از تکرار پس از قطع پاسخ و درخواست هم‌زمان، شماره مستقل، هویت معتبر، rollback رویداد، نمایش پیش‌نویس و ثبات مفاد اصلی | `amendments.test.mjs`، `amendments.spec.mjs` |
 | پیوست مالی الحاقیه | نسخه ثابت همان تننت، مقایسه سرور، تشخیص مبنای قدیمی و مبلغ نامشخص، پاسخ دیرهنگام، دریافت JSON و حفظ اصل قرارداد | `amendment-pricing.test.mjs`، `amendment-pricing.spec.mjs` |
+| اجرای پس از امضا | مبنای امضاشده ثابت، تحویل جزئی/پذیرش، سقف صورت‌وضعیت، کسورات و پیش‌پرداخت، پرداخت/برگشت، سپرده، تضمین/تمدید، تعهد و اختلاف، توقف و خاتمه، نقش/تننت و پشتیبان | `execution.test.mjs`، `execution.spec.mjs` |
 | خروجی قرارداد و الحاقیه | متن اولیه و پیشنهاد جدا، وضعیت مستقل، نسخه مالی ثابت، سابقه بررسی، فونت/نشان آفلاین، دانلود و چاپ، مشاهده‌گر و رد پاسخ دیرهنگام | `contract-document.test.mjs`، `contract-document.spec.mjs` |
 | قیمت‌گذاری پویا | چند نرخ مبنا، چند ضریب، محاسبه دقیق ریالی، نسخه‌ها، مقایسه اثر تغییر با تاریخچه، اتصال به پنج پیشنهاد و ثبات سند گذشته | `pricing.test.mjs`، `pricing-comparison.test.mjs`، `titan-pricing.test.mjs`، `pricing.spec.mjs`، `pricing-comparison.spec.mjs`، `titan-pricing.spec.mjs` |
 | اجرای گردش | نسخه مستقل هر قرارداد، ترتیب مراحل، جلوگیری از پیشروی تکراری و امضای پیش‌نویس ناقص | `workflow.test.mjs`، `titan-board.test.mjs`، `contract-routing.spec.mjs` |
