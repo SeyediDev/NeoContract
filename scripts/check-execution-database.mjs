@@ -4,6 +4,7 @@ import assert from 'node:assert/strict';
 import {randomUUID} from 'node:crypto';
 import {createDatabase} from '../lib/database.mjs';
 import {createStore} from '../lib/store.mjs';
+import {renderExecutionDocument} from '../lib/execution-document.mjs';
 const connectionString=process.env.NEOCONTRACT_EXECUTION_ACCEPTANCE_URL;
 if(!connectionString)throw Error('NEOCONTRACT_EXECUTION_ACCEPTANCE_URL is required.');
 const url=new URL(connectionString),name=decodeURIComponent(url.pathname.slice(1));
@@ -23,6 +24,7 @@ try{
  const before=structuredClone(s),transaction=db.transaction;db.transaction=work=>transaction(tx=>work({...tx,query:async(sql,p)=>{if(sql.startsWith('INSERT INTO contracts.contract_events'))throw Error('acceptance rollback');return tx.query(sql,p);}}));
  try{await assert.rejects(cmd('issue',{kind:'risk',title:'rollback',owner:'آزمون',dueDate:'2026-12-01',impact:'آزمون'}),/acceptance rollback/);}finally{db.transaction=transaction;}assert.deepEqual(await store.execution.read(c.id),before);
  await cmd('close',{reference:'CLOSE',comment:'تسویه کامل آزمون'});assert.equal(s.status,'closed');const result=await store.contract(c.id);assert.deepEqual(result.snapshot,c.snapshot);assert.equal(result.amount,c.amount);
+ const report=renderExecutionDocument(result);assert.match(report,/SCRATCH-SIGNED/);assert.match(report,/خاتمه و تسویه‌شده/);assert.match(report,/RET-PAY/);assert.match(report,/data:font\/woff2;base64/);assert.deepEqual(await store.execution.read(c.id),s);
  await assert.rejects(db.query('DELETE FROM contracts.execution_commands WHERE contract_id=$1',[c.id]),/immutable/i);
- console.log(JSON.stringify({postgresqlAcceptance:'PASS',migrations:7,status:s.status,revision:s.revision,originalPreserved:true,concurrentRetry:true,auditRollback:true}));
+ console.log(JSON.stringify({postgresqlAcceptance:'PASS',migrations:7,status:s.status,revision:s.revision,originalPreserved:true,concurrentRetry:true,auditRollback:true,executionReport:true}));
 }finally{if(db)await db.close();}

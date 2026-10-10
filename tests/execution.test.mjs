@@ -101,7 +101,7 @@ test('execution enforces signed basis, delivery, financial settlement and immuta
 test('execution API isolates tenants and roles, concurrent receipts and audit rollback',{timeout:240000},async t=>{
  const previous=process.env.NEOCONTRACT_TRUST_PROXY_AUTH;process.env.NEOCONTRACT_TRUST_PROXY_AUTH='true';const db=await createDatabase({dataDir:'memory://'}),store=createStore(db,TITAN_TENANT_ID),api=await createApi({database:db,authMode:'oidc-proxy'});
  async function call(url,method='GET',input,subject='demo-admin'){
-  let status,value;await api.handler({url,method,headers:{host:'localhost','x-auth-request-sub':subject},socket:{remoteAddress:'127.0.0.1'},async *[Symbol.asyncIterator](){if(input)yield Buffer.from(JSON.stringify(input));}},{writeHead(s){status=s;},end(b){value=JSON.parse(b);}});return {status,value};
+  let status,value,headers;await api.handler({url,method,headers:{host:'localhost','x-auth-request-sub':subject},socket:{remoteAddress:'127.0.0.1'},async *[Symbol.asyncIterator](){if(input)yield Buffer.from(JSON.stringify(input));}},{writeHead(s,h){status=s;headers=h;},end(b){value=String(b).startsWith('<!doctype')?String(b):JSON.parse(b);}});return {status,value,headers};
  }
  try{
   await db.query("UPDATE contracts.app_users SET status='active' WHERE tenant_id=$1",[TITAN_TENANT_ID]);const {c}=await fixture(store),path=`/api/contracts/${c.id}/execution`;
@@ -109,9 +109,14 @@ test('execution API isolates tenants and roles, concurrent receipts and audit ro
    for(const subject of ['demo-viewer','demo-legal','demo-finance'])assert.equal((await call(path+'/commands','POST',{action:'start',payload:signed,expectedRevision:0,idempotencyKey:randomUUID()},subject)).status,403);
    const input={action:'start',payload:signed,expectedRevision:0,idempotencyKey:randomUUID()};const results=await Promise.all([call(path+'/commands','POST',input),call(path+'/commands','POST',input)]);assert.deepEqual(results.map(r=>r.status),[200,200]);assert.equal((await store.execution.read(c.id)).history.length,1);
    const read=await call(path,'GET',undefined,'demo-viewer');assert.equal(read.status,200);assert.equal(read.value.basis.actor.subject,'demo-admin');assert.ok(!JSON.stringify(read.value).includes('request_hash'));
+   const report=await call(path+'/document?revision=1','GET',undefined,'demo-viewer');assert.equal(report.status,200);assert.match(report.value,/SIGNED|signed-file-2026-01/);assert.match(report.headers['Content-Type'],/text\/html/);assert.equal(report.headers['Cache-Control'],'no-store');
+   assert.equal((await call(path+'/document?revision=0')).status,409);assert.equal((await call(path+'/document?revision=bad')).status,400);assert.equal((await call(path+'/document/extra')).status,404);
    assert.equal((await call(path+'/extra')).status,404);assert.equal((await call(path+'/commands','POST',{action:'milestone',payload:{title:'مرحله',gross:100,dueDate:'2026-12-01',condition:'شرط'},expectedRevision:1,idempotencyKey:randomUUID()},'demo-finance')).status,403);
    const foreign=(await fixture(createStore(db,DEMO_TENANT_ID))).c;assert.equal((await call(`/api/contracts/${foreign.id}/execution`)).status,404);
+   assert.equal((await call(`/api/contracts/${foreign.id}/execution/document`)).status,404);
+   const notStarted=(await fixture(store)).c;assert.equal((await call(`/api/contracts/${notStarted.id}/execution/document`)).status,409);
    const before=await store.execution.read(c.id);await db.query("UPDATE contracts.app_users SET status='disabled' WHERE tenant_id=$1 AND subject='demo-viewer'",[TITAN_TENANT_ID]);assert.equal((await call(path,'GET',undefined,'demo-viewer')).status,403);assert.deepEqual(await store.execution.read(c.id),before);
+   assert.equal((await call(path+'/document','GET',undefined,'demo-viewer')).status,403);
   });
   await t.test('failed audit atomically rolls back state, receipt and revision',async()=>{
    const before=await store.execution.read(c.id),transaction=db.transaction;db.transaction=work=>transaction(tx=>work({...tx,query:async(sql,p)=>{if(sql.startsWith('INSERT INTO contracts.contract_events'))throw Error('Injected audit failure');return tx.query(sql,p);}}));
