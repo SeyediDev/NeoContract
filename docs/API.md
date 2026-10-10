@@ -411,3 +411,14 @@ receipt معتبر همه نسخه‌های جاری نیاز دارد. ارسا
 نسخه نامعتبر ۴۰۰، اجرای آغازنشده ۴۰۹، قرارداد تننت دیگر ۴۰۴ و کاربر غیرفعال یا
 غیرمجاز ۴۰۳ است. مشاهده‌گر فعال اجازه دریافت دارد. فایل از state و سابقه ذخیره‌شده
 ساخته می‌شود و هیچ فرمان یا تغییر داده‌ای ایجاد نمی‌کند.
+
+## Service-limit delivery evidence
+
+`GET /api/contracts/:id/service-limits` retains the existing tenant/role checks.
+Each outbox row additionally exposes `dispatch_sha256` and
+`dispatch_registry_reference` (null before the first prepared dispatch). The full
+normalized projection stays private to the operator integration. `receipt.phase`
+distinguishes `pending`, `superseded` and `acknowledged`; acceptance is never a
+Gateway enforcement receipt. `error_code` describes the last failed attempt without
+erasing earlier acceptance. A superseded row is `blocked`; no browser endpoint
+changes its mapping, retries it or injects a Gateway receipt.

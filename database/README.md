@@ -1,5 +1,11 @@
 # PostgreSQL storage
 
+Version 012 freezes each normalized trusted projection, its SHA-256 and registry
+reference in the existing service-limit outbox before transmission. SQL rejects
+snapshot changes and modification of an observed acknowledgement. PCC 202 acceptance
+receipts remain pending; superseded inputs become blocked. No new worker, registry,
+ledger or guessed mapping is introduced. Backup includes the added columns.
+
 Version 009 adds typed commercial definitions/history, versioned contract parameters,
 immutable commands and an awaiting-mapping outbox. Version 010 adds redacted API
 telemetry with GIN content search, tenant/time indexes and transactional hourly

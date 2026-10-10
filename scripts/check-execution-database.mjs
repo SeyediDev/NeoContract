@@ -14,7 +14,7 @@ const probe=new Client({connectionString});await probe.connect();
 try{assert.equal(Number((await probe.query("SELECT count(*) n FROM information_schema.tables WHERE table_schema NOT IN ('pg_catalog','information_schema')")).rows[0].n),0,'Acceptance DB must be empty.');}finally{await probe.end();}
 let db;
 try{
- db=await createDatabase({connectionString});assert.equal(db.backend,'postgresql');assert.equal((await db.health()).migrations.length,11);const store=createStore(db),data=await store.bootstrap(),template=data.templates.find(t=>t.currentPublishedVersion);
+ db=await createDatabase({connectionString});assert.equal(db.backend,'postgresql');assert.equal((await db.health()).migrations.length,12);const store=createStore(db),data=await store.bootstrap(),template=data.templates.find(t=>t.currentPublishedVersion);
  let c=await store.createContract({templateId:template.id,customerId:data.customers[0].id,title:'آزمون PostgreSQL جداگانه؛ قرارداد واقعی نیست',owner:'پذیرش',amount:2000,start:'2026-10-01',end:'2027-10-01',paymentTerms:'آزمون',services:[]});while(c.status!=='active')c=await store.advance(c.id,{expectedStatus:c.status,expectedStepId:c.stages.find(x=>x.status==='active')?.stepId||null});
  let s=null;const command=(action,payload)=>({action,payload,expectedRevision:s?.revision||0,idempotencyKey:randomUUID()}),cmd=async(action,payload)=>s=await store.execution.command(c.id,command(action,payload));
  const first=command('start',{reference:'SCRATCH-SIGNED',counterparties:'طرفین آزمایشی',confirmSigned:true,signedDate:'2026-10-01',startDate:'2026-10-01',endDate:'2027-10-01',amount:2000,advanceLimit:500,direction:'payable'});const start=await Promise.all([store.execution.command(c.id,first),store.execution.command(c.id,first)]);assert.deepEqual(start[0],start[1]);s=start[0];assert.equal(s.revision,1);
@@ -28,5 +28,5 @@ try{
  await cmd('close',{reference:'CLOSE',comment:'تسویه کامل آزمون'});assert.equal(s.status,'closed');const result=await store.contract(c.id);assert.deepEqual(result.snapshot,c.snapshot);assert.equal(result.amount,c.amount);assert.equal(result.execution.summary.followups.counts.total,0);
  const report=renderExecutionDocument(result);assert.match(report,/SCRATCH-SIGNED/);assert.match(report,/خاتمه و تسویه‌شده/);assert.match(report,/RET-PAY/);assert.match(report,/data:font\/woff2;base64/);assert.deepEqual(await store.execution.read(c.id),s);
  await assert.rejects(db.query('DELETE FROM contracts.execution_commands WHERE contract_id=$1',[c.id]),/immutable/i);
- console.log(JSON.stringify({postgresqlAcceptance:'PASS',migrations:11,status:s.status,revision:s.revision,originalPreserved:true,concurrentRetry:true,auditRollback:true,executionReport:true,executionFollowups:true}));
+ console.log(JSON.stringify({postgresqlAcceptance:'PASS',migrations:12,status:s.status,revision:s.revision,originalPreserved:true,concurrentRetry:true,auditRollback:true,executionReport:true,executionFollowups:true}));
 }finally{if(db)await db.close();}

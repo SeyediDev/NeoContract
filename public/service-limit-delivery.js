@@ -1,0 +1,7 @@
+const errors={central_rejected:'مرکز درخواست را نپذیرفت؛ مجوز و نسخه باید بررسی شوند.',central_unavailable:'ارتباط با مرکز کامل نشد؛ نتیجه آخرین تلاش نامعلوم است.',invalid_ack:'پاسخ مرکز رسید معتبر مشاهده Gateway ندارد.',dispatch_binding_changed:'نگاشت مرکزی رویداد تغییر کرده است؛ بازبینی نگاشت قبلاً ارسال‌شده لازم است.',gateway_binding_invalid:'نگاشت معتبر مرکزی برای این رویداد آماده نیست.',execution_not_running:'ارسال به دلیل توقف یا پایان اجرای قرارداد متوقف است.',parameter_mapping_required:'نگاشت اجرایی پارامترهای عمومی قرارداد هنوز پذیرفته نشده است.',limits_expired:'بازه اعتبار محدودیت یا عرضه مرکزی پایان یافته است.',limits_not_effective:'زمان اثر عرضه مرکزی نرسیده است.',outbox_corrupt:'یکپارچگی رویداد ارسالی تأیید نشد؛ بررسی فنی لازم است.',central_superseded:'مرکز نسخه جدیدتری دارد؛ این رویداد دیگر خودکار ارسال نمی‌شود.'};
+export function serviceLimitDelivery(row,effectiveAt,now=new Date().toISOString()){
+ if(row.status==='acknowledged')return {label:'نسخه مقصد تأیید شده',warning:null};
+ if(row.status==='blocked')return {label:row.receipt?.phase==='superseded'?'نسخه در مرکز جایگزین شده است':'ارسال متوقف است',warning:errors[row.error_code]||'بررسی اپراتور اتصال لازم است.'};
+ const label=row.receipt?.phase==='pending'?'مرکز رویداد را پذیرفته؛ منتظر مشاهده Gateway':effectiveAt>now?'منتظر تاریخ اثر؛ هنوز به مقصد ارسال نشده':'منتظر اتصال و تأیید مرکز / Gateway';
+ return {label,warning:row.error_code?(errors[row.error_code]||'آخرین تلاش ارسال کامل نشد؛ بررسی اتصال لازم است.'):null};
+}

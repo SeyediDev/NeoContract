@@ -32,7 +32,7 @@ test('signed TPS amendments, transactional outbox, authorization, retry and obse
  if(connectionString)assert.match(decodeURIComponent(new URL(connectionString).pathname.slice(1)),/^neocontract_capacity_acceptance_\d+$/);
  const db=await createDatabase(connectionString?{connectionString}:{dataDir:'memory://'}),store=createStore(db,DEMO_TENANT_ID);let s;
  try{
-  assert.equal((await db.health()).migrations.length,11);
+  assert.equal((await db.health()).migrations.length,12);
   if(connectionString)assert.equal(db.backend,'postgresql');
   const data=await store.bootstrap();let c=await store.createContract({templateId:data.templates.find(t=>t.currentPublishedVersion).id,customerId:data.customers[0].id,title:'TPS contract',owner:'آزمون',amount:10000,start:'2026-10-01',end:'2026-11-01',paymentTerms:'آزمون',services:[]});
   await db.query("INSERT INTO contracts.contract_documents(tenant_id,contract_id,document_type,file_name,storage_key,mime_type,metadata) VALUES($1,$2,'proposal_revision','fixture.md','fixture','text/plain',$3)",[DEMO_TENANT_ID,c.id,JSON.stringify({body:quote})]);
@@ -66,8 +66,22 @@ test('signed TPS amendments, transactional outbox, authorization, retry and obse
   await assert.rejects(dispatchServiceLimits(db,{}),/تنظیم/);let calls=0;
   const options={endpoint:'http://localhost:9000/fixture',token:'synthetic-token',bindingForEvent:()=>binding,now:'2026-10-10T06:30:00.000Z',fetchImpl:async()=>{calls++;return new Response('{}');}};
   const invalid=await dispatchServiceLimits(db,options);assert.equal(calls,1);assert.equal(invalid.results[0].code,'invalid_ack');assert.equal((await store.serviceLimits.read(c.id)).gatewayApplied,false);
+  const frozen=(await db.query('SELECT dispatch_projection,dispatch_sha256,dispatch_registry_reference FROM contracts.service_limit_outbox WHERE event_id=$1',[event.eventId])).rows[0];assert.deepEqual(frozen.dispatch_projection,projected);assert.equal(frozen.dispatch_sha256,serviceLimitHash(projected));
+  await assert.rejects(db.query("UPDATE contracts.service_limit_outbox SET dispatch_sha256=$2 WHERE event_id=$1",[event.eventId,'a'.repeat(64)]),/immutable/i);
+  const changed=structuredClone(binding);changed.allocationRevisions[event.eventId]=42;
+  assert.equal((await dispatchServiceLimits(db,{...options,bindingForEvent:()=>changed})).results[0].code,'dispatch_binding_changed');assert.equal(calls,1,'changed retry bindings never reach the receiver');
+  options.fetchImpl=async(_url,request)=>{calls++;assert.deepEqual(JSON.parse(request.body),frozen.dispatch_projection);return Response.json({eventId:event.eventId,aggregateVersion:event.aggregateVersion,phase:'pending',status:'applied',errors:[],state:{private:'must not leak'}},{status:202});};
+  const accepted=await dispatchServiceLimits(db,options);assert.equal(accepted.results[0].status,'pending');assert.equal(accepted.results[0].phase,'pending');assert.equal(accepted.results[0].code,null);assert.equal((await store.serviceLimits.read(c.id)).gatewayApplied,false);
+  const acceptedReceipt=(await store.serviceLimits.read(c.id)).outbox[0].receipt;assert.equal('state' in acceptedReceipt,false);
+  options.fetchImpl=async()=>{calls++;throw Error('connection failed after durable central acceptance');};
+  assert.equal((await dispatchServiceLimits(db,options)).results[0].code,'central_unavailable');assert.deepEqual((await store.serviceLimits.read(c.id)).outbox[0].receipt,acceptedReceipt,'a failed retry does not erase durable prior acceptance');
   options.fetchImpl=async(_url,request)=>{calls++;const e=JSON.parse(request.body);assert.equal(request.headers['Idempotency-Key'],event.eventId);const p=e.projection;return Response.json({eventId:e.eventId,aggregateVersion:e.aggregateVersion,phase:'acknowledged',gateway:{contractVersion:p.contractVersion,allocationId:p.limits.allocationId,canonicalScope:p.limits.canonicalScope,configRevision:p.limits.configRevision,limitsSha256:serviceLimitHash(p.limits),observedAt:options.now}});};
-  assert.equal((await dispatchServiceLimits(db,options)).results[0].status,'acknowledged');assert.equal((await dispatchServiceLimits(db,options)).processed,0);assert.equal(calls,2,'future amendment was not sent early');
+  assert.equal((await dispatchServiceLimits(db,options)).results[0].status,'acknowledged');assert.equal((await dispatchServiceLimits(db,options)).processed,0);assert.equal(calls,4,'future amendment was not sent early');
+  await assert.rejects(db.query("UPDATE contracts.service_limit_outbox SET status='pending',receipt=NULL WHERE event_id=$1",[event.eventId]),/immutable/i);
+  const amendedEvent=(await db.query('SELECT payload FROM contracts.service_limit_outbox WHERE aggregate_version=$1 AND contract_id=$2',[s.outbox[1].aggregate_version,c.id])).rows[0].payload;
+  binding.allocationRevisions[amendedEvent.eventId]=42;
+  const supersededOptions={...options,now:'2026-10-16T06:30:00.000Z',fetchImpl:async(_url,request)=>{const e=JSON.parse(request.body);assert.equal(e.eventId,amendedEvent.eventId);return Response.json({eventId:e.eventId,aggregateVersion:e.aggregateVersion,status:'stale',phase:'superseded',errors:[]},{status:202});}};
+  const superseded=await dispatchServiceLimits(db,supersededOptions);assert.equal(superseded.results[0].status,'blocked');assert.equal(superseded.results[0].code,'central_superseded');assert.equal((await dispatchServiceLimits(db,supersededOptions)).processed,0,'superseded events are not automatically retried');
   const broken=structuredClone(binding);delete broken.allocationRevisions;assert.throws(()=>serviceLimitProjection(event,broken),/مستقل/);broken.allocationRevisions={[event.eventId]:41};broken.localTenantId=TITAN_TENANT_ID;assert.throws(()=>serviceLimitProjection(event,broken),/تننت/);
   await assert.rejects(db.query("UPDATE contracts.contract_service_limits SET revision=revision+1,state=jsonb_set(state,'{versions,0,terms,requestsPerSecond}','999') WHERE contract_id=$1",[c.id]),/immutable/i);
   await assert.rejects(db.query('DELETE FROM contracts.service_limit_outbox WHERE tenant_id=$1',[DEMO_TENANT_ID]),/immutable/i);

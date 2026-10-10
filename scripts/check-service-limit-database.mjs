@@ -9,4 +9,4 @@ const probe=new Client({connectionString});await probe.connect();
 try{assert.equal(Number((await probe.query("SELECT count(*) n FROM information_schema.tables WHERE table_schema NOT IN ('pg_catalog','information_schema')")).rows[0].n),0,'Acceptance DB must be empty.');}finally{await probe.end();}
 const result=spawnSync(process.execPath,['--test','--test-concurrency=1','tests/service-limits.test.mjs'],{cwd:new URL('..',import.meta.url),env:process.env,stdio:'inherit',timeout:240000});
 if(result.error||result.status!==0)throw Error('Scratch capacity acceptance failed.');
-console.log(JSON.stringify({postgresqlAcceptance:'PASS',migrations:11,signedAmendments:true,transactionalOutbox:true,immutableHistory:true,idempotency:true,authorization:true,observedGatewayReceipt:true,liveGateway:false}));
+console.log(JSON.stringify({postgresqlAcceptance:'PASS',migrations:12,signedAmendments:true,transactionalOutbox:true,immutableHistory:true,idempotency:true,frozenDispatch:true,centralAcceptanceDistinct:true,supersededNotRetried:true,observedGatewayReceipt:true,liveGateway:false}));

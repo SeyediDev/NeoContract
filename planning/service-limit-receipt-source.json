@@ -1,0 +1,19 @@
+{
+  "status": "source-reviewed-not-live-acceptance",
+  "owner": "Fanasa Platform Control Center",
+  "profile": "PCC 0.4.0 publication observation",
+  "reviewedAt": "2026-10-10",
+  "sources": [
+    {
+      "path": "Neo/docs/fanasa-platform-control-center/workstreams/contract-policy/implementation/pcc/ContractPolicyApi.cs",
+      "sha256": "23fdee8fc2be6ad1d0790e203a0c2476467f22524b2952065321238ff5a23e16",
+      "contract": "POST /api/contract-policy/projection-events: 202 pending/applied-or-duplicate, 202 superseded/stale, 200 observed acknowledgement"
+    },
+    {
+      "path": "Neo/docs/fanasa-platform-control-center/workstreams/contract-policy/implementation/pcc/ContractGatewayPublication.cs",
+      "sha256": "4bb0aed3b4b58ca7c27e2c9831d01bd2f17ce344955799cfe4ca2d0e94f88e9a",
+      "contract": "immutable observed tuple and canonical limits hash; default observer unavailable"
+    }
+  ],
+  "validation": "NeoContract receipt, SQL and browser tests use explicit synthetic fixtures; they do not execute the PCC HTTP receiver or a live Gateway."
+}
