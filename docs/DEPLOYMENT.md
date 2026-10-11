@@ -46,7 +46,34 @@ docker compose --env-file .env -f docker-compose.production.yml up -d --build
 
 DNS عمومی برای این نام‌ها وجود ندارد؛ هر دستگاه باید آن‌ها را در hosts به IP سرور نگاشت کند و گواهی محلی را پس از تطبیق اثر انگشت مورد اعتماد قرار دهد. کلید خصوصی گواهی و اطلاعات حساب‌های دمو فقط روی سرور نگه‌داری می‌شوند و نباید وارد Git شوند.
 
-در SSO فن‌آسا یک OIDC client با redirect URL محیط بسازید و claimهای `sub` و `email` را فعال کنید. کاربر باید با `subject` یا ایمیل در `contracts.app_users` ثبت و سپس فعال شود. نقش‌ها در `contracts.app_roles` و انتساب آن‌ها در `contracts.app_user_roles` نگه‌داری می‌شوند.
+در SSO فن‌آسا یک OIDC client با redirect URL محیط بسازید و claimهای `sub` و `email` را فعال کنید. کاربر باید با `subject` معتبر SSO و ایمیل همان حساب در `contracts.app_users` ثبت و سپس فعال شود. نقش‌ها در `contracts.app_roles` و انتساب آن‌ها در `contracts.app_user_roles` نگه‌داری می‌شوند.
+
+عضویت فعلی برنامه به `sub` تأییدشده متصل است؛ ایمیل به‌تنهایی جای شناسه را
+نمی‌گیرد. `email_verified=true` نیز برای ورود OIDC لازم است. در محیط فعلی SMTP
+SSO تنظیم نشده؛ تأیید دستی حساب مالک در ۱۱ اکتبر، پس از تأیید صریح همان کاربر
+ثبت شد و کنترل تأیید ایمیل در proxy فعال باقی ماند.
+
+پذیرش دامنه ایمیل و عضویت برنامه دو کنترل جدا هستند. برای حساب تأییدشده خارج
+از دامنه مجاز، فایل خصوصی `authorized-emails.txt` شامل آدرس‌های دقیق، یک آدرس
+در هر خط، استفاده می‌شود. این فهرست به‌خودی‌خود نقش یا عضویت تننت ایجاد نمی‌کند.
+تنظیم VPS در `compose.https.yml` پایدار است و در انتشارهای بعدی حفظ می‌شود:
+
+```yaml
+services:
+  oauth2-proxy:
+    environment:
+      OAUTH2_PROXY_AUTHENTICATED_EMAILS_FILE: /etc/oauth2-proxy/authorized-emails.txt
+    volumes:
+      - /opt/neocontract-auth/authorized-emails.txt:/etc/oauth2-proxy/authorized-emails.txt:ro
+```
+
+این قطعه را با override موجود ادغام کنید؛ گواهی، PKCE، cookie و اتصال HTTPS
+همان فایل را حفظ کنید. افزودن یک حساب به فهرست نیازمند پذیرش صریح آن حساب است؛
+برای رفع خطا، دامنه عمومی یا `*` و `insecure-oidc-allow-unverified-email` فعال
+نمی‌شوند. گزینه فایل آدرس‌ها در
+[مستندات رسمی OAuth2 Proxy ۷٫۸](https://oauth2-proxy.github.io/oauth2-proxy/7.8.x/configuration/overview/#proxy-options)
+توضیح داده شده است. جزئیات اصلاح حساب مالک در
+[گزارش رفع خطای ورود](RELEASE-2026-10-11-OWNER-SSO.md) ثبت شده است.
 
 نقش‌های پایه: `platform_admin`، `contract_admin`، `legal_reviewer`، `finance_reviewer`، `account_manager` و `viewer`.
 
