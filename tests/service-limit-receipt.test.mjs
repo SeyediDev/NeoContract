@@ -4,6 +4,7 @@ import {readFile} from 'node:fs/promises';
 import {serviceLimitReceipt,readServiceLimitResponse} from '../lib/service-limit-receipt.mjs';
 import {serviceLimitHash} from '../lib/service-limits.mjs';
 import {serviceLimitDelivery} from '../public/service-limit-delivery.js';
+import {serviceLimitJourney} from '../public/service-limit-journey.js';
 const projection=JSON.parse(await readFile(new URL('./fixtures/service-limit-projection.json',import.meta.url),'utf8'));
 const event={eventId:'fixture-event',aggregateVersion:7,projection},now='2026-10-10T12:00:00.000Z';
 const ack={eventId:event.eventId,aggregateVersion:7,phase:'acknowledged',gateway:{contractVersion:7,allocationId:projection.limits.allocationId,canonicalScope:projection.limits.canonicalScope,configRevision:1,limitsSha256:serviceLimitHash(projection.limits),observedAt:now}};
@@ -31,4 +32,13 @@ test('delivery copy preserves prior central acceptance while explaining a later 
  assert.match(serviceLimitDelivery(row,projection.effectiveAt,now).warning,/نامعلوم/);
  assert.match(serviceLimitDelivery({...row,status:'blocked',receipt:{phase:'superseded'},error_code:'central_superseded'},projection.effectiveAt,now).label,/جایگزین/);
  assert.match(serviceLimitDelivery({status:'pending'},'2026-10-15T00:00:00.000Z',now).label,/تاریخ اثر/);
+});
+
+test('journey distinguishes evidence recorded, accepted and actually observed',()=>{
+ const v={status:'signed'};
+ assert.equal(serviceLimitJourney({status:'draft'},null).complete,0);
+ assert.equal(serviceLimitJourney(v,{status:'pending'}).complete,2);
+ assert.equal(serviceLimitJourney(v,{status:'pending',receipt:{phase:'pending'}}).complete,3);
+ assert.equal(serviceLimitJourney(v,{status:'acknowledged',receipt:{phase:'acknowledged'}}).complete,4);
+ const superseded=serviceLimitJourney(v,{status:'blocked',receipt:{phase:'superseded'}});assert.equal(superseded.complete,2);assert.equal(superseded.steps[2].state,'blocked');
 });

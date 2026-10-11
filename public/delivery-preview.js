@@ -1,0 +1,5 @@
+import {renderServiceLimitJourney} from './service-limit-journey.js';
+const messages={unsent:'مدرک امضا و نسخه تغییر ثبت شده‌اند؛ پذیرش مرکز هنوز دریافت نشده است.',pending:'مرکز این رویداد را پذیرفته است. تأیید اعمال در مقصد، پس از دریافت رسید مشاهده همان نسخه نمایش داده می‌شود.',acknowledged:'در این سناریوی نمایشی، رسید همان نسخه و تخصیص دریافت شده است و هر چهار مرحله تأییدشده‌اند.',superseded:'مرکز نسخه جدیدتری دارد. این رویداد تاریخی خودکار دوباره ارسال نمی‌شود؛ نگاشت و نسخه جاری باید بررسی شوند.'};
+function show(phase){const row={status:phase==='acknowledged'?'acknowledged':phase==='superseded'?'blocked':'pending',receipt:phase==='unsent'?null:{phase}};document.querySelector('#journeyPreview').innerHTML=renderServiceLimitJourney({status:'signed'},row);document.querySelector('#previewMessage').textContent=messages[phase];document.querySelectorAll('[data-preview]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.preview===phase)));}
+document.querySelectorAll('[data-preview]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.preview)));
+show('pending');
