@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>پنل مشتری · پیش‌نمایش | فن‌آسا</title><link rel="stylesheet" href="assets/fonts/vazirmatn.css"><link rel="stylesheet" href="fanasa-theme.css"><link rel="stylesheet" href="client-preview.css"></head>
+<body class="cp-page">
+<a class="cp-skip" href="#cp-main">رفتن به گزارش</a>
+<aside class="cp-sidebar" aria-label="هویت و مسیر بازگشت">
+ <img class="cp-brand" src="assets/brand/fanasa-logo-horizontal-fa-color.svg" width="150" height="54" alt="فن‌آسا">
+ <div class="cp-sidebar-title">مدیریت قراردادها <small>NeoContract</small></div>
+ <div class="cp-nav-label">پیش‌نمایش تجربه مشتری</div><span class="cp-current">◉ &nbsp; مصرف و سلامت سرویس‌ها</span>
+ <a href="/#view=client">بازکردن پنل واقعی ←</a><a href="/delivery-preview.html">پیش‌نمایش اجرای قرارداد ←</a>
+ <div class="cp-center"><img src="assets/brand/center-rayan-lockup-fa-color.svg" width="160" height="110" alt="مرکز رایان"><p>مرکز قابلیت رایان</p></div>
+</aside>
+<main id="cp-main" class="cp-main">
+ <header class="cp-topbar"><span>مدیریت قراردادها / پنل مشتری</span><span class="cp-demo">داده نمایشی · بدون اتصال به API</span></header>
+ <section class="cp-hero"><div><p class="cp-eyebrow">دید روشن به هر فراخوانی</p><h1>مصرف و سلامت سرویس‌ها</h1><p>از روند ترافیک تا علت یک خطا؛ ورودی و خروجی فراخوانی را در همین صفحه بررسی کنید.</p></div><div class="cp-window"><span>پایان بازه نمونه · تهران</span><strong>۱۹ مهر ۱۴۰۵ · ۱۳:۰۰</strong><small>بازه ثابت برای بررسی طراحی</small></div></section>
+ <section class="cp-filter-card" aria-label="فیلتر گزارش"><form id="cp-filters">
+  <label class="cp-search"><span>جست‌وجو در ورودی، خروجی، مسیر و شناسه</span><input name="q" type="search" maxlength="200" autocomplete="off" placeholder="مثلاً rate_limited یا SAMPLE-0360" aria-describedby="cp-search-help"></label>
+  <label><span>سرویس</span><select name="service"><option value="">همه سرویس‌ها</option><option value="identity-check">استعلام هویت</option><option value="payment-inquiry">استعلام پرداخت</option><option value="document-verify">اعتبارسنجی سند</option></select></label>
+  <label><span>پاسخ API</span><select name="status"><option value="">همه پاسخ‌ها</option><option value="errors">همه خطاها</option><option value="200">200 · موفق</option><option value="400">400 · ورودی نامعتبر</option><option value="429">429 · محدودیت نرخ</option><option value="503">503 · سرویس در دسترس نیست</option></select></label>
+  <label><span>بازه زمانی</span><select name="hours"><option value="24">۲۴ ساعت</option><option value="6">۶ ساعت</option><option value="1">۱ ساعت</option></select></label>
+  <button type="reset" class="cp-button cp-reset">پاک‌کردن فیلترها</button>
+ </form><div class="cp-filter-footer"><p id="cp-search-help">جست‌وجوی زیررشته در داده نمونه؛ گزارش واقعی از جست‌وجوی واژه و عبارت استفاده می‌کند.</p><span id="cp-match" role="status" aria-live="polite"></span></div></section>
+ <section id="cp-kpis" class="cp-kpis" aria-label="خلاصه گزارش"></section>
+ <div class="cp-chart-grid"><section class="cp-card cp-trend"><div class="cp-section-title"><div><p class="cp-eyebrow">ترافیک سرویس</p><h2>روند فراخوانی‌ها</h2></div><div class="cp-legend"><span>● کل فراخوانی</span><span>● خطا</span></div></div><div id="cp-trend"></div></section>
+ <section class="cp-card"><div class="cp-section-title"><div><p class="cp-eyebrow">داشبورد فنی</p><h2>وضعیت پاسخ API</h2></div></div><p class="cp-hint">هر وضعیت را برای بررسی فراخوانی‌ها انتخاب کنید.</p><div id="cp-status"></div></section></div>
+ <section class="cp-card cp-latency"><div><p class="cp-eyebrow">سرعت پاسخ‌گویی</p><h2>توزیع زمان پاسخ</h2><p class="cp-hint">میلی‌ثانیه · P95 دقیق از داده همین پیش‌نمایش</p></div><div id="cp-latency"></div></section>
+ <section class="cp-card cp-calls"><div class="cp-section-title"><div><p class="cp-eyebrow">از گزارش تا جزئیات</p><h2>فراخوانی‌ها</h2></div><span class="cp-hint">جدیدترین در ابتدا · ساعت تهران</span></div><div id="cp-table"></div><div class="cp-pagination"><span id="cp-page-label"></span><div><button id="cp-prev" class="cp-button" type="button">قبلی</button><button id="cp-next" class="cp-button" type="button">بعدی</button></div></div></section>
+ <footer class="cp-footer">همه رویدادها ساختگی‌اند و به قراردادهای مشتریان تعلق ندارند. گزارش پایش فنی است؛ مصرف مالی، موجودی کیف پول و ظرفیت مصوب را نمایش نمی‌دهد.</footer>
+</main>
+<dialog id="cp-detail" aria-labelledby="cp-detail-title"><div class="cp-dialog-heading"><div><span class="cp-demo">فراخوانی نمایشی</span><h2 id="cp-detail-title">جزئیات فراخوانی</h2></div><button id="cp-close" class="cp-button" aria-label="بستن جزئیات" autofocus>بستن ×</button></div><div id="cp-detail-body"></div></dialog>
+<script type="module" src="client-preview.js"></script>
+</body></html>
