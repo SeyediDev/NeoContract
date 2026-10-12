@@ -33,6 +33,9 @@ for(const width of [1440,390])test(`contract dossier has stable navigation, sear
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  expect((await panel.boundingBox()).height).toBeGreaterThan(150);
  expect((await dialog.locator('.modal-footer').boundingBox()).y-(await paper.boundingBox()).y).toBeGreaterThan(100);
+ expect((await dialog.locator('.modal-header').boundingBox()).y).toBeGreaterThanOrEqual(0);
+ const footer=await dialog.locator('.modal-footer').boundingBox();expect(footer.y+footer.height).toBeLessThanOrEqual(page.viewportSize().height+1);
+ await expect(dialog.locator('[data-action="advance-dialog"]')).toBeInViewport({ratio:1});
  await page.screenshot({path:testInfo.outputPath(`dossier-document-${width}.png`)});
  await page.keyboard.press('Escape');await expect(dialog).toHaveCount(0);
  expect(await(await request.get('/api/contracts/'+c.id,{headers})).json()).toEqual(before);expect(writes).toEqual([]);expect(errors).toEqual([]);

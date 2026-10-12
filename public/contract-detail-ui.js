@@ -57,14 +57,16 @@ export function mountContractDetail(modalRoot, contract) {
       tab.id = 'contract-tab-'+tab.dataset.tab;
       tab.setAttribute('role','tab');tab.setAttribute('aria-selected',String(active));
       tab.setAttribute('aria-controls','contractDetailPanel');tab.tabIndex = active?0:-1;
-      if(active){body.setAttribute('aria-labelledby',tab.id);tab.scrollIntoView({block:'nearest',inline:'nearest'});}
+      if(active)body.setAttribute('aria-labelledby',tab.id);
     });
+    const selected=tabs.querySelector('.active');
+    if(selected){const box=selected.getBoundingClientRect(),frame=tabs.getBoundingClientRect();if(box.left<frame.left)tabs.scrollLeft+=box.left-frame.left;else if(box.right>frame.right)tabs.scrollLeft+=box.right-frame.right;}
     tabs.addEventListener('keydown',event=>{
       if(!['ArrowLeft','ArrowRight','Home','End'].includes(event.key)||!event.target.matches('[data-tab]'))return;
       event.preventDefault();
       const buttons=[...tabs.querySelectorAll('[data-tab]')],index=buttons.indexOf(event.target);
       const next=event.key==='Home'?0:event.key==='End'?buttons.length-1:(index+(event.key==='ArrowLeft'?1:-1)+buttons.length)%buttons.length;
-      buttons[next].focus();buttons[next].click();
+      buttons[next].focus({preventScroll:true});buttons[next].click();
     });
   }
   body.id='contractDetailPanel';body.setAttribute('role','tabpanel');body.tabIndex=0;
@@ -78,7 +80,8 @@ export function mountContractDetail(modalRoot, contract) {
     active=(active+delta+matches.length)%matches.length;
     paper.querySelectorAll('mark').forEach((mark,i)=>mark.classList.toggle('current-match',i===active));
     status.textContent=number(active+1)+' از '+number(matches.length)+(truncated?' نتیجه نمایش‌داده‌شده':' نتیجه');
-    paper.querySelectorAll('mark')[active]?.scrollIntoView({block:'center',inline:'nearest'});
+    const selected=paper.querySelectorAll('mark')[active];
+    if(selected){const box=selected.getBoundingClientRect(),frame=body.getBoundingClientRect(),toolbar=body.querySelector('.document-reader-tools');const offset=Math.min(body.clientHeight-24,Math.max(body.clientHeight/2,(toolbar?.offsetHeight||0)+24));body.scrollTop+=box.top-frame.top-offset;}
   };
   input.addEventListener('input',()=>{
     ({matches,truncated}=documentMatches(text,input.value));active=-1;
