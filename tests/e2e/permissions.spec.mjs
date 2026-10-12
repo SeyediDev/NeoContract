@@ -53,6 +53,7 @@ test('late user responses from a previous tenant cannot replace the current user
   else await r.fulfill({json:response('current-tenant-user')});
  });
  await page.goto('/#view=settings');await oldStarted;
+ try {
  await page.locator('#tenantSelect').selectOption(second.id);
  await expect(page.locator('#userAdministrationPanel')).toContainText('current-tenant-user');
  const oldReply=page.waitForResponse(r=>r.url().endsWith('/api/users')&&r.request().headers()['x-tenant-id']===first.id);
@@ -60,6 +61,7 @@ test('late user responses from a previous tenant cannot replace the current user
  await page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
  await expect(page.locator('#userAdministrationPanel')).toContainText('current-tenant-user');
  await expect(page.locator('#userAdministrationPanel')).not.toContainText('previous-tenant-user');
+ } finally { release(); }
 });
 test('administrator can read access history with actor and before/after roles on mobile',async({page,request})=>{
  await page.setViewportSize({width:390,height:844});
