@@ -1,4 +1,6 @@
 /* The contract chrome stays visible; only the selected panel scrolls. Official brand tokens are preserved. */
+/* Tab changes rebuild this panel; keep its geometry stable instead of replaying the generic modal entrance. */
+.contract-detail-modal{animation:none}
 .modal-backdrop:has(.contract-detail-modal){overflow:hidden}
 .contract-detail-modal{--ui-border:var(--line);--ui-muted:var(--muted);--ui-navy:var(--primary);--ui-bg:var(--bg);--ui-ink:var(--ink);width:min(1180px,calc(100vw - 40px));height:min(920px,calc(100dvh - 40px));max-height:calc(100dvh - 40px);display:flex;flex-direction:column;overflow:hidden}
 .contract-detail-modal .modal-header{flex:none;padding:16px 22px 12px;gap:16px}
