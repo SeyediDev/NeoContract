@@ -9,6 +9,7 @@ import {createClientPanelUI} from './client-panel-ui.js';
 import {createDigitalEconomyUI} from './digital-economy-ui.js';
 import {createProviderPanelUI} from './provider-panel-ui.js';
 import {readinessHtml,documentReaderHtml,mountContractDetail} from './contract-detail-ui.js';
+import {createAmendmentDraftStore,amendmentPayload} from './amendment-draft.js';
 
 (() => {
 'use strict';
@@ -33,6 +34,7 @@ const state = {view:'dashboard',data:null,error:'',selected:new Set(),catalog:{s
 Object.assign(state,{tenantId:'',tenants:[],accessMode:'',switchingTenant:false,refreshGeneration:0,board:null,boardError:'',boardFilter:'all',boardCustomer:'',boardSearch:''});
 const root = $('#viewRoot');
 const modalRoot = $('#modalRoot');
+const amendmentDrafts=createAmendmentDraftStore({storage:()=>sessionStorage,scope:()=>({tenantId:state.tenantId,actorId:state.data?.access?.identity?.id||(state.accessMode==='local-demo'?'local-demo':'')})});
 const executionUI=createExecutionUI({state,api,showModal,requestCloseModal,showContract,refresh,renderView,busyRequest,formError,toast,download});
 const serviceLimitsUI=createServiceLimitsUI({state,api,showModal,showContract,busyRequest,refresh,formError,toast});
 const contractParametersUI=createContractParametersUI({state,api,showModal,showContract,busyRequest,refresh,formError,toast});
@@ -45,7 +47,7 @@ const pricingUI = createPricingUI({state,api,toast,header:(...args)=>header(...a
 });
 const chip = (s, label) => '<span class="status-chip '+(['active','published','completed'].includes(s)?'status-active':['in_process','draft','pending'].includes(s)?'status-legal':['archived','inactive'].includes(s)?'status-expired':'status-finance')+'">'+esc(label || statusLabels[s] || s || '—')+'</span>';
 const administrativeActions=new Set(['new-manager','edit-manager','delete-manager','new-template','edit-template','save-template','publish-template','archive-template','save-settings','check-neo','sync-fanasa','approve-import','edit-user','save-user','user-audit']);
-const contractActions=new Set(['new-contract','catalog-contract','use-template','resume-wizard','start-fresh-wizard','wizard-create','new-customer','edit-customer','delete-customer','new-amendment','save-amendment','contract-neo','manager-assign','save-assignment']);
+const contractActions=new Set(['new-contract','catalog-contract','use-template','resume-wizard','start-fresh-wizard','wizard-create','new-customer','edit-customer','delete-customer','new-amendment','save-amendment','resume-amendment','discard-amendment-draft','save-amendment-exit','contract-neo','manager-assign','save-assignment']);
 function actionAllowed(name){
  const access=state.data?.access;if(!access?.identity)return true;
  const roles=access.identity.roles||[];if(isAdministrator(roles))return true;
@@ -175,7 +177,14 @@ function showModal(title,body,footer='',wide=false){state.modalRevision=(state.m
 function closeModal(){state.modalRevision=(state.modalRevision||0)+1;state.modal=false;state.modalDirty=false;state.modalKind='';state.pendingClose=null;modalRoot.innerHTML='';$('#app').inert=false;document.body.classList.remove('modal-open');if(state.returnFocus?.isConnected)state.returnFocus.focus({preventScroll:true});else root.focus({preventScroll:true});}
 function confirmDiscard(callback,title='تغییرات ذخیره نشده‌اند',copy='اگر خارج شوید، تغییرات این فرم کنار گذاشته می‌شود.'){state.pendingClose=callback;$('#app').inert=true;const dialog=$('.modal',modalRoot);if(dialog)dialog.inert=true;modalRoot.insertAdjacentHTML('beforeend','<div class="discard-confirm"><section class="discard-card" role="alertdialog" aria-modal="true" aria-labelledby="discardTitle" aria-describedby="discardCopy"><span class="tag amber">تغییرات شما</span><h3 id="discardTitle">'+esc(title)+'</h3><p id="discardCopy">'+esc(copy)+'</p><div class="page-actions">'+action('keep-editing','ادامه ویرایش','primary')+action('discard-changes','کنارگذاشتن تغییرات','danger')+'</div></section></div>');setTimeout(()=>$('[data-action="keep-editing"]')?.focus(),0);}
 function dismissDiscard(){const el=$('.discard-confirm');el?.remove();const dialog=$('.modal',modalRoot);if(dialog)dialog.inert=false;state.pendingClose=null;if(!state.modal)$('#app').inert=false;($('#modalTitle')||root).focus({preventScroll:true});}
-function requestCloseModal(after){if(state.busy||state.integration.busy){toast('عملیات در حال انجام است؛ نتیجه همین‌جا نمایش داده می‌شود.','warning');return;}const returning=state.returnToWizard;const wasWizard=state.modalKind==='wizard';const done=()=>{state.returnToWizard=false;if(wasWizard&&state.data)renderView();closeModal();if(after)after();else if(returning&&state.wizard)renderWizard();};if(state.modalKind==='wizard'){collectWizard();saveWizardDraft();state.wizard=null;done();return;}if(state.modalDirty){confirmDiscard(done);return;}done();}
+function requestCloseModal(after){if(state.busy||state.integration.busy){toast('عملیات در حال انجام است؛ نتیجه همین‌جا نمایش داده می‌شود.','warning');return;}const returning=state.returnToWizard;const wasWizard=state.modalKind==='wizard';const done=()=>{state.returnToWizard=false;if(wasWizard&&state.data)renderView();closeModal();if(after)after();else if(returning&&state.wizard)renderWizard();};if(state.modalKind==='wizard'){collectWizard();saveWizardDraft();state.wizard=null;done();return;}if(state.modalDirty){
+ const form=$('#amendmentForm');
+ if(form){
+  const kept=captureAmendmentDraft(form);state.pendingAmendmentExit=done;
+  confirmDiscard(()=>{if(!amendmentDrafts.remove(form.dataset.contractId)){formError('پاک‌کردن ذخیره موقت انجام نشد؛ اطلاعات فرم حفظ شده است.');return;}done();},'الحاقیه نیمه‌تمام است',kept.ok?'می‌توانید کار را در همین برگه برای ادامه نگه دارید یا ذخیره موقت را صریحاً کنار بگذارید. این کار ثبت الحاقیه در سرور نیست.':'ذخیره موقت مرورگر انجام نشد؛ برای حفظ متن به ویرایش برگردید.');
+  if(kept.ok)$('.discard-card .page-actions').insertAdjacentHTML('beforeend',action('save-amendment-exit','نگه‌داری و بازگشت','primary'));
+ }else confirmDiscard(done);return;
+ }done();}
 function formError(message){const e=$('#modalError');if(e){e.hidden=false;e.textContent=message;e.focus();e.scrollIntoView({block:'nearest'});}else toast(message,'warning');}
 function validateForm(form){if(!form)return false;for(const el of $$('[data-money]',form)){const value=cleanNumber(el.value);el.setCustomValidity(value!==''&&(!/^\d+(\.\d+)?$/.test(value)||!Number.isFinite(Number(value)))?'مبلغ را با عدد صفر یا مثبت وارد کنید.':'');}const bad=$(':invalid',form);if(bad){bad.closest('details')?.setAttribute('open','');bad.reportValidity();bad.focus();return false;}return true;}
 function formValues(id){const form=$(id);if(!validateForm(form))return null;return Object.fromEntries(new FormData(form));}
@@ -275,7 +284,7 @@ function renderContractDetail(){const c=state.detail;const snap=c.snapshot||{};c
  if(state.detailTab==='execution')body+=executionUI.render(c);
  if(state.detailTab==='economics')body+=digitalEconomyUI.render(c);
  if(state.detailTab==='service-limits')body+=serviceLimitsUI.render(c)+contractParametersUI.render(c);
- if(state.detailTab==='document')body+=documentReaderHtml(c,action('download-document','↓ دریافت متن')+action('print-document','چاپ / PDF')+action('new-amendment','＋ الحاقیه','primary'))+intakeNotice(c)+(c.originalDocument?'<details class="amendment-card"><summary>مرور متن اولیه پرونده</summary><pre class="document-paper">'+esc(c.originalDocument)+'</pre></details>':'')+'<h3 class="section-caption">الحاقیه‌ها</h3>'+((c.amendments||[]).length?c.amendments.map(a=>'<details class="amendment-card" data-amendment-id="'+esc(a.id)+'"><summary><span>الحاقیه '+nf(a.number)+' · '+esc(a.title)+'</span>'+chip(a.status)+' <small>'+dateText(a.createdAt)+'</small></summary><p class="muted-copy">'+esc(a.reason)+'</p><p class="muted-copy">ثبت‌کننده: '+esc(a.actor?.name||a.actor?.email||'در سابقه ثبت نشده')+'</p>'+(a.status==='draft'?'<p class="notice-note">این الحاقیه پیش‌نویس است؛ تأیید طرفین و اعمال مفاد آن ثبت نشده است.</p>':'')+'<pre class="document-paper">'+esc(a.body||a.document)+'</pre>'+amendmentFinancialHtml(a.financial)+(a.financial?action('download-amendment-pricing','دریافت پیوست مالی JSON','secondary','data-id="'+esc(a.id)+'"'):'')+amendmentReviewHtml(a,state.data?.access?.identity?.roles||['contract_admin'],dateTimeText)+'</details>').join(''):empty('هنوز الحاقیه‌ای ثبت نشده','سند اولیه ثابت می‌ماند؛ تغییرات بعدی به صورت الحاقیه ثبت می‌شوند.'));
+ if(state.detailTab==='document')body+=amendmentDraftBanner(c)+documentReaderHtml(c,action('download-document','↓ دریافت متن')+action('print-document','چاپ / PDF')+action('new-amendment','＋ الحاقیه','primary'))+intakeNotice(c)+(c.originalDocument?'<details class="amendment-card"><summary>مرور متن اولیه پرونده</summary><pre class="document-paper">'+esc(c.originalDocument)+'</pre></details>':'')+'<h3 class="section-caption">الحاقیه‌ها</h3>'+((c.amendments||[]).length?c.amendments.map(a=>'<details class="amendment-card" data-amendment-id="'+esc(a.id)+'"><summary><span>الحاقیه '+nf(a.number)+' · '+esc(a.title)+'</span>'+chip(a.status)+' <small>'+dateText(a.createdAt)+'</small></summary><p class="muted-copy">'+esc(a.reason)+'</p><p class="muted-copy">ثبت‌کننده: '+esc(a.actor?.name||a.actor?.email||'در سابقه ثبت نشده')+'</p>'+(a.status==='draft'?'<p class="notice-note">این الحاقیه پیش‌نویس است؛ تأیید طرفین و اعمال مفاد آن ثبت نشده است.</p>':'')+'<pre class="document-paper">'+esc(a.body||a.document)+'</pre>'+amendmentFinancialHtml(a.financial)+(a.financial?action('download-amendment-pricing','دریافت پیوست مالی JSON','secondary','data-id="'+esc(a.id)+'"'):'')+amendmentReviewHtml(a,state.data?.access?.identity?.roles||['contract_admin'],dateTimeText)+'</details>').join(''):empty('هنوز الحاقیه‌ای ثبت نشده','سند اولیه ثابت می‌ماند؛ تغییرات بعدی به صورت الحاقیه ثبت می‌شوند.'));
  if(state.detailTab==='history')body+='<div class="audit-timeline">'+(c.history||c.events||[]).map(e=>'<article><span>✓</span><div><h4>'+esc(e.title||eventLabels[e.type]||e.message||e.action||e.type||'رویداد')+'</h4><p>'+esc(e.comment||e.description||e.details?.comment||'')+'</p><small>'+dateText(e.createdAt||e.at)+' · '+esc((typeof e.actor==='object'?e.actor?.name||e.actor?.email:e.actor)||e.role||'پنل دمو')+'</small></div></article>').join('')+'</div>';
  if(state.detailTab==='snapshot')body+='<div class="notice-note">این داده‌ها در زمان ایجاد قرارداد ثبت شده‌اند؛ ویرایش مشتری، الگو یا کاتالوگ آن‌ها را تغییر نمی‌دهد.</div>'+action('download-snapshot','↓ دریافت نسخه JSON')+'<pre class="json-view" dir="ltr">'+esc(JSON.stringify(snap,null,2))+'</pre>';
  showModal(c.title,body,'<div class="page-actions">'+action('print-document','چاپ سند')+'</div><div class="detail-next-action">'+(c.status==='cancelled'?'<span class="status-chip status-cancelled">پرونده فقط برای ردگیری است</span>':current?'<small>اقدام بعدی با نقش '+esc(roleName(current.role))+'؛ نتیجه بررسی در تاریخچه ثبت می‌شود.</small>'+action('advance-dialog',c.status==='draft'?'بررسی و آغاز فرآیند ←':'بررسی و تکمیل «'+esc(current.name)+'» ←','primary'):'<span class="status-chip status-active">فرآیند قرارداد تکمیل شده</span>')+'</div>',true);
@@ -286,30 +295,81 @@ async function advanceContract(){const revision=state.modalRevision;const d=form
 function amendmentEditor(){
  const c=state.detail,plans=state.data.pricingPlans||[];
  showModal('افزودن پیش‌نویس الحاقیه','<form id="amendmentForm" class="form-grid" data-contract-id="'+esc(c.id)+'" data-pricing-basis="'+esc(c.amendmentPricingBasis.token)+'"><p class="notice-note form-field full">این متن به‌صورت پیش‌نویس ثبت می‌شود. تأیید و امضای طرفین برای اجرای تغییرات لازم است.</p>'+field('عنوان الحاقیه <span class="required">*</span>',input('title','','required maxlength="200"'),true)+field('علت تغییر <span class="required">*</span>','<textarea name="reason" rows="2" required maxlength="500"></textarea>',true)+field('متن الحاقیه <span class="required">*</span>','<textarea name="body" rows="6" required maxlength="20000"></textarea>',true)+field('پیوست مالی (اختیاری)',select('pricingPlanId',plans.map(p=>({value:p.id,label:p.name+' · نسخه '+nf(p.revision)+' · '+money(p.total)})),'','بدون پیوست مالی','data-amendment-plan'),true)+'<div id="amendmentPricingPreview" class="form-field full" aria-live="polite"></div></form>',action('detail-back','بازگشت')+action('save-amendment','ثبت پیش‌نویس الحاقیه','primary'),true);
+ const form=$('#amendmentForm'),saved=amendmentDrafts.load(c.id);
+ $('.notice-note',form).insertAdjacentHTML('beforeend','<span data-amendment-draft-status role="status" aria-live="polite"></span>');
+ form.draftWriteFailed=!saved.ok;
+ if(saved.draft){
+  const draft=saved.draft;
+  for(const name of ['title','reason','body'])form.elements[name].value=draft.fields[name];
+  if(draft.reference){
+   const picker=form.elements.pricingPlanId,option=picker.querySelector('option[value="'+CSS.escape(draft.reference.id)+'"]');
+   if(option)option.textContent=(plans.find(p=>p.id===draft.reference.id)?.name||'مدل ذخیره‌شده')+' · نسخه محفوظ '+nf(draft.reference.revision);
+   else picker.add(new Option('مدل ذخیره‌شده · نسخه '+nf(draft.reference.revision),draft.reference.id));
+   picker.value=draft.reference.id;form.draftReference=draft.reference;
+  }
+  if(draft.attempt){form.dataset.submissionContent=draft.attempt.content;form.dataset.submissionKey=draft.attempt.key;}
+  state.modalDirty=true;form.restoredDraft=true;
+  if(draft.reference)updateAmendmentPricing(form.elements.pricingPlanId,draft.reference);
+ }
+ updateAmendmentDraftStatus(form);
 }
-async function updateAmendmentPricing(el){
+function amendmentDraftBanner(c){
+ if(!actionAllowed('new-amendment'))return '';
+ const saved=amendmentDrafts.load(c.id);if(!saved.draft)return '';
+ return '<section class="draft-resume-banner amendment-draft-banner" aria-label="الحاقیه نیمه‌تمام"><div><strong>'+esc(saved.draft.fields.title||'الحاقیه نیمه‌تمام')+'</strong><p>کار شما در همین برگه حفظ شده است · '+dateTimeText(saved.draft.savedAt)+(saved.draft.attempt?' · نتیجه آخرین ارسال نیازمند بررسی است':' · هنوز ثبت سرور نشده است')+'</p></div>'+action('resume-amendment','ادامه الحاقیه','primary')+action('discard-amendment-draft','کنارگذاشتن کار نیمه‌تمام','ghost')+'</section>';
+}
+function amendmentRetry(form){
+ if(!form?.dataset.submissionKey)return null;
+ const fields=Object.fromEntries(new FormData(form)),payload=amendmentPayload(fields,form.draftReference||null);
+ return JSON.stringify(payload)===form.dataset.submissionContent?{...payload,idempotencyKey:form.dataset.submissionKey}:null;
+}
+function updateAmendmentDraftStatus(form){
+ const status=$('[data-amendment-draft-status]',form);if(!status)return;
+ status.textContent=form.draftWriteFailed?'ذخیره موقت مرورگر انجام نشد؛ متن را پیش از بستن کپی کنید.':(form.restoredDraft?'کار نیمه‌تمام بازیابی شد. ':'')+'ذخیره موقت در همین برگه؛ ثبت و امضای الحاقیه نیست.';
+ const button=$('[data-action="save-amendment"]',modalRoot);if(!button)return;
+ const retry=amendmentRetry(form);
+ button.textContent=retry?'بررسی نتیجه و تلاش مجدد همان ارسال':'ثبت پیش‌نویس الحاقیه';
+ button.disabled=!actionAllowed('save-amendment')||Boolean(form.elements.pricingPlanId.value&&!form.financial&&!retry);
+}
+function captureAmendmentDraft(form=$('#amendmentForm')){
+ if(!form)return {ok:false};
+ const fields=Object.fromEntries(new FormData(form)),payload=amendmentPayload(fields,form.draftReference||null),content=JSON.stringify(payload);
+ if(form.dataset.submissionContent!==content){delete form.dataset.submissionContent;delete form.dataset.submissionKey;}
+ const attempt=form.dataset.submissionKey?{key:form.dataset.submissionKey,content}:null;
+ const result=amendmentDrafts.save(form.dataset.contractId,{fields,reference:form.draftReference||null,attempt});
+ form.draftWriteFailed=!result.ok;updateAmendmentDraftStatus(form);return result;
+}
+async function updateAmendmentPricing(el,pinned=null){
  const form=el.closest('#amendmentForm'),preview=$('#amendmentPricingPreview',form),button=$('[data-action="save-amendment"]',modalRoot);
  const generation=Number(form.dataset.pricingGeneration||0)+1;form.dataset.pricingGeneration=generation;form.financial=null;
- const plan=(state.data.pricingPlans||[]).find(p=>p.id===el.value),tenant=state.tenantId;
- if(!plan){preview.innerHTML='';button.disabled=!actionAllowed('save-amendment');return;}
+ const plan=pinned?{id:pinned.id,revision:pinned.revision}:(state.data.pricingPlans||[]).find(p=>p.id===el.value),tenant=state.tenantId;
+ form.draftReference=plan?{id:plan.id,revision:plan.revision,basis:pinned?.basis||state.detail.amendmentPricingBasis.token}:null;
+ captureAmendmentDraft(form);
+ if(!plan){preview.innerHTML='';updateAmendmentDraftStatus(form);return;}
  button.disabled=true;preview.innerHTML='<p role="status">در حال دریافت نسخه ثابت و مقایسه با مبنای پرونده…</p>';
  const current=()=>form.isConnected&&form.dataset.pricingGeneration===String(generation)&&state.tenantId===tenant;
  try{
-  const financial=await api('/contracts/'+encodeURIComponent(form.dataset.contractId)+'/amendments/preview',{pricingPlanId:plan.id,pricingPlanRevision:plan.revision,expectedPricingBasis:form.dataset.pricingBasis});
-  if(!current())return;form.financial=financial;preview.innerHTML=amendmentFinancialHtml(financial);button.disabled=!actionAllowed('save-amendment');
- }catch(error){if(!current())return;preview.innerHTML='<p class="inline-error" role="alert">'+esc(error.message)+'</p><p class="field-hint">متن فرم حفظ شده است. برای تغییر مبنا، آخرین جزئیات پرونده را بازبینی کنید؛ یا پیوست مالی را حذف کنید.</p>';}
+  const financial=await api('/contracts/'+encodeURIComponent(form.dataset.contractId)+'/amendments/preview',{pricingPlanId:plan.id,pricingPlanRevision:plan.revision,expectedPricingBasis:form.draftReference.basis});
+  if(!current())return;form.financial=financial;preview.innerHTML=amendmentFinancialHtml(financial);updateAmendmentDraftStatus(form);
+ }catch(error){if(!current())return;preview.innerHTML='<p class="inline-error" role="alert">'+esc(error.message)+'</p><p class="field-hint">متن و نسخه انتخابی حفظ شده‌اند. برای تغییر مبنا، آخرین جزئیات پرونده را بازبینی و مدل را دوباره انتخاب کنید؛ یا پیوست مالی را حذف کنید.'+(amendmentRetry(form)?' تلاش مجدد تنها نتیجه همان ارسال قبلی را بررسی می‌کند؛ اگر قبلاً ثبت نشده باشد، سرور مبنای قدیمی را رد می‌کند.':'')+'</p>';updateAmendmentDraftStatus(form);}
 }
 async function saveAmendment(){
  if(state.busy)return;
- const form=$('#amendmentForm'),d=formValues('#amendmentForm');if(!d)return;
+ const form=$('#amendmentForm');let d=formValues('#amendmentForm');if(!d)return;
+ const retry=amendmentRetry(form);
+ if(retry)d=retry;
+ else{
  for(const name of ['title','reason','body'])d[name]=d[name].trim();
  if(d.pricingPlanId){if(!form.financial||form.financial.sourcePlan.id!==d.pricingPlanId)throw new Error('ابتدا پیش‌نمایش پیوست مالی را دریافت کنید.');d.pricingPlanRevision=form.financial.sourcePlan.revision;d.expectedPricingBasis=form.financial.basis.token;}else delete d.pricingPlanId;
  const content=JSON.stringify(d);
  if(form.dataset.submissionContent!==content){form.dataset.submissionContent=content;form.dataset.submissionKey=crypto.randomUUID();}
  d.idempotencyKey=form.dataset.submissionKey;
+ }
+ captureAmendmentDraft(form);
  const id=form.dataset.contractId,tenant=state.tenantId,revision=state.modalRevision;
  const saved=await busyRequest(()=>api('/contracts/'+encodeURIComponent(id)+'/amendments',d));
  if(state.tenantId!==tenant)return;
+ if(!amendmentDrafts.remove(id))toast('الحاقیه ثبت شد؛ پاک‌کردن ذخیره موقت مرورگر انجام نشد.','warning');
  if(state.modalRevision===revision){state.detail=saved;state.detailTab='document';renderContractDetail();}
  await refresh(false);renderView();toast('پیش‌نویس الحاقیه ثبت شد.');
 }
@@ -432,6 +492,15 @@ async function handleAction(a,b){
  else if(a==='advance-dialog')advanceDialog();
  else if(a==='advance-contract')await advanceContract();
  else if(a==='new-amendment')amendmentEditor();
+ else if(a==='resume-amendment')amendmentEditor();
+ else if(a==='discard-amendment-draft'){
+  const id=state.detail.id;confirmDiscard(()=>{if(!amendmentDrafts.remove(id)){toast('پاک‌کردن ذخیره موقت انجام نشد.','warning');return;}renderContractDetail();},'کنارگذاشتن الحاقیه نیمه‌تمام','فقط کار نگه‌داری‌شده در این برگه حذف می‌شود. الحاقیه ثبت‌شده در سرور یا نتیجه ارسال قبلی با این کار حذف نمی‌شود.');
+ }
+ else if(a==='save-amendment-exit'){
+  const form=$('#amendmentForm');if(!form||!$('.discard-card'))return;
+  const next=state.pendingAmendmentExit;if(!captureAmendmentDraft(form).ok){dismissDiscard();formError('ذخیره موقت انجام نشد؛ متن را پیش از بستن کپی کنید.');return;}
+  dismissDiscard();next?.();
+ }
  else if(a==='save-amendment')await saveAmendment();
  else if(a==='amendment-decision')amendmentDecisionDialog(id,b.dataset.decision);
  else if(a==='save-amendment-decision')await saveAmendmentDecision();
@@ -513,6 +582,7 @@ document.addEventListener('input',e=>{
  else if(search==='wizard-templates'){state.wizardTemplateSearch=el.value;const pos=el.selectionStart;renderWizard();const next=$('[data-search="wizard-templates"]');next?.focus();next?.setSelectionRange(pos,pos);}
  if(el.closest('#wizardForm')){if(el.hasAttribute('data-money'))el.setCustomValidity('');collectWizard();if(el.name==='amount')$('#amountHelp').textContent=Number.isFinite(Number(cleanNumber(el.value)))?nf(Number(cleanNumber(el.value)))+' ریال':'مبلغ را به صورت عدد وارد کنید.';if(el.name==='start')$('[name="end"]').min=el.value;if($('#wizardFinancialSummary'))$('#wizardFinancialSummary').innerHTML=financialSummary();}
  else if(el.closest('#modalRoot form'))state.modalDirty=true;
+ if(el.closest('#amendmentForm')&&el.name!=='pricingPlanId')captureAmendmentDraft(el.closest('#amendmentForm'));
 });
 document.addEventListener('change',e=>{
  if(e.target.id==='tenantSelect'){switchTenant(e.target.value).catch(error=>toast(error.message,'warning'));return;}

@@ -48,6 +48,9 @@
 .document-paper mark{background:var(--warning-soft);color:var(--ui-ink);border-radius:2px}
 .document-paper mark.current-match{background:var(--fanasa-saffron);outline:2px solid var(--ui-navy);outline-offset:2px}
 .contract-detail-modal :focus-visible{outline:2px solid var(--ui-navy);outline-offset:3px}
+.amendment-draft-banner{margin:0 0 16px;flex-wrap:wrap}
+.amendment-draft-banner p{overflow-wrap:anywhere}
+[data-amendment-draft-status]{display:block;font-size:12px;line-height:1.9;margin-top:6px}
 @media(max-width:760px){
  .modal-backdrop:has(.contract-detail-modal){padding:0;align-items:stretch}
  .contract-detail-modal{width:100%;height:100dvh;max-height:100dvh;border-radius:0}
