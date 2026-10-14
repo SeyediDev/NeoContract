@@ -1,0 +1,70 @@
+const limit=BigInt(Number.MAX_SAFE_INTEGER);
+const live=invoice=>!['cancelled','rejected'].includes(invoice.status);
+const sum=values=>values.reduce((total,value)=>total+BigInt(value),0n);
+export const executionDeductionFields=['retention','withholding','insurance','penalty','advanceRecovery'];
+const amount=value=>/^\d+$/.test(String(value))&&BigInt(value)<=limit?BigInt(value):null;
+const quantity=value=>{
+ if(!/^\d{1,12}(\.\d{1,3})?$/.test(String(value)))return null;
+ const [whole,fraction='']=String(value).split('.');
+ const result=BigInt(whole)*1000n+BigInt(fraction.padEnd(3,'0'));
+ return result>0n?result:null;
+};
+export const executionQuantityText=units=>{
+ const value=BigInt(units),fraction=String(value%1000n).padStart(3,'0').replace(/0+$/,'');
+ return String(value/1000n)+(fraction?'.'+fraction:'');
+};
+export function executionInvoiceCapacity(s){
+ const invoices=s.invoices.filter(live),accepted=new Map(),billed=new Map();
+ for(const delivery of s.deliveries)if(delivery.status==='accepted')accepted.set(delivery.itemId,(accepted.get(delivery.itemId)||0n)+BigInt(delivery.quantity));
+ for(const invoice of invoices)for(const line of invoice.lines||[])billed.set(line.itemId,(billed.get(line.itemId)||0n)+BigInt(line.quantity));
+ const advances=invoices.filter(invoice=>invoice.kind==='advance'),advanceIds=new Set(advances.map(invoice=>invoice.id)),reversed=new Set(s.reversals.map(row=>row.paymentId));
+ const advancePaid=sum(s.payments.filter(payment=>advanceIds.has(payment.invoiceId)&&!reversed.has(payment.id)).map(payment=>payment.amount));
+ const stages=s.milestones.map(stage=>({id:stage.id,title:stage.title,remaining:String(BigInt(stage.gross)-sum(invoices.filter(invoice=>invoice.milestoneId===stage.id).map(invoice=>invoice.gross))),lines:s.items.filter(item=>item.milestoneId===stage.id).map(item=>({...item,availableUnits:String((accepted.get(item.id)||0n)-(billed.get(item.id)||0n))}))}));
+ return {stages,advanceAvailable:String(BigInt(s.basis.advanceLimit)-sum(advances.map(invoice=>invoice.gross))),advanceRecoverable:String(advancePaid-sum(invoices.map(invoice=>invoice.advanceRecovery))),contractRemaining:String(BigInt(s.effectiveAmount)-sum(invoices.filter(invoice=>['progress','final'].includes(invoice.kind)).map(invoice=>invoice.gross))),finalReady:s.items.length>0&&s.items.every(item=>(accepted.get(item.id)||0n)===BigInt(item.quantity))};
+}
+export function executionInvoicePreview(s,input){
+ const capacity=executionInvoiceCapacity(s),errors=[],error=(field,message)=>errors.push({field,message});
+ const stage=capacity.stages.find(stage=>stage.id===input.milestoneId);
+ let gross=0n,validGross=true;
+ if(!['progress','advance','final'].includes(input.kind))error('kind','نوع صورت‌وضعیت معتبر نیست.');
+ if(input.kind==='advance'){
+  gross=amount(input.gross);validGross=gross!==null;
+  if(!validGross)error('gross','مبلغ صحیح و نامنفی ریالی لازم است.');
+  else if(gross<=0n)error('gross','مبلغ پیش‌پرداخت باید مثبت باشد.');
+  else if(gross>BigInt(capacity.advanceAvailable))error('gross','مبلغ از سقف باقی‌مانده پیش‌پرداخت بیشتر است.');
+ }else{
+  if(!stage)error('milestoneId','مرحله مالی را انتخاب کنید.');
+  const lines=input.lines||[],seen=new Set();
+  if(!lines.length||lines.length>100)error('kind','بین یک تا صد ردیف تحویل تأییدشده انتخاب کنید.');
+  for(const line of lines){
+   const field='line-'+line.itemId,item=stage?.lines.find(item=>item.id===line.itemId),units=quantity(line.quantity);
+   if(!item||seen.has(line.itemId)){error('kind','ردیف تکراری یا مربوط به مرحله دیگری است.');validGross=false;continue;}seen.add(line.itemId);
+   if(units===null){error(field,'مقدار مثبت با حداکثر سه رقم اعشار لازم است.');validGross=false;continue;}
+   if(units>BigInt(item.availableUnits))error(field,'مقدار از تحویل تأییدشده قابل صورت‌وضعیت بیشتر است.');
+   const value=(units*BigInt(item.unitPrice)+500n)/1000n;gross+=value;
+   if(value>limit)error(field,'مبلغ ردیف خارج از محدوده امن ریالی است.');
+  }
+  if(gross>limit)error('kind','جمع ناخالص خارج از محدوده امن ریالی است.');
+  if(stage&&gross>BigInt(stage.remaining))error('milestoneId','ناخالص از سقف باقی‌مانده مرحله بیشتر است.');
+  if(gross>BigInt(capacity.contractRemaining))error('kind','ناخالص از مبلغ باقی‌مانده قرارداد بیشتر است.');
+  if(input.kind==='final'&&!capacity.finalReady)error('kind','پذیرش کامل همه اقلام برای صورت‌وضعیت نهایی لازم است.');
+ }
+ const values={};for(const field of ['tax',...executionDeductionFields]){values[field]=amount(input[field]);if(values[field]===null)error(field,'مبلغ صحیح و نامنفی ریالی لازم است.');}
+ const validAmounts=Object.values(values).every(value=>value!==null),deductions=validAmounts?sum(executionDeductionFields.map(field=>values[field])):null;
+ const basisRequired=validAmounts&&(deductions>0n||values.tax>0n);
+ if(basisRequired&&!String(input.basis||'').trim())error('basis','مرجع و مبنای مالیات و کسورات را وارد کنید.');
+ if(validAmounts){
+  if(input.kind==='advance')for(const field of ['tax',...executionDeductionFields])if(values[field]>0n)error(field,'پیش‌پرداخت بدون مالیات و کسورات ثبت می‌شود.');
+  if(values.advanceRecovery>BigInt(capacity.advanceRecoverable))error('advanceRecovery','بازیافت از پیش‌پرداخت دریافت/پرداخت‌شده باقیمانده بیشتر است.');
+  if(validGross&&deductions>gross)error(executionDeductionFields.find(field=>values[field]>0n)||'retention','جمع کسورات از مبلغ ناخالص بیشتر است.');
+ }
+ const net=validGross&&validAmounts?gross+values.tax-deductions:null;
+ if(net!==null&&net>limit)error('tax','خالص صورت‌وضعیت خارج از محدوده امن ریالی است.');
+ if(input.number&&s.invoices.some(invoice=>invoice.number===String(input.number).trim()))error('number','شماره صورت‌وضعیت قبلاً استفاده شده است.');
+ return {capacity,stageRemaining:stage?.remaining??null,gross:validGross?String(gross):null,tax:values.tax===null?null:String(values.tax),deductions:deductions===null?null:String(deductions),net:net===null?null:String(net),basisRequired,errors};
+}
+export function executionDeductionRemaining(s,invoiceId){
+ const invoice=s.invoices.find(invoice=>invoice.id===invoiceId);if(!invoice)return null;
+ const reversed=new Set(s.deductionReversals.map(row=>row.settlementId));
+ return Object.fromEntries(['withholding','insurance'].map(kind=>[kind,String(BigInt(invoice[kind])-sum(s.deductionSettlements.filter(row=>row.invoiceId===invoiceId&&row.kind===kind&&!reversed.has(row.id)).map(row=>row.amount)))]));
+}
