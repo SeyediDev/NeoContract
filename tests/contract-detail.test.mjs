@@ -1,6 +1,18 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {documentMatches,missingContractTerms,readinessHtml,documentReaderHtml} from '../public/contract-detail-ui.js';
+import {documentSections,documentMatches,missingContractTerms,readinessHtml,documentReaderHtml} from '../public/contract-detail-ui.js';
+
+test('outline keeps original offsets and duplicates, excludes code fences and unstructured prose',()=>{
+ const text='# قرارداد\r\n\r\n## ماده ۱ ـ مبلغ ##\r\nمتن ماده ۲ و تعهدات\r\n```md\r\n## نمونه داخل کد\r\n````\r\n~~~\nپیوست 9: داخل کد\n~~~\nماده ۲ ـ تحویل\n## ماده ۱ ـ مبلغ\n    # کد تورفته\nپیوست ۳: <img onerror=bad()>\n###بدون فاصله';
+ const sections=documentSections(text);
+ assert.deepEqual(sections.map(s=>s.title),['قرارداد','ماده ۱ ـ مبلغ','ماده ۲ ـ تحویل','ماده ۱ ـ مبلغ','پیوست ۳: <img onerror=bad()>']);
+ assert.ok(sections.every(s=>text.slice(s.start).startsWith(s.level===1?'# قرارداد':s.title.startsWith('پیوست')?'پیوست':s.title==='ماده ۲ ـ تحویل'?'ماده ۲':'## ماده')));
+ const html=documentReaderHtml({document:text},'');
+ assert.ok(html.includes('value="3">ماده ۱ ـ مبلغ'));
+ assert.ok(html.includes('&lt;img onerror=bad()&gt;'));
+ assert.ok(!html.includes('<img'));
+ assert.ok(!documentReaderHtml({document:'متن بدون عنوان'},'').includes('data-document-section-select'));
+});
 
 test('literal document search preserves Persian/Arabic offsets, digits and HTML-shaped text',()=>{
  const text='كیف ۱۲۳ · کیف 123 · API [a+b] <script> داده';

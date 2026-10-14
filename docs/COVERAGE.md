@@ -9,6 +9,7 @@
 | کاتالوگ رسمی | ۱۴ مرکز، ۸۷ سرویس، منبع، SLA، نرخ‌های چندبخشی، شکست دریافت و بازبینی اپراتور | `fanasa-importer.test.mjs`، `integrations.test.mjs`، `integrations.spec.mjs` |
 | الگوی قرارداد | نسخه ثابت، انتشار با revision، تعارض هم‌زمان، متغیرهای معتبر و مراحل الزامی | `api.test.mjs`، `domain.test.mjs`، `contract-routing.spec.mjs` |
 | ساخت و پرونده قرارداد | ویزارد، پیش‌نویس قابل ادامه، اعتبارسنجی، idempotency، سند، snapshot و الحاقیه | `api.test.mjs`، `workflow.spec.mjs`، `ux.spec.mjs` |
+| خواندن سند بلند | فهرست تیترهای صریح، مقصد مستقل برای تیتر تکراری، حذف بلوک کد از فهرست، حفظ CRLF و متن HTML، جست‌وجوی عبوری از تیتر، اسکرول مستقل و فوکوس در دسکتاپ/موبایل | `contract-detail.test.mjs`، `contract-detail.spec.mjs` |
 | ثبت الحاقیه | جلوگیری از تکرار پس از قطع پاسخ و درخواست هم‌زمان، شماره مستقل، هویت معتبر، rollback رویداد، نمایش پیش‌نویس و ثبات مفاد اصلی | `amendments.test.mjs`، `amendments.spec.mjs` |
 | کار نیمه‌تمام الحاقیه | بازیابی همان برگه، جداسازی کاربر/تننت/قرارداد، نگه‌داری و کنارگذاشتن صریح، ارسال idempotent پس از reload، نسخه مالی ثابت و مبنای قدیمی | `amendment-draft.test.mjs`، `amendment-draft.spec.mjs` |
 | پیوست مالی الحاقیه | نسخه ثابت همان تننت، مقایسه سرور، تشخیص مبنای قدیمی و مبلغ نامشخص، پاسخ دیرهنگام، دریافت JSON و حفظ اصل قرارداد | `amendment-pricing.test.mjs`، `amendment-pricing.spec.mjs` |

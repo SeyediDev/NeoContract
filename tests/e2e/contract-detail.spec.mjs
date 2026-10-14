@@ -17,12 +17,22 @@ for(const width of [1440,390])test(`contract dossier has stable navigation, sear
  await expect(panel).toHaveAttribute('aria-labelledby','contract-tab-document');
  const paper=dialog.locator('#contractDocumentText');await expect(paper).toContainText('قرارداد');
  expect(await paper.textContent()).toBe(before.document||before.snapshot.document);
+ const sectionSelect=dialog.locator('[data-document-section-select]'),go=dialog.getByRole('button',{name:'رفتن به بخش',exact:true});
+ await expect(sectionSelect).toBeVisible();await expect(go).toBeDisabled();
+ const last=await sectionSelect.locator('option').last().getAttribute('value');
+ await sectionSelect.selectOption(last);await expect(go).toBeEnabled();
+ const background=await page.evaluate(()=>window.scrollY);await go.click();
+ await expect(paper).toBeFocused();expect(await page.evaluate(()=>window.scrollY)).toBe(background);
+ expect(await panel.evaluate(e=>e.scrollTop)).toBeGreaterThan(0);
+ const anchor=await paper.locator(`[data-document-section="${last}"]`).boundingBox(),frame=await panel.boundingBox();
+ expect(anchor.y).toBeGreaterThanOrEqual(frame.y);expect(anchor.y).toBeLessThan(frame.y+frame.height);
  const search=dialog.getByRole('searchbox',{name:'جست‌وجو در متن قرارداد'});
  await search.fill('قرارداد');await expect(paper.locator('mark').first()).toBeVisible();
  await search.press('Enter');await expect(paper.locator('mark.current-match')).toHaveCount(1);
  await search.press('Shift+Enter');await expect(paper.locator('mark.current-match')).toHaveCount(1);
  await search.fill('<script>');await expect(paper.locator('script')).toHaveCount(0);await expect(dialog.locator('[data-document-search-status]')).toHaveText('عبارت در متن پیدا نشد');
  await search.fill('');expect(await paper.textContent()).toBe(before.document||before.snapshot.document);
+ await sectionSelect.selectOption('0');await go.click();await expect(paper).toBeFocused();
  await expect(dialog.locator('[data-document-next]')).toBeDisabled();
  const tabPosition=await tabs.boundingBox();await panel.evaluate(e=>e.scrollTop=e.scrollHeight);
  expect((await tabs.boundingBox()).y).toBe(tabPosition.y);await expect(tabs).toBeVisible();await expect(dialog.locator('[data-action="advance-dialog"]')).toBeVisible();
@@ -42,4 +52,31 @@ for(const width of [1440,390])test(`contract dossier has stable navigation, sear
  await page.screenshot({path:testInfo.outputPath(`dossier-document-${width}.png`)});
  await page.keyboard.press('Escape');await expect(dialog).toHaveCount(0);
  expect(await(await request.get('/api/contracts/'+c.id,{headers})).json()).toEqual(before);expect(writes).toEqual([]);expect(errors).toEqual([]);
+});
+
+test('outline and search preserve CRLF, literal markup and a match crossing a heading boundary',async({page})=>{
+ const text='# قرارداد\r\n'+('متن آزمایشی\r\n'.repeat(50))+'قبل\r\n## ماده ۲ ـ <img src=x onerror=bad()>\r\nپایان\r\n## ماده ۲ ـ <img src=x onerror=bad()>\r\n';
+ await page.addInitScript(id=>sessionStorage.setItem('neocontract-active-tenant',id),tenant);
+ await page.route('**/api/bootstrap',async route=>{
+   const response=await route.fetch(),data=await response.json();
+   data.contracts=data.contracts.map(c=>({...c,document:text,snapshot:{...c.snapshot,document:text}}));
+   await route.fulfill({response,json:data});
+ });
+ await page.route(/\/api\/contracts\/[^/]+$/,async route=>{
+   const response=await route.fetch(),data=await response.json();
+   await route.fulfill({response,json:{...data,document:text,snapshot:{...data.snapshot,document:text}}});
+ });
+ await page.goto('/#view=contracts');await page.locator('[data-action="contract-detail"]').first().click();
+ const dialog=page.getByRole('dialog');await dialog.getByRole('tab',{name:'سند و الحاقیه‌ها',exact:true}).click();
+ const paper=dialog.locator('#contractDocumentText'),search=dialog.locator('[data-document-search]'),select=dialog.locator('[data-document-section-select]');
+ expect(await paper.textContent()).toBe(text);await expect(paper.locator('img')).toHaveCount(0);
+ await expect(select.locator('option')).toHaveCount(4);
+ await search.fill('قبل\r\n## ماده');
+ // Search inputs remove line breaks; dispatch a literal multiline value via the listener's input source.
+ await search.evaluate(e=>{Object.defineProperty(e,'value',{configurable:true,value:'قبل\r\n## ماده'});e.dispatchEvent(new Event('input',{bubbles:true}));});
+ await search.press('Enter');await expect(paper.locator('mark')).toHaveCount(1);await expect(paper.locator('mark.current-match')).toHaveCount(1);
+ await expect(paper.locator('mark [data-document-section="1"]')).toHaveCount(1);
+ expect(await paper.textContent()).toBe(text);await select.selectOption('2');await dialog.locator('[data-document-section-go]').click();await expect(paper).toBeFocused();
+ await search.evaluate(e=>{delete e.value;e.value='';e.dispatchEvent(new Event('input',{bubbles:true}));});
+ expect(await paper.textContent()).toBe(text);await expect(paper.locator('mark')).toHaveCount(0);await expect(paper.locator('[data-document-section]')).toHaveCount(3);
 });
