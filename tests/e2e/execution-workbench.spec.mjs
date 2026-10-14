@@ -47,15 +47,20 @@ for(const [width,role] of [[1440,'contract_admin'],[390,'viewer']])test(`executi
 });
 
 test('workbench paginates 30 browser records and resets the page on normalized search without fetching',async({page})=>{
+ let closed=false;
  await page.route('**/api/bootstrap',async route=>{
   const response=await route.fetch(),data=await response.json();
   const s={status:'running',basis:{direction:'receivable'},endDate:offset(60),items:[],deliveries:[],invoices:[],payments:[],reversals:[],deductionSettlements:[],deductionReversals:[],guarantees:[],issues:[],summary:{itemProgress:[],outstanding:0,retentionHeld:0,advanceOutstanding:0},obligations:Array.from({length:30},(_,i)=>({id:String(i).padStart(2,'0'),status:'open',title:'تعهد '+i,dueDate:today,owner:'مسئول',condition:'مدرک آزمون'}))};
-  await route.fulfill({response,json:{...data,contracts:[{...data.contracts[0],execution:s}]}});
+  if(closed)s.status='closed';
+  await route.fulfill({response,json:{...data,contracts:[{id:'workbench-browser-fixture',number:'WB-TEST',title:'نمونه مستقل پیگیری اجرا',status:'active',execution:s}]}});
  });
  await page.goto('/#view=execution');const panel=page.locator('#executionWorkbench');await expect(panel.locator('.workbench-record')).toHaveCount(25);
  let requests=0;page.on('request',r=>{if(new URL(r.url()).pathname.startsWith('/api/'))requests++;});
  await panel.locator('[data-workbench-navigation="next"]').click();await expect(panel.locator('.workbench-record')).toHaveCount(5);await expect(panel.locator('.workbench-record').first()).toContainText('تعهد 25');await expect(panel.locator('[data-workbench-navigation="next"]')).toBeDisabled();
  await panel.locator('[data-workbench-filter="query"]').fill('تعهد ۲۹');await expect(panel.locator('.workbench-record')).toHaveCount(1);await expect(panel.locator('.workbench-result')).toContainText('صفحه ۱ از ۱');await expect(panel.locator('[data-workbench-filter="query"]')).toBeFocused();expect(requests).toBe(0);
+ const contract=await panel.locator('[data-workbench-filter="contract"] option').nth(1).getAttribute('value');await panel.locator('[data-workbench-filter="contract"]').selectOption(contract);closed=true;
+ const fresh=page.waitForResponse(r=>new URL(r.url()).pathname==='/api/bootstrap');await panel.locator('[data-workbench-refresh]').click();expect((await fresh).status()).toBe(200);await expect(panel.locator('[data-workbench-refresh]')).toBeEnabled();
+ await expect(panel.locator('[data-workbench-filter="contract"]')).toHaveValue(contract);await expect(panel.locator('[data-workbench-filter="contract"] option:checked')).toContainText('دیگر اجرای باز ندارد');await expect(panel.locator('.workbench-record')).toHaveCount(0);
 });
 
 test('workbench filters are isolated between tenants and retained on SPA navigation',async({page,request})=>{
