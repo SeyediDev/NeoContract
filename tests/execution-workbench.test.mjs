@@ -1,0 +1,41 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {executionWorkbench} from '../public/execution-workbench.js';
+import {executionSummary} from '../lib/execution.mjs';
+const today='2026-10-14';
+const state=direction=>({status:'running',basis:{direction},effectiveAmount:10000,endDate:'2027-10-01',items:[],deliveries:[],milestones:[],invoices:[],payments:[],reversals:[],deductionSettlements:[],deductionReversals:[],obligations:[],guarantees:[],issues:[],changes:[]});
+const invoice=(id,status='approved',net=1000)=>({id,number:id,status,kind:'progress',lines:[],gross:net,net,tax:0,retention:0,withholding:0,insurance:0,advanceRecovery:0,dueDate:today});
+const contract=(id,s)=>({id,title:'قرارداد '+id,number:'C-'+id,customerName:'شرکت كیف ۱۲۳',execution:{...s,summary:executionSummary(s,today)}});
+test('approved and disputed balances remain separate by direction without double counting collateral or reversals',()=>{
+ const receivable=state('receivable');receivable.invoices=[{...invoice('r'),retention:200,withholding:50},invoice('dispute','disputed'),invoice('submitted','submitted'),invoice('cancel','cancelled')];
+ receivable.payments=[{id:'p',invoiceId:'r',amount:100},{id:'reverse',invoiceId:'r',amount:700},{id:'partial',invoiceId:'dispute',amount:200}];receivable.reversals=[{paymentId:'reverse'}];
+ receivable.guarantees=[{id:'g',status:'held',expiryDate:today,reference:'ضمانت',amount:3000}];
+ const payable=state('payable');payable.invoices=[invoice('p'),invoice('pd','disputed',500)];
+ const closed=state('receivable');closed.status='closed';closed.invoices=[invoice('closed')];
+ const contracts=[contract('one',receivable),contract('two',payable),contract('closed',closed),{id:'draft',status:'active'}],before=structuredClone(contracts);
+ const result=executionWorkbench(contracts,{}, {today});
+ assert.deepEqual(result.totals,{receivable:'900',payable:'1000',disputedReceivable:'800',disputedPayable:'500'});
+ assert.ok(result.rows.some(r=>r.kind==='retention'));assert.ok(result.rows.some(r=>r.kind==='guarantee'));
+ assert.ok(!result.rows.some(r=>r.contractId==='closed'));assert.deepEqual(contracts,before);
+ assert.deepEqual(executionWorkbench(contracts,{direction:'payable'},{today}).totals,{receivable:'0',payable:'1000',disputedReceivable:'0',disputedPayable:'500'});
+});
+test('date, review, subject, contract and normalized text filters intersect; dates refresh from state',()=>{
+ const s=state('receivable');s.invoices=[invoice('review','submitted')];s.obligations=[{id:'o',title:'تعهد API ١٢٣',owner:'مسئول',condition:'مدرک',status:'open',dueDate:today}];
+ s.issues=[{id:'late',title:'ریسک',owner:'مجری',impact:'حل اختلاف',status:'open',dueDate:'2026-10-13'}];
+ const cs=[contract('one',s),contract('two',s)];
+ assert.equal(executionWorkbench(cs,{urgency:'overdue'},{today}).rows.length,2);
+ assert.equal(executionWorkbench(cs,{urgency:'review',category:'finance',contract:'two',query:'کیف 123'},{today}).rows.length,1);
+ assert.equal(executionWorkbench(cs,{category:'obligation',query:'api ۱۲۳'},{today}).rows.length,2);
+ assert.equal(executionWorkbench(cs,{urgency:'near',category:'issue'},{today}).rows.length,0);
+ assert.equal(executionWorkbench(cs,{query:'ناموجود'},{today}).rows.length,0);
+ assert.equal(executionWorkbench(cs,{}, {today:'2026-10-15'}).counts.overdue,6);
+});
+test('large sums stay exact and pagination is bounded with stable destinations even when record IDs repeat',()=>{
+ const cs=Array.from({length:30},(_,i)=>{const s=state('receivable');s.invoices=[invoice('shared','approved',Number.MAX_SAFE_INTEGER)];return contract('c'+String(i).padStart(2,'0'),s);});
+ const first=executionWorkbench(cs,{}, {today}),second=executionWorkbench(cs,{page:2},{today});
+ assert.equal(first.totals.receivable,(30n*BigInt(Number.MAX_SAFE_INTEGER)).toString());
+ assert.equal(first.visible.length,25);assert.equal(second.visible.length,5);assert.equal(second.visible[0].contractId,'c25');
+ assert.equal(executionWorkbench(cs,{page:99},{today}).page,2);assert.equal(executionWorkbench(cs,{page:-4},{today}).page,1);
+ assert.equal(executionWorkbench(cs,{query:'ناموجود',page:2},{today}).page,1);
+ assert.equal(new Set(first.rows.map(r=>r.contractId+':'+r.key)).size,30);
+});

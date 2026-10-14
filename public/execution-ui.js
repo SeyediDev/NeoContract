@@ -115,5 +115,5 @@ export function createExecutionUI({state,api,showModal,requestCloseModal,showCon
  });
  document.addEventListener('change',e=>{const form=e.target.closest('#executionForm');if(form?.dataset.command==='invoice'&&['kind','milestoneId'].includes(e.target.name))invoiceLines(form);});
  document.addEventListener('input',e=>{if(e.target.closest('#executionForm'))preview(e.target.closest('#executionForm'));});
- return {render};
+ return {render,open(contractId,target='overview'){section=Object.hasOwn(sections,target)?target:'overview';followupFilter='all';return showContract(contractId,'execution');}};
 }
