@@ -1,0 +1,26 @@
+import {test,expect} from '@playwright/test';
+const instant='2026-10-16T12:00:00.000Z';
+async function fixture(request){
+ const d=await(await request.get('/api/bootstrap')).json();
+ const response=await request.post('/api/contracts',{data:{templateId:d.templates.find(t=>t.currentPublishedVersion).id,customerId:d.customers[0].id,title:'مقایسه ظرفیت بدون اعمال واقعی',owner:'آزمون',amount:1000,start:'2026-10-01',end:'2027-10-01',paymentTerms:'آزمون مستقل',services:[]}});expect(response.status()).toBe(201);return response.json();
+}
+const version=(n,changes={})=>({id:'comparison-'+n,version:n,status:'signed',terms:{serviceKey:'organization-api',title:'API سازمان',productKey:'organization-fabric',environment:'development',operationGroup:'organization',requestsPerSecond:5,burstCapacity:10,monthlyRequests:1000,effectiveAt:'2026-10-01T00:00:00.000Z',validFrom:'2026-10-01T00:00:00.000Z',validTo:'2027-01-01T00:00:00.000Z',source:{clauseQuote:'TPS مستند آزمون <script>throw Error("unsafe")</script>'},...changes}});
+// Signed versions and receipts here are response fixtures, never persisted claims.
+for(const width of [1440,390])test(`capacity comparison separates scheduled amendments, old receipts and lifecycle at ${width}px`,async({page,request},info)=>{
+ const c=await fixture(request),before=await(await request.get(`/api/contracts/${c.id}/service-limits`)).json(),writes=[],errors=[];
+ page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>{if(r.method()!=='GET'&&new URL(r.url()).pathname.startsWith('/api/'))writes.push(r.url());});
+ await page.clock.install({time:new Date(instant)});await page.setViewportSize({width,height:width===390?844:1000});
+ let executionStatus='running';const a=version(1),b=version(2,{requestsPerSecond:8,monthlyRequests:0,effectiveAt:'2026-10-20T00:00:00.000Z',validTo:'2026-11-01T00:00:00.000Z'});
+ await page.route('**/api/bootstrap',async route=>{const response=await route.fetch(),data=await response.json();data.access={...data.access,identity:{roles:['viewer']}};await route.fulfill({json:data});});
+ await page.route(`**/api/contracts/${c.id}/service-limits`,r=>r.fulfill({json:{revision:2,executionStatus,versions:[a,b],current:[],gatewayApplied:true,outbox:[{version_id:a.id,event_id:'ui-observation-only',status:'acknowledged',attempts:1,receipt:{phase:'acknowledged',gateway:{observedAt:'2026-10-10T12:00:00.000Z',configRevision:1}}}]}}));
+ await page.goto('/#view=contracts');await page.locator(`button.contract-link[data-id="${c.id}"]`).click();await page.locator('[data-action="detail-tab"][data-tab="service-limits"]').click();
+ const summary=page.locator('.service-limit-impact'),first=page.locator('[data-service-limit-id="comparison-1"]'),second=page.locator('[data-service-limit-id="comparison-2"]');
+ await expect(summary).toContainText('نسخه مؤثر: ۱');await expect(summary).toContainText('تغییر آینده: نسخه ۲');await expect(summary).toContainText('رسید مشاهده همین نسخه موجود است');await expect(page.locator('[data-sl="extract"]')).toBeDisabled();
+ await expect(second.locator('[data-limit-applicability]')).toHaveAttribute('data-limit-applicability','scheduled');
+ await second.locator('summary').focus();await page.keyboard.press('Enter');await expect(second.locator('table')).toBeVisible();await expect(second.locator('tbody tr').nth(0)).toContainText('افزایش');await expect(second.locator('tbody tr').nth(1)).toContainText('بدون تغییر');await expect(second.locator('tbody tr').nth(2)).toContainText('منع مصرف');await expect(second.locator('blockquote')).toContainText('<script>');
+ expect(await page.locator('.modal').evaluate(e=>e.scrollWidth<=e.clientWidth)).toBeTruthy();await second.scrollIntoViewIfNeeded();await page.screenshot({path:info.outputPath(`capacity-comparison-${width}.png`)});
+ await page.clock.setSystemTime(new Date('2026-10-20T00:00:00.000Z'));await page.locator('[data-sl="reload"]').click();await expect(summary).toContainText('نسخه مؤثر: ۲');await expect(summary).toContainText('رسید نسخه قبلی، تأیید این نسخه نیست');await expect(summary).toContainText('سهمیه صفر');await expect(first.locator('[data-limit-applicability]')).toHaveAttribute('data-limit-applicability','superseded');
+ executionStatus='paused';await page.locator('[data-sl="reload"]').click();await expect(summary).toContainText('نسخه قابل مصرف محلی نداریم');await expect(second.locator('[data-limit-applicability]')).toHaveAttribute('data-limit-applicability','paused');await expect(first).toContainText('این رسید تاریخی است');await expect(summary).not.toContainText('نسخه مؤثر:');
+ executionStatus='running';await page.clock.setSystemTime(new Date('2026-11-01T00:00:00.000Z'));await page.locator('[data-sl="reload"]').click();await expect(summary).toContainText('نسخه منقضی‌شده با حدود نسخه قدیمی جایگزین نمی‌شود');await expect(summary).not.toContainText('نسخه مؤثر:');await expect(second.locator('[data-limit-applicability]')).toHaveAttribute('data-limit-applicability','expired');
+ const after=await(await request.get(`/api/contracts/${c.id}/service-limits`)).json();expect(after).toEqual(before);expect(writes).toEqual([]);expect(errors).toEqual([]);expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBeTruthy();
+});

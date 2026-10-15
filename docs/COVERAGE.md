@@ -44,6 +44,7 @@
 | پنل مشتری | producer مستقل، redaction/replay، مرز تننت، جست‌وجو و keyset، rollup و ساعات مرزی، نمودار/status و موبایل | `customer-economy.test.mjs`، `customer-economy.spec.mjs` |
 | پیش‌نمایش پنل مشتری | یکپارچگی فیلتر/آمار/نمودار، ورودی/خروجی، صدک، نتیجه خالی، صفحه‌بندی، موبایل، Escape/فوکوس و نبود API | `client-preview.test.mjs`، `client-preview.spec.mjs` |
 | رسید اتصال مرکزی | تفکیک HTTP 202/200، snapshot ثابت پیش از ارسال، منع تغییر نگاشت retry، حفظ پذیرش پس از خطا، توقف نسخه منسوخ و SQL immutable | `service-limit-receipt.test.mjs`، `service-limits.test.mjs`، `service-limits.spec.mjs` |
+| اثر اصلاحیه ظرفیت | مقایسه مستقل هر سرویس با نسخه امضاشده پیشین، نسخه آینده، مرز تاریخ اثر/انقضا بدون بازگشت به حدود قدیمی، توقف/خاتمه، رسید تاریخی مستقل از وضعیت لحظه‌ای، بازخوانی مشاهده‌گر و جدول موبایل/صفحه‌کلید | `service-limit-impact.test.mjs`، `service-limit-impact.spec.mjs` |
 | اقتصاد و ارائه‌دهنده | سهم دقیق، اعتبار اختیاری خاموش، مدرک امضا، اصلاحیه/rollback، پیشنهاد تسویه بدون write کیف پول و بررسی مرحله‌ای | `customer-economy.test.mjs`، `customer-economy.spec.mjs` |
 | مرز HTTP | روش‌ها، MIME، HEAD، JSON، origin، مسیر فایل و symlink | `server.test.mjs`، `api.test.mjs` |
 | اتصال مرکزی | عضویت و admission تازه، revocation بدون کش مجوز، token مشترک، TLS، منع fallback، پیش‌بررسی چهار نگاشت/کاربر/ثبت محصول و تفکیک خطای توکن از policy | `central-access.test.mjs`، `central-access-preflight.test.mjs`؛ فعال‌سازی زنده وابسته به provisioning مرکزی |

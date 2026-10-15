@@ -5,7 +5,7 @@ export function serviceLimitJourney(version,row){
   {title:'مدرک امضا',description:signed?'مبنای تغییر ثبت شده':'نیازمند مدرک طرفین',state:signed?'done':'current'},
   {title:'ثبت تغییر',description:row?'نسخه و رویداد محفوظ‌اند':'پس از ثبت امضا',state:row?'done':signed?'current':'waiting'},
   {title:'پذیرش مرکز',description:superseded?'نسخه جدیدتری در مرکز است':accepted?'پذیرش این رویداد ثبت شده':'در انتظار پذیرش نسخه',state:superseded?'blocked':accepted?'done':row?'current':'waiting'},
-  {title:'مشاهده مقصد',description:observed?'نسخه مقصد تأیید شده':'در انتظار رسید Gateway',state:observed?'done':accepted?'current':'waiting'}
+  {title:'مشاهده مقصد',description:observed?'مشاهده این نسخه ثبت شده':'در انتظار رسید Gateway',state:observed?'done':accepted?'current':'waiting'}
  ];
  return {steps,complete:steps.filter(s=>s.state==='done').length};
 }
