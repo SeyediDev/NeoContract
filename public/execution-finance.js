@@ -120,3 +120,30 @@ export function executionReversalPreview(s,action,id){
  }
  return result;
 }
+export function executionCancellationPreview(s,id){
+ const invoice=s.invoices.find(row=>row.id===id),errors=[];
+ if(!invoice)return {errors:['صورت‌وضعیت یافت نشد.'],after:null};
+ if(!['submitted','approved','disputed'].includes(invoice.status))errors.push('این صورت‌وضعیت دیگر قابل ابطال نیست.');
+ if(s.status!=='running')errors.push(s.status==='paused'?'اجرا متوقف است؛ ابتدا شروع مجدد مستند لازم است.':'پرونده اجرا خاتمه یافته است.');
+ const reversed=new Set(s.reversals.map(row=>row.paymentId)),deductionReversed=new Set(s.deductionReversals.map(row=>row.settlementId));
+ const receipts=s.payments.filter(row=>row.invoiceId===id&&!reversed.has(row.id));
+ const deductions=s.deductionSettlements.filter(row=>row.invoiceId===id&&!deductionReversed.has(row.id));
+ if(receipts.length)errors.push('ابتدا رسیدهای دریافت/پرداخت مؤثر را با مدرک برگشت اصلاح کنید: '+receipts.map(row=>row.reference).join('، ')+'.');
+ if(deductions.length)errors.push('ابتدا رسیدهای تسویه کسور مؤثر را با مدرک برگشت اصلاح کنید: '+deductions.map(row=>row.reference).join('، ')+'.');
+ const releases=s.invoices.filter(row=>live(row)&&row.kind==='retention');
+ if(invoice.retention>0){
+  const otherHeld=sum(s.invoices.filter(row=>row.id!==id&&['approved','disputed'].includes(row.status)).map(row=>row.retention));
+  if(otherHeld<sum(releases.map(row=>row.net)))errors.push('مجوزهای آزادسازی از سپرده سایر صورت‌وضعیت‌ها بیشترند؛ ابتدا مجوز مرتبط را مطابق مدارک اصلاح کنید: '+releases.map(row=>row.number).join('، ')+'.');
+ }
+ const snapshot=state=>{
+  const capacity=executionInvoiceCapacity(state),retention=executionRetentionCapacity(state);
+  return {contractRemaining:capacity.contractRemaining,stageRemaining:capacity.stages.find(row=>row.id===invoice.milestoneId)?.remaining??null,advanceAvailable:capacity.advanceAvailable,advanceRecoverable:capacity.advanceRecoverable,retentionHeld:retention.held,retentionReserved:retention.reserved,retentionRemaining:retention.remaining,lines:(invoice.lines||[]).map(line=>{
+   const item=capacity.stages.flatMap(row=>row.lines).find(row=>row.id===line.itemId);
+   return {itemId:line.itemId,title:line.title,unit:item?.unit||'',availableUnits:item?.availableUnits??'0'};
+  })};
+ };
+ const before=snapshot(s);
+ if(invoice.kind==='advance'&&BigInt(before.advanceRecoverable)<sum(receipts.map(row=>row.amount)))errors.push('این پیش‌پرداخت پشتوانه بازیافت رزروشده است؛ ابتدا صورت‌وضعیت مرتبط را مطابق مدارک اصلاح کنید.');
+ const after=errors.length?null:snapshot({...s,invoices:s.invoices.map(row=>row.id===id?{...row,status:'cancelled'}:row)});
+ return {id,number:invoice.number,kind:invoice.kind,errors,receipts,deductions,before,after};
+}

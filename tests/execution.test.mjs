@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {executionClosure} from '../public/execution-closure.js';
-import {executionReceiptPreview,executionRetentionCapacity,executionReversalPreview,executionPaymentCapacity,executionDeductionRemaining} from '../public/execution-finance.js';
+import {executionReceiptPreview,executionRetentionCapacity,executionReversalPreview,executionPaymentCapacity,executionDeductionRemaining,executionCancellationPreview,executionInvoiceCapacity} from '../public/execution-finance.js';
 import {randomUUID} from 'node:crypto';
 import {mkdtemp,rm} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
@@ -27,8 +27,11 @@ test('execution enforces signed basis, delivery, financial settlement and immuta
    if(['payment','retention-release'].includes(action))assert.deepEqual(executionReceiptPreview(s,action,payload,payload.invoiceId).errors,[]);
    const reversal=['payment-reverse','deduction-reverse'].includes(action)?executionReversalPreview(s,action,payload.id):null;
    if(reversal)assert.deepEqual(reversal.errors,[]);
+   const cancellation=action==='invoice-cancel'?executionCancellationPreview(s,payload.id):null;
+   if(cancellation)assert.deepEqual(cancellation.errors,[]);
    s=await store.execution.command(c.id,make(action,payload));assert.equal(executionRetentionCapacity(s).remaining,String(s.summary.retentionHeld));
    if(reversal){assert.equal(reversal.remainingAfter,action==='payment-reverse'?executionPaymentCapacity(s,reversal.invoiceId).remaining:executionDeductionRemaining(s,reversal.invoiceId)[reversal.kind]);if(reversal.advanceAfter!==undefined)assert.equal(reversal.advanceAfter,String(s.summary.advanceOutstanding));}
+   if(cancellation){const capacity=executionInvoiceCapacity(s);assert.equal(cancellation.after.contractRemaining,capacity.contractRemaining);assert.equal(cancellation.after.advanceRecoverable,String(s.summary.advanceOutstanding));assert.equal(cancellation.after.retentionRemaining,String(s.summary.retentionHeld));}
    if(action==='close'){assert.equal(executionClosure(s).closed,true);assert.equal(executionClosure(s).ready,false);}return s;
   };
   const fail=async(action,payload,status=400)=>{const before=await store.execution.read(c.id);if(action==='close')assert.equal(executionClosure(before).ready,false);await assert.rejects(store.execution.command(c.id,make(action,payload)),e=>e.status===status);assert.deepEqual(await store.execution.read(c.id),before);};
