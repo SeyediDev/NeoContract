@@ -1,7 +1,7 @@
 import {canExecute,executionActionAvailable} from './execution-permissions.js';
 import {executionFollowups,followupUrgencies,followupCategories} from './execution-followups.js';
 import {executionPreparation,executionItemValue} from './execution-preparation.js';
-import {executionInvoiceCapacity,executionInvoicePreview,executionDeductionRemaining,executionQuantityText,executionPaymentCapacity,executionRetentionCapacity,executionReceiptPreview} from './execution-finance.js';
+import {executionInvoiceCapacity,executionInvoicePreview,executionDeductionRemaining,executionQuantityText,executionPaymentCapacity,executionRetentionCapacity,executionReceiptPreview,executionReversalPreview} from './execution-finance.js';
 import {executionClosure} from './execution-closure.js';
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const nf=v=>new Intl.NumberFormat('fa-IR',{maximumFractionDigits:3}).format(v||0);
@@ -25,10 +25,11 @@ export function createExecutionUI({state,api,showModal,requestCloseModal,showCon
   if(action==='deduction-settle'&&s){const remaining=executionDeductionRemaining(s,id);if(remaining&&Object.values(remaining).every(value=>BigInt(value)<=0n))return 'کسور تسویه‌نشده‌ای برای این صورت‌وضعیت باقی نمانده است.';}
   if(action==='payment'&&s){const c=executionPaymentCapacity(s,id);if(!c?.approved||BigInt(c.remaining)<=0n)return 'تأیید مالی، رفع اختلاف و مانده مثبت صورت‌وضعیت لازم است.';}
   if(action==='retention-release'&&s){const c=executionRetentionCapacity(s);if(c.blockers.length)return 'تسویه صورت‌وضعیت‌های دارای سپرده و رفع اختلاف آن‌ها لازم است.';if(BigInt(c.remaining)<=0n)return 'سپرده آزاد‌نشده‌ای باقی نمانده است.';}
+  if(['payment-reverse','deduction-reverse'].includes(action)&&s)return executionReversalPreview(s,action,id).errors.join(' ');
   if(action==='close'&&s&&!executionClosure(s).ready)return 'موارد چک‌لیست آمادگی خاتمه و تسویه را تکمیل و پرونده را بازخوانی کنید.';
   return '';
  };
- const button=(action,id='',label=titles[action])=>{const allowed=canExecute(roles(),action),available=action==='start'||executionActionAvailable(executionStatus,action),reason=prerequisite(action,id);return `<button type="button" class="btn btn-secondary" data-exec="${esc(action)}" data-id="${esc(id)}" ${allowed&&available&&!reason?'':`disabled title="${esc(!allowed?'نقش شما اجازه این اقدام را ندارد.':!available?'این اقدام در وضعیت فعلی اجرا در دسترس نیست.':reason)}"`}>${esc(label)}</button>`;};
+ const button=(action,id='',label=titles[action])=>{const allowed=canExecute(roles(),action),available=action==='start'||executionActionAvailable(executionStatus,action),reason=prerequisite(action,id);return `<button type="button" class="btn btn-secondary" data-exec="${esc(action)}" data-id="${esc(id)}" ${allowed&&available&&!reason?'':`disabled title="${esc(!allowed?'نقش شما اجازه این اقدام را ندارد.':!available?'این اقدام در وضعیت فعلی اجرا در دسترس نیست.':reason)}"`}>${esc(label)}</button>${reason&&['payment-reverse','deduction-reverse'].includes(action)?`<p class="notice-note">${esc(reason)}</p>`:''}`;};
  const badge=(status,late=false)=>`<span class="tag ${late?'amber':'blue'}">${esc(statuses[status]||status)}${late?' · موعد گذشته':''}</span>`;
  const phaseProgress=(s,id)=>{const p=s.summary.milestoneProgress.find(p=>p.id===id);return p?badge(p.status)+`<p>کارکرد تأیید مالی: ${money(p.approvedGross)} · دریافت/پرداخت: ${money(p.paid)} · مانده خالص: ${money(p.outstanding)}</p>`:'';};
  const card=(title,content,actions='')=>`<section class="execution-card"><div class="execution-card-head"><h3>${esc(title)}</h3><div class="execution-actions">${actions}</div></div>${content}</section>`;
@@ -86,6 +87,7 @@ export function createExecutionUI({state,api,showModal,requestCloseModal,showCon
   if(form&&['milestone','item'].includes(form.dataset.command))return budgetPreview(form);
   if(form?.dataset.command==='deduction-settle')return deductionPreview(form);
   if(form&&['payment','retention-release'].includes(form.dataset.command))return receiptPreview(form);
+  if(form&&['payment-reverse','deduction-reverse'].includes(form.dataset.command))return reversalPreview(form);
   if(!form||form.dataset.command!=='invoice')return;
   const values=Object.fromEntries(new FormData(form));values.lines=[...form.querySelectorAll('[data-exec-line]')].filter(input=>!input.disabled&&input.value!==''&&Number(input.value)!==0).map(input=>({itemId:input.dataset.execLine,quantity:input.value}));
   const result=executionInvoicePreview(state.detail.execution,values);
@@ -106,6 +108,14 @@ export function createExecutionUI({state,api,showModal,requestCloseModal,showCon
   form.elements.amount.min='1';form.elements.amount.max=String(c?BigInt(c.remaining)>limitSafe?limitSafe:c.remaining:0);
   const values=payment?[['خالص صورت‌وضعیت',c?.net],['رسید مؤثر',c?.paid],['رسید برگشتی',c?.reversed],['مانده پیش از ثبت',c?.remaining],['مانده پس از این رسید',result.after]]:[['سپرده تأییدشده',c.held],['مجوزهای آزادسازی جاری',c.reserved],['سپرده آزاد‌نشده',c.remaining],['مجوز پیشنهادی',result.amount],['سپرده پس از مجوز',result.after]];
   form.querySelector('#executionReceiptPreview').innerHTML=`<h4>${payment?'اثر رسید':'اثر مجوز آزادسازی'} · ${s.basis.direction==='receivable'?'دریافت از مشتری':'پرداخت به طرف قرارداد'}</h4>${payment?`<p>صورت‌وضعیت: ${esc(c?.number||'یافت نشد')}</p>`:''}<dl class="execution-finance-preview">${values.map(([label,value])=>`<div><dt>${label}</dt><dd>${value===null||value===undefined?'نیازمند مقدار معتبر':money(value)}</dd></div>`).join('')}</dl>${result.errors.length?`<ul class="execution-finance-errors">${[...new Set(result.errors.map(error=>error.message))].map(message=>`<li>${esc(message)}</li>`).join('')}</ul>`:'<p>مبالغ و نسخه پرونده هنگام ثبت در سرور بازبینی می‌شوند.</p>'}<p>${payment?'این اقدام ثبت رسید است؛ انتقال پول به بانک انجام نمی‌دهد.':'این مجوز یک صورت‌وضعیت مستقل ایجاد می‌کند؛ ثبت رسید دریافت یا پرداخت آن جداگانه انجام می‌شود.'}</p>`;
+ }
+ function reversalPreview(form){
+  const s=state.detail.execution,r=executionReversalPreview(s,form.dataset.command,form.dataset.id),payment=r.kind==='payment';
+  form.elements.reference.setCustomValidity(r.errors.join(' '));
+  const values=[['مبلغ کامل رسید',r.amount],['مانده پیش از برگشت',r.remainingBefore],['مانده پس از برگشت',r.remainingAfter]];
+  if(payment)values.push(['رسید مؤثر پیش از برگشت',r.paidBefore],['رسید مؤثر پس از برگشت',r.paidAfter]);
+  if(r.advanceBefore!==undefined)values.push(['پیش‌پرداخت قابل بازیافت پیش از برگشت',r.advanceBefore],['پیش‌پرداخت قابل بازیافت پس از برگشت',r.advanceAfter]);
+  form.querySelector('#executionReversalPreview').innerHTML=`<h4>اثر برگشت رسید · ${payment?(s.basis.direction==='receivable'?'دریافت از مشتری':'پرداخت به طرف قرارداد'):r.kind==='insurance'?'بیمه':'مالیات تکلیفی'}</h4><p>صورت‌وضعیت: ${esc(r.number)} · مرجع رسید اصلی: ${esc(r.reference)}</p><dl class="execution-finance-preview">${values.map(([label,value])=>`<div><dt>${label}</dt><dd>${value===undefined?'ناموجود':money(value)}</dd></div>`).join('')}</dl>${r.effects.map(message=>`<p>${esc(message)}</p>`).join('')}${r.errors.length?`<ul class="execution-finance-errors">${r.errors.map(message=>`<li>${esc(message)}</li>`).join('')}</ul>`:''}<p>برگشت برای کل مبلغ همین رسید، با مرجع و علت مستقل ثبت می‌شود. رسید اصلی و سابقه آن حفظ می‌شوند؛ این ثبت بازپرداخت بانکی انجام نمی‌دهد. برای اصلاح جزئی، برگشت کامل و رسید جایگزین باید مطابق مدارک ثبت شوند.</p>`;
  }
  function budgetPreview(form){
   const p=executionPreparation(state.detail.execution),output=form.querySelector('#executionBudgetPreview');
@@ -150,6 +160,9 @@ export function createExecutionUI({state,api,showModal,requestCloseModal,showCon
   }
   if(['payment','retention-release'].includes(action)){
    const form=document.querySelector('#executionForm');form.insertAdjacentHTML('beforeend','<section id="executionReceiptPreview" class="notice-note form-field full" aria-label="پیش‌نمایش ثبت مالی" aria-live="polite"></section>');receiptPreview(form);
+  }
+  if(['payment-reverse','deduction-reverse'].includes(action)){
+   const form=document.querySelector('#executionForm');form.insertAdjacentHTML('beforeend','<section id="executionReversalPreview" class="notice-note form-field full" aria-label="پیش‌نمایش برگشت رسید" aria-live="polite"></section>');reversalPreview(form);
   }
  }
  async function save(){

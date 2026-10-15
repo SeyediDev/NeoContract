@@ -93,3 +93,30 @@ export function executionReceiptPreview(s,action,input,invoiceId){
  else if(capacity&&value>BigInt(capacity.remaining))error('amount',action==='payment'?'مبلغ از مانده صورت‌وضعیت بیشتر است.':'مبلغ از سپرده آزاد‌نشده بیشتر است.');
  return {capacity,amount:value===null?null:String(value),after:capacity&&value!==null?String(BigInt(capacity.remaining)-value):null,errors};
 }
+export function executionReversalPreview(s,action,id){
+ const payment=action==='payment-reverse',errors=[],effects=[];
+ const receipt=(payment?s.payments:s.deductionSettlements).find(row=>row.id===id);
+ if(!receipt)return {errors:['رسید یافت نشد.'],effects};
+ const invoice=s.invoices.find(row=>row.id===receipt.invoiceId);
+ if(!invoice)return {errors:['صورت‌وضعیت رسید یافت نشد.'],effects};
+ const reversed=(payment?s.reversals:s.deductionReversals).some(row=>(payment?row.paymentId:row.settlementId)===id);
+ if(reversed)errors.push('رسید قبلاً برگشت خورده است.');
+ if(s.status==='closed')errors.push('پرونده اجرا خاتمه یافته است.');
+ const delta=reversed?0n:BigInt(receipt.amount),result={amount:String(receipt.amount),reference:receipt.reference,invoiceId:invoice.id,number:invoice.number,kind:payment?'payment':receipt.kind,errors,effects};
+ if(payment){
+  const c=executionPaymentCapacity(s,invoice.id);
+  Object.assign(result,{paidBefore:c.paid,paidAfter:String(BigInt(c.paid)-delta),remainingBefore:c.remaining,remainingAfter:String(BigInt(c.remaining)+delta)});
+  if(invoice.kind==='advance'){
+   const before=executionInvoiceCapacity(s).advanceRecoverable;
+   Object.assign(result,{advanceBefore:before,advanceAfter:String(BigInt(before)-delta)});
+   if(!reversed&&BigInt(before)<delta)errors.push('این پیش‌پرداخت در بازیافت رزرو شده است؛ ابتدا صورت‌وضعیت مرتبط را مطابق مدارک اصلاح کنید.');
+  }
+  if(invoice.retention>0)effects.push('برگشت این رسید، مانده صورت‌وضعیت دارای سپرده را باز می‌کند و مانع صدور مجوز آزادسازی تازه می‌شود؛ مجوزهای قبلی خودکار باطل نمی‌شوند.');
+  if(invoice.kind==='retention')effects.push('مانده دریافت/پرداخت مجوز سپرده دوباره باز می‌شود؛ خود مجوز باقی می‌ماند و مبلغ سپرده آزاد‌نشده تغییر نمی‌کند.');
+ }else{
+  const before=executionDeductionRemaining(s,invoice.id)[receipt.kind];
+  Object.assign(result,{remainingBefore:before,remainingAfter:String(BigInt(before)+delta)});
+  effects.push('مانده '+(receipt.kind==='insurance'?'بیمه':'مالیات تکلیفی')+' دوباره باز می‌شود؛ مانده خالص صورت‌وضعیت تغییر نمی‌کند.');
+ }
+ return result;
+}
