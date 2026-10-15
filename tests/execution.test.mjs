@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {executionClosure} from '../public/execution-closure.js';
+import {executionReceiptPreview,executionRetentionCapacity} from '../public/execution-finance.js';
 import {randomUUID} from 'node:crypto';
 import {mkdtemp,rm} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
@@ -21,7 +22,7 @@ test('execution enforces signed basis, delivery, financial settlement and immuta
  const db=await createDatabase({dataDir:'memory://'}),store=createStore(db);let target;const root=await mkdtemp(join(tmpdir(),'neocontract-execution-'));
  try{
   const {c}=await fixture(store);let s=null;const make=(action,payload,key=randomUUID())=>({action,payload,expectedRevision:s?.revision||0,idempotencyKey:key});
-  const cmd=async(action,payload)=>{if(action==='close')assert.equal(executionClosure(s).ready,true);s=await store.execution.command(c.id,make(action,payload));if(action==='close'){assert.equal(executionClosure(s).closed,true);assert.equal(executionClosure(s).ready,false);}return s;};
+  const cmd=async(action,payload)=>{if(action==='close')assert.equal(executionClosure(s).ready,true);if(['payment','retention-release'].includes(action))assert.deepEqual(executionReceiptPreview(s,action,payload,payload.invoiceId).errors,[]);s=await store.execution.command(c.id,make(action,payload));assert.equal(executionRetentionCapacity(s).remaining,String(s.summary.retentionHeld));if(action==='close'){assert.equal(executionClosure(s).closed,true);assert.equal(executionClosure(s).ready,false);}return s;};
   const fail=async(action,payload,status=400)=>{const before=await store.execution.read(c.id);if(action==='close')assert.equal(executionClosure(before).ready,false);await assert.rejects(store.execution.command(c.id,make(action,payload)),e=>e.status===status);assert.deepEqual(await store.execution.read(c.id),before);};
   await t.test('explicit signed reference, exact dates and active contract required',async()=>{
    const data=await store.bootstrap();const draft=await store.createContract({templateId:data.templates.find(t=>t.currentPublishedVersion).id,customerId:data.customers[0].id,title:'پیش از امضا',owner:'آزمون',amount:1,start:'2026-10-01',end:'2027-10-01',paymentTerms:'توافق',services:[]});

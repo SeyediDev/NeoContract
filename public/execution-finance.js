@@ -68,3 +68,28 @@ export function executionDeductionRemaining(s,invoiceId){
  const reversed=new Set(s.deductionReversals.map(row=>row.settlementId));
  return Object.fromEntries(['withholding','insurance'].map(kind=>[kind,String(BigInt(invoice[kind])-sum(s.deductionSettlements.filter(row=>row.invoiceId===invoiceId&&row.kind===kind&&!reversed.has(row.id)).map(row=>row.amount)))]));
 }
+export function executionPaymentCapacity(s,invoiceId){
+ const invoice=s.invoices.find(row=>row.id===invoiceId);if(!invoice)return null;
+ const reversed=new Set(s.reversals.map(row=>row.paymentId)),receipts=s.payments.filter(row=>row.invoiceId===invoiceId);
+ const paid=sum(receipts.filter(row=>!reversed.has(row.id)).map(row=>row.amount));
+ return {number:invoice.number,net:String(invoice.net),paid:String(paid),reversed:String(sum(receipts.filter(row=>reversed.has(row.id)).map(row=>row.amount))),remaining:String(BigInt(invoice.net)-paid),approved:invoice.status==='approved'};
+}
+export function executionRetentionCapacity(s){
+ const invoices=s.invoices.filter(live),sources=invoices.filter(row=>row.retention>0).map(row=>({id:row.id,number:row.number,status:row.status,retention:String(row.retention),remaining:executionPaymentCapacity(s,row.id).remaining}));
+ const held=sum(sources.filter(row=>['approved','disputed'].includes(row.status)).map(row=>row.retention));
+ const reserved=sum(invoices.filter(row=>row.kind==='retention').map(row=>row.net));
+ return {held:String(held),reserved:String(reserved),remaining:String(held-reserved),sources,blockers:sources.filter(row=>row.status!=='approved'||BigInt(row.remaining)!==0n)};
+}
+export function executionReceiptPreview(s,action,input,invoiceId){
+ const errors=[],error=(field,message)=>errors.push({field,message}),value=amount(input.amount);
+ const capacity=action==='payment'?executionPaymentCapacity(s,invoiceId):executionRetentionCapacity(s);
+ if(s.status==='closed')error('amount','پرونده اجرا خاتمه یافته است.');
+ if(action==='payment'){
+  if(!capacity)error('amount','صورت‌وضعیت یافت نشد.');
+  else if(!capacity.approved)error('amount','تأیید مالی و رفع اختلاف صورت‌وضعیت لازم است.');
+  if(String(input.reference||'').trim()&&s.payments.some(row=>row.reference===String(input.reference).trim()))error('reference','مرجع رسید قبلاً استفاده شده است؛ مرجع رسید برگشتی نیز قابل استفاده مجدد نیست.');
+ }else if(capacity.blockers.length)error('amount','تسویه همه صورت‌وضعیت‌های دارای سپرده و رفع اختلاف آن‌ها لازم است.');
+ if(value===null||value<=0n)error('amount','مبلغ صحیح و مثبت در محدوده امن ریالی لازم است.');
+ else if(capacity&&value>BigInt(capacity.remaining))error('amount',action==='payment'?'مبلغ از مانده صورت‌وضعیت بیشتر است.':'مبلغ از سپرده آزاد‌نشده بیشتر است.');
+ return {capacity,amount:value===null?null:String(value),after:capacity&&value!==null?String(BigInt(capacity.remaining)-value):null,errors};
+}
