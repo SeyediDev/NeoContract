@@ -27,7 +27,9 @@ test('due periods exclude proposed periods, stop at amendments and do not auto-f
  const v={id:'v1',status:'signed',terms:validateEconomicTerms(terms),validFrom:'2026-10-01T00:00:00.000Z',validTo:'2026-11-01T00:00:00.000Z',effectiveAt:'2026-10-01T00:00:00.000Z'};
  const schedule=settlementSchedule([v],[{periodStart:'2026-10-01T00:00:00.000Z',periodEnd:'2026-10-02T00:00:00.000Z'}],{now:Date.parse('2026-10-04T00:00:00Z')});assert.equal(schedule.periods.length,2);assert.equal(schedule.periods[0].customerCreditEnabled,false);assert.equal(schedule.periods[0].status,'awaiting-financial-evidence');assert.equal(settlementSchedule([v],[],{executionStatus:'paused'}).periods.length,0);assert.equal(settlementSchedule([v],[],{now:Date.parse('2026-10-04T00:00:00Z'),limit:1}).truncated,true);
 });
-test('telemetry search, hourly reports, economic lifecycle and provider reviews are durable and tenant-scoped',{timeout:240000},async()=>{
+test('telemetry search, hourly reports, economic lifecycle and provider reviews are durable and tenant-scoped',{timeout:240000},async t=>{
+ // Keep the amendment ahead of the fixture clock, independently of the run date.
+ t.mock.timers.enable({apis:['Date'],now:new Date('2026-10-14T12:00:00.000Z')});
  const db=await createDatabase({dataDir:'memory://',connectionString:process.env.NEOCONTRACT_CUSTOMER_ECONOMY_ACCEPTANCE_URL}),store=createStore(db,DEMO_TENANT_ID),foreign=createStore(db,TITAN_TENANT_ID);let state;
  try{
   const hour=Math.floor(Date.now()/3600000)*3600000,events=[200,429,503,201].map((statusCode,i)=>({eventId:'test-'+i,requestId:'request-'+i,serviceKey:'test-api',occurredAt:new Date(hour-3600000+i*1000).toISOString(),method:'POST',path:'/service/test',statusCode,durationMs:10+i*100,requestBytes:20,responseBytes:30,requestBody:{query:i===2?'needle':'other',password:'private'},responseBody:{status:'completed'}}));

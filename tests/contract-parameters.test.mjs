@@ -15,7 +15,9 @@ test('extensible typed parameters preserve meanings, unknowns and source evidenc
  const a={status:'signed',effectiveAt:'2026-10-01T00:00:00.000Z',validFrom:'2026-10-01T00:00:00.000Z',validTo:'2026-11-01T00:00:00.000Z'},b={...a,effectiveAt:'2026-10-15T00:00:00.000Z'};
  assert.equal(currentContractParameters({versions:[a,b]},{now:'2026-10-10T00:00:00.000Z'}),a);assert.equal(currentContractParameters({versions:[a,b]},{now:b.effectiveAt}),b);assert.equal(currentContractParameters({versions:[a,b]},{now:b.effectiveAt,executionStatus:'paused'}),null);
 });
-test('custom definitions, immutable commercial versions and signed amendments preserve unchanged values',{timeout:240000},async()=>{
+test('custom definitions, immutable commercial versions and signed amendments preserve unchanged values',{timeout:240000},async t=>{
+ // This fixture verifies a signed amendment whose effective date is still ahead.
+ t.mock.timers.enable({apis:['Date'],now:new Date('2026-10-14T12:00:00.000Z')});
  const db=await createDatabase({dataDir:'memory://',connectionString:process.env.NEOCONTRACT_PARAMETER_ACCEPTANCE_URL}),store=createStore(db,DEMO_TENANT_ID);let state;
  try{
   const before=(await store.parameters.definitions()).length;
