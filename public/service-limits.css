@@ -30,3 +30,8 @@
 .delivery-journey .journey-blocked{color:var(--warning)}
 .journey-blocked .journey-number{background:var(--warning-soft);border-color:var(--warning)}
 @media(max-width:600px){.delivery-journey{padding:16px}.delivery-journey ol{grid-template-columns:1fr;gap:18px}.delivery-journey-heading{align-items:start}.delivery-journey small{margin-top:2px}}
+
+.contract-parameters-workspace,.contract-parameter-impact,.contract-parameter-version{min-width:0;overflow-wrap:anywhere}
+.parameter-comparison small{display:block;font-weight:400;margin-top:6px}
+.parameter-comparison td{vertical-align:top;overflow-wrap:anywhere;min-width:150px}
+.parameter-comparison th{overflow-wrap:anywhere}
