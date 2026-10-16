@@ -18,6 +18,9 @@
 [پذیرش مقایسه اصلاحیه ظرفیت](RELEASE-2026-10-16-SERVICE-IMPACT.md) نسخه مؤثر،
 تغییر آینده، مقایسه TPS/burst/quota، رسید تاریخی مستقل، CI و مرز پذیرش زنده را ثبت می‌کند.
 
+[پذیرش اصلاحیه پارامترهای عمومی](RELEASE-2026-10-17-PARAMETER-IMPACT.md) مقایسه نوع و واحد تاریخی،
+نسخه مؤثر/آینده، CI، حفظ داده و مرز پذیرش زنده را ثبت می‌کند.
+
 | حوزه | رفتار تحت پوشش | شاهد |
 | --- | --- | --- |
 | مشتری و مدیر حساب | ثبت، ویرایش، سلسله‌مراتب، منع چرخه و ارجاع بین تننت‌ها | `api.test.mjs`، `workflow.spec.mjs` |
@@ -44,6 +47,7 @@
 | تجربه کاربری | RTL، دسکتاپ/موبایل، نشان مراکز، فوکوس و صفحه‌کلید، SPA/history، حفظ فرم و پاسخ‌های دیرهنگام | `ux.spec.mjs`، `spa.spec.mjs`، `settings-draft.spec.mjs`، `permissions.spec.mjs` |
 | ذخیره‌سازی و بازیابی | migration، تراکنش، قیدها، ماندگاری پس از بازگشایی، backup/restore و رد دست‌کاری | `database.test.mjs`، `backup.test.mjs` |
 | پارامترهای عمومی | تعریف سفارشی تننت، انواع و حدود، استخراج بند، نسخه تاریخی واحد، امضا و الحاقیه، rollback و تاریخچه immutable | `contract-parameters.test.mjs`، `workflow-authorization.test.mjs`، `contract-parameters.spec.mjs` |
+| اثر اصلاحیه پارامترهای عمومی | نسخه جاری/آینده، مرز اثر و انقضا مطابق سرور، منع احیای نسخه قدیمی، توقف/خاتمه، مقایسه نوع و واحد تاریخی و تعریف سفارشی، صفر/خیر/فهرست/اعشار کوچک، بازخوانی مشاهده‌گر بدون write و موبایل/صفحه‌کلید | `contract-parameter-impact.test.mjs`، `contract-parameter-impact.spec.mjs` |
 | پنل مشتری | producer مستقل، redaction/replay، مرز تننت، جست‌وجو و keyset، rollup و ساعات مرزی، نمودار/status و موبایل | `customer-economy.test.mjs`، `customer-economy.spec.mjs` |
 | پیش‌نمایش پنل مشتری | یکپارچگی فیلتر/آمار/نمودار، ورودی/خروجی، صدک، نتیجه خالی، صفحه‌بندی، موبایل، Escape/فوکوس و نبود API | `client-preview.test.mjs`، `client-preview.spec.mjs` |
 | رسید اتصال مرکزی | تفکیک HTTP 202/200، snapshot ثابت پیش از ارسال، منع تغییر نگاشت retry، حفظ پذیرش پس از خطا، توقف نسخه منسوخ و SQL immutable | `service-limit-receipt.test.mjs`، `service-limits.test.mjs`، `service-limits.spec.mjs` |
