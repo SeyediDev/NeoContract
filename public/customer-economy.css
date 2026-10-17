@@ -19,3 +19,5 @@
 .settlement-preview-table caption{text-align:start;padding:12px;color:var(--muted)}.settlement-preview-table small{display:block;font-weight:400;min-width:160px;margin-top:6px}
 .settlement-preview-table:focus-visible{outline:2px solid var(--primary);outline-offset:2px}.settlement-preview-errors{color:var(--danger);padding-inline-start:20px}
 @media(max-width:640px){.settlement-preview-totals{grid-template-columns:1fr}}
+
+.economy-impact,.economy-comparison{min-width:0;overflow-wrap:anywhere}.economy-comparison summary{cursor:pointer;font-weight:600;padding:12px 0}.economy-comparison .settlement-preview-table{margin-block:12px}
