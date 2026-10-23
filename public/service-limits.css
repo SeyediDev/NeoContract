@@ -37,3 +37,10 @@
 .parameter-comparison th{overflow-wrap:anywhere}
 
 #capacityAmendmentComparison{grid-column:1/-1;min-width:0}
+.parameter-value-row{min-width:0;margin-block:18px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.parameter-value-row>.form-field:nth-child(3){grid-column:1/-1}
+.parameter-empty-list{display:flex;align-items:center;gap:8px;margin-block:12px}
+#contractParameterForm input[type=checkbox]{width:auto;min-height:0;accent-color:var(--primary)}
+#parameterAmendmentComparison{min-width:0;margin-top:20px}
+.parameter-amendment-origin summary{cursor:pointer;color:var(--primary);padding-block:12px}
+@media(max-width:600px){.parameter-value-row{grid-template-columns:1fr}}

@@ -2,7 +2,7 @@ import {parameterTargets,parameterTypes} from './contract-parameter-model.js';
 import {parameterImpactLabels} from './contract-parameter-impact.js';
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fa=v=>new Intl.NumberFormat('fa-IR').format(v);
-export const parameterValue=v=>Array.isArray(v)?v.join('، '):typeof v==='boolean'?v?'بله':'خیر':typeof v==='number'?new Intl.NumberFormat('fa-IR',{maximumSignificantDigits:21}).format(v):String(v);
+export const parameterValue=v=>Array.isArray(v)?v.length?v.join('، '):'فهرست خالی (بدون گزینه)':typeof v==='boolean'?v?'بله':'خیر':typeof v==='number'?new Intl.NumberFormat('fa-IR',{maximumSignificantDigits:21}).format(v):String(v);
 const date=v=>new Intl.DateTimeFormat('fa-IR',{timeZone:'Asia/Tehran',dateStyle:'medium',timeStyle:'short'}).format(new Date(v));
 export const parameterValidity=v=>`اعتبار: ${date(v.validFrom)} تا ${date(v.validTo)} (پایان غیرشامل)`;
 const changeLabels={added:'افزوده‌شده',removed:'حذف‌شده',definition:'تغییر تعریف؛ نوع، واحد یا مقصد را بررسی کنید',unchanged:'بدون تغییر',increased:'افزایش',decreased:'کاهش',changed:'تغییر مقدار'};
