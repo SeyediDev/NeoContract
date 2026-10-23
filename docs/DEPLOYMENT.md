@@ -97,6 +97,12 @@ services:
 
 ## CI/CD
 
+انتشار محدود به app در ۲۳ اکتبر برای اصلاحیه پارامترها، با CI دقیق کامیت،
+backup، تصویر rollback و تطابق fingerprint هر ۵۳ جدول و ۱۲ migration انجام شد.
+چهار فایل برنامه با `21dd364` تطبیق دارند؛ ادغام نمونه مستقل master و مستندات
+بعدی، سورس اجرایی برنامه را تغییر نمی‌دهد. وضعیت پذیرش مرورگر و مرزهای اتصال
+مرکزی در [گزارش انتشار](RELEASE-2026-10-23-PARAMETER-AMENDMENT.md) ثبت شده است.
+
 - `.github/workflows/ci.yml`: نصب، تست backend، بررسی syntax، build تصویر و دو مجموعه تست مرورگر شامل پیکربندی چهار تننت؛ trace و تصویر شکست مرورگر هفت روز نگهداری می‌شود.
 - `.github/workflows/deploy.yml`: اجرای دستی staging/production از طریق SSH و Compose.
 - GitHub Environmentهای staging و production باید secretهای `VPS_HOST`، `VPS_USER`، `VPS_SSH_KEY` و `VPS_APP_DIR` جداگانه داشته باشند.
