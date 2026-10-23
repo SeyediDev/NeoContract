@@ -30,21 +30,35 @@ export const builtInParameters=[
  builtin('data-region','محل نگهداری داده','text','منطقه','commercial'),
  builtin('special-condition','شرط اختصاصی','text','متن','commercial')
 ];
-const normalize=s=>s.replace(/[۰-۹٠-٩]/g,c=>String('۰۱۲۳۴۵۶۷۸۹'.includes(c)?'۰۱۲۳۴۵۶۷۸۹'.indexOf(c):'٠١٢٣٤٥٦٧٨٩'.indexOf(c))).replace(/٬|,(?=\d{3}(?:\D|$))/g,'').replace(/٫/g,'.');
+const normalize=s=>s.replace(/[۰-۹٠-٩]/g,c=>String('۰۱۲۳۴۵۶۷۸۹'.includes(c)?'۰۱۲۳۴۵۶۷۸۹'.indexOf(c):'٠١٢٣٤٥٦٧٨٩'.indexOf(c))).replace(/٫/g,'.');
 const escape=s=>s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+function extractedNumber(raw,definition){
+ raw=normalize(raw);
+ // Validate the whole numeric token before removing grouping separators.
+ const token=raw.match(/^([+-]?(?:\d{1,3}(?:[,٬]\d{3})+|\d+)(?:\.\d+)?(?:[eE][+-]?\d+)?)(?=\s|%|٪|$)/);
+ if(!token)return null;
+ const suffix=raw.slice(token[0].length).trim(),unit=normalize(definition.unit||'');
+ // An alternative, formula, condition, or another amount needs human interpretation.
+ if(suffix!==unit&&(/[0-9=<>≤≥+*/−–—-]|(?:^|\s)(?:یا|تا|الی|اگر|مشروط|حداقل|حداکثر|بین|or|to|if|and)(?:\s|$)/i.test(suffix)))return null;
+ const value=Number(token[1].replace(/[,٬]/g,''));
+ if(!Number.isFinite(value)||(value===0&&/[1-9]/.test(token[1].split(/[eE]/)[0]))||(Number.isInteger(value)&&!Number.isSafeInteger(value))||definition.type==='integer'&&!Number.isSafeInteger(value)||(definition.min!=null&&value<definition.min)||(definition.max!=null&&value>definition.max))return null;
+ return value;
+}
 export function extractContractParameters(document,definitions){
  const candidates=[];
  document.split(/\r?\n/).forEach((quote,i)=>{for(const d of definitions.filter(d=>!d.archived)){
-  const names=[d.label,...d.aliases].map(escape).sort((a,b)=>b.length-a.length);
-  const match=normalize(quote).match(new RegExp('(?:'+names.join('|')+')\\s*[:=：]\\s*([^؛;]+)','i'));if(!match)continue;
+  const names=[...new Set([d.label,...d.aliases])].map(escape).sort((a,b)=>b.length-a.length);
+  const matches=quote.matchAll(new RegExp('(?<![\\p{L}\\p{N}_‌.\\-])(?:'+names.join('|')+')\\s*[:=：]\\s*([^؛;]+)','giu'));
+  for(const match of matches){
   const raw=match[1].trim();let value=null;
-  if(['number','integer'].includes(d.type)){const n=raw.match(/^([0-9]+(?:\.[0-9]+)?)(?:\s|%|$)/);if(n)value=Number(n[1]);}
+  if(['number','integer'].includes(d.type))value=extractedNumber(raw,d);
   else if(d.type==='boolean'){if(/^(بله|فعال|true|yes)$/i.test(raw))value=true;else if(/^(خیر|غیرفعال|false|no)$/i.test(raw))value=false;}
   else if(d.type==='list')value=raw.split(/[,،]/).map(s=>s.trim()).filter(Boolean);
+  else if(d.type==='date')value=normalize(raw);
   else value=raw;
-  const ambiguous=value===null||/حداقل|هدف|نمونه|تقریبی|example|target/i.test(quote)||['number','integer'].includes(d.type)&&/\d\s*(?:تا|الی|[-–])\s*\d/.test(raw);
-  candidates.push({key:d.key,label:d.label,definitionRevision:d.revision,value,quote:quote.slice(0,4000),line:i+1,status:ambiguous?'ambiguous':'needs-review'});
- }});
- for(const c of candidates)if(new Set(candidates.filter(x=>x.key===c.key).map(x=>JSON.stringify(x.value))).size>1)c.status='ambiguous';
+  const ambiguous=value===null||/حداقل|هدف|نمونه|تقریبی|example|target/i.test(quote);
+  candidates.push({key:d.key,label:d.label,definitionRevision:d.revision,value:ambiguous?null:value,quote:quote.slice(0,4000),line:i+1,status:ambiguous?'ambiguous':'needs-review'});
+ }}});
+ for(const c of candidates){const related=candidates.filter(x=>x.key===c.key);if(related.some(x=>x.status==='ambiguous')||new Set(related.map(x=>JSON.stringify(x.value))).size>1)c.status='ambiguous';}
  return {candidates,automaticPublication:false};
 }

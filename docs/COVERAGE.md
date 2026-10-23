@@ -64,6 +64,7 @@
 | تجربه کاربری | RTL، دسکتاپ/موبایل، نشان مراکز، فوکوس و صفحه‌کلید، SPA/history، حفظ فرم و پاسخ‌های دیرهنگام | `ux.spec.mjs`، `spa.spec.mjs`، `settings-draft.spec.mjs`، `permissions.spec.mjs` |
 | ذخیره‌سازی و بازیابی | migration، تراکنش، قیدها، ماندگاری پس از بازگشایی، backup/restore و رد دست‌کاری | `database.test.mjs`، `backup.test.mjs` |
 | پارامترهای عمومی | تعریف سفارشی تننت، انواع و حدود، استخراج بند، نسخه تاریخی واحد، امضا و الحاقیه، rollback و تاریخچه immutable | `contract-parameters.test.mjs`، `workflow-authorization.test.mjs`، `contract-parameters.spec.mjs` |
+| ابهام استخراج پارامتر | چند مقدار و شرط/فرمول، گروه‌بندی عدد، حدود و صحیح امن، تکرار متناقض در یک سطر، حفظ رقم فارسی متن/شناسه و منع انتخاب مبهم در دسکتاپ/موبایل | `contract-parameter-extraction.test.mjs`، `contract-parameter-extraction.spec.mjs` |
 | اثر اصلاحیه پارامترهای عمومی | نسخه جاری/آینده، مرز اثر و انقضا مطابق سرور، منع احیای نسخه قدیمی، توقف/خاتمه، مقایسه نوع و واحد تاریخی و تعریف سفارشی، صفر/خیر/فهرست/اعشار کوچک، بازخوانی مشاهده‌گر بدون write و موبایل/صفحه‌کلید | `contract-parameter-impact.test.mjs`، `contract-parameter-impact.spec.mjs` |
 | پنل مشتری | producer مستقل، redaction/replay، مرز تننت، جست‌وجو و keyset، rollup و ساعات مرزی، نمودار/status و موبایل | `customer-economy.test.mjs`، `customer-economy.spec.mjs` |
 | پیش‌نمایش پنل مشتری | یکپارچگی فیلتر/آمار/نمودار، ورودی/خروجی، صدک، نتیجه خالی، صفحه‌بندی، موبایل، Escape/فوکوس و نبود API | `client-preview.test.mjs`، `client-preview.spec.mjs` |
