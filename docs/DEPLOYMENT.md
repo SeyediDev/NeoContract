@@ -44,6 +44,22 @@ docker compose --env-file .env -f docker-compose.production.yml up -d --build
 
 آدرس‌های محیط مشاهده: `contracts.fanasa.net.local` برای قرارداد، `hub.fanasa.net.local` برای پنجره واحد، `access.fanasa.net.local` برای مدیریت دسترسی، `sso.fanasa.net.local` برای Keycloak، `ai.fanasa.net.local` برای Open WebUI و `admin.fanasa.net.local` برای Portainer. آدرس قبلی `panel.fanasa.net.local` به `access.fanasa.net.local` هدایت می‌شود؛ لینک‌های قدیمی ورود زیر `/realms/` و `/admin/` در `access` به `sso` هدایت می‌شوند. issuer ورود `https://sso.fanasa.net.local/realms/fanasa` است. همه از HTTPS روی پورت ۴۴۳ استفاده می‌کنند. آدرس `agentic.fanasa.net.local` رزرو شده و تا استقرار نسخه برنامه، پاسخ ۵۰۳ با توضیح روشن می‌دهد.
 
+در ۲۳ اکتبر، خطای `upstream sent too big header` برای بازگشت SSO قراردادها
+در لاگ Nginx تأیید شد. بافر پاسخ در همان server میزبان قراردادها تنظیم شده است
+تا مسیرهای `/oauth2/` و `/oauth2/auth` پاسخ بزرگ‌تر ورود را دریافت کنند:
+
+```nginx
+proxy_buffer_size 32k;
+proxy_buffers 8 32k;
+proxy_busy_buffers_size 64k;
+```
+
+این دستورها داخل server موجود در `/opt/fanasa-gateway/nginx.conf` هستند؛
+کنترل `auth_request` و ساخت هدرهای هویت همان مسیر حفظ می‌شوند. پیش از تغییر
+نسخه پشتیبان بگیرید، `nginx -t` را داخل کانتینر gateway اجرا و فقط reload کنید؛
+سپس ورود تازه را از ریشه برنامه تا میزکار بررسی کنید. گزارش و مسیر بازگشت در
+[پذیرش اصلاحیه ظرفیت](RELEASE-2026-10-23-CAPACITY-AMENDMENT.md) ثبت شده است.
+
 DNS عمومی برای این نام‌ها وجود ندارد؛ هر دستگاه باید آن‌ها را در hosts به IP سرور نگاشت کند و گواهی محلی را پس از تطبیق اثر انگشت مورد اعتماد قرار دهد. کلید خصوصی گواهی و اطلاعات حساب‌های دمو فقط روی سرور نگه‌داری می‌شوند و نباید وارد Git شوند.
 
 در SSO فن‌آسا یک OIDC client با redirect URL محیط بسازید و claimهای `sub` و `email` را فعال کنید. کاربر باید با `subject` معتبر SSO و ایمیل همان حساب در `contracts.app_users` ثبت و سپس فعال شود. نقش‌ها در `contracts.app_roles` و انتساب آن‌ها در `contracts.app_user_roles` نگه‌داری می‌شوند.
