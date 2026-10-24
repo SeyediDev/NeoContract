@@ -5,6 +5,8 @@ import {executionInvoiceCapacity,executionInvoicePreview,executionDeductionRemai
 import {executionClosure} from './execution-closure.js';
 import {executionChangePreview} from './execution-change.js';
 import {renderExecutionChangePreview,renderExecutionChangeHistory} from './execution-change-ui.js';
+import {executionDeliveryCapacity,executionDeliveryPreview} from './execution-delivery.js';
+import {renderExecutionDeliveryPreview} from './execution-delivery-ui.js';
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const nf=v=>new Intl.NumberFormat('fa-IR',{maximumFractionDigits:3}).format(v||0);
 const money=v=>nf(typeof v==='string'&&/^-?\d+$/.test(v)?BigInt(v):v)+' ریال';
@@ -21,6 +23,7 @@ export function createExecutionUI({state,api,showModal,requestCloseModal,showCon
  const roles=()=>state.data?.access?.identity?.roles||['contract_admin'];
  const prerequisite=(action,id)=>{
   const s=state.detail?.execution;
+  if(action==='delivery'&&s){const c=executionDeliveryCapacity(s,id);if(!c||BigInt(c.remaining)<=0n)return 'مانده تعهد قابل تحویل برای این قلم باقی نمانده است.';}
   if(action==='item'&&!s?.milestones?.length)return 'ابتدا یک مرحله مالی تعریف کنید.';
   if(action==='milestone'&&s&&BigInt(executionPreparation(s).unallocated)<=0n)return 'تمام مبلغ جاری به مراحل مالی تخصیص یافته است؛ تغییر سقف به توافق جداگانه نیاز دارد.';
   if(action==='invoice'&&s){const c=executionInvoiceCapacity(s);if(BigInt(c.advanceAvailable)<=0n&&!c.stages.some(stage=>stage.lines.some(line=>BigInt(line.availableUnits)>0n)))return 'تحویل تأییدشده قابل صورت‌وضعیت یا ظرفیت پیش‌پرداخت باقی نمانده است.';}
@@ -87,6 +90,7 @@ export function createExecutionUI({state,api,showModal,requestCloseModal,showCon
   preview(form);
  }
  function preview(form){
+  if(form&&['delivery','accept','reject'].includes(form.dataset.command))return deliveryPreview(form);
   if(form?.dataset.command==='change')return changePreview(form);
   if(form&&['milestone','item'].includes(form.dataset.command))return budgetPreview(form);
   if(form?.dataset.command==='deduction-settle')return deductionPreview(form);
@@ -101,6 +105,13 @@ export function createExecutionUI({state,api,showModal,requestCloseModal,showCon
   form.elements.basis.required=result.basisRequired;form.elements.advanceRecovery.max=result.capacity.advanceRecoverable;
   const cap=values.kind==='advance'?`سقف باقی‌مانده پیش‌پرداخت: ${money(result.capacity.advanceAvailable)}`:`سقف باقی‌مانده مرحله: ${result.stageRemaining===null?'مرحله انتخاب نشده':money(result.stageRemaining)} · کارکرد قابل صورت‌وضعیت قرارداد: ${money(result.capacity.contractRemaining)}`;
   form.querySelector('#executionInvoicePreview').innerHTML=`<h4>پیش‌نمایش مالی · ${state.detail.execution.basis.direction==='receivable'?'دریافت از مشتری':'پرداخت به طرف قرارداد'}</h4><p>${esc(cap)} · پیش‌پرداخت قابل بازیافت: ${money(result.capacity.advanceRecoverable)}</p><dl class="execution-finance-preview">${[['ناخالص',result.gross],['مالیات افزوده',result.tax],['کسورات',result.deductions],['خالص',result.net]].map(([label,value])=>`<div><dt>${label}</dt><dd>${value===null?'نیازمند مقدار معتبر':money(value)}</dd></div>`).join('')}</dl>${result.errors.length?`<ul class="execution-finance-errors">${[...new Set(result.errors.map(error=>error.message))].map(message=>`<li>${esc(message)}</li>`).join('')}</ul>`:'<p>مبالغ و مدارک هنگام ثبت در سرور بازبینی می‌شوند.</p>'}`;
+ }
+ function deliveryPreview(form){
+  const result=executionDeliveryPreview(form.deliveryExecution,form.dataset.command,form.dataset.id,Object.fromEntries(new FormData(form)));
+  for(const name of ['quantity','deliveredAt','reference']){const control=form.elements[name];if(control)control.setCustomValidity(result.errors.filter(e=>e.field===name).map(e=>e.message).join(' '));}
+  if(form.dataset.command==='delivery'&&result.before){form.elements.quantity.min='0.001';form.elements.quantity.max=executionQuantityText(result.before.remaining);form.elements.quantity.setAttribute('aria-describedby','executionDeliveryPreview');}
+  const panel=form.querySelector('#executionDeliveryPreview'),markup=renderExecutionDeliveryPreview(result);
+  if(panel.previewMarkup!==markup){panel.innerHTML=markup;panel.previewMarkup=markup;}
  }
  function changePreview(form){
   form.changeSelections??={itemId:{id:'',cache:new Map()},milestoneId:{id:'',cache:new Map()}};
@@ -160,7 +171,7 @@ export function createExecutionUI({state,api,showModal,requestCloseModal,showCon
   if(action==='start')fields=ref()+input('counterparties','نام و سمت امضاکنندگان هر دو طرف')+input('signedDate','تاریخ امضا (میلادی)','date',today)+input('startDate','تاریخ اثر (میلادی)','date',c.start||today)+input('endDate','تاریخ پایان (میلادی)','date',c.end)+input('amount','مبلغ پایه توافق‌شده، بدون مالیات (ریال)','number','')+input('advanceLimit','سقف پیش‌پرداخت (ریال)','number',0)+select('direction','جهت مالی',[['receivable','دریافت از مشتری'],['payable','پرداخت به طرف قرارداد']])+`<label class="form-field full"><span><input type="checkbox" name="confirmSigned" required> امضای طرفین در سند مرجع ثبت شده و اطلاعات بالا مطابق نسخه توافق‌شده است.</span></label>`;
   else if(action==='milestone')fields=input('title','عنوان مرحله مالی')+input('gross','سقف ناخالص مرحله (ریال)','number')+input('dueDate','سررسید','date')+textarea('condition','شرط آزادسازی مرحله');
   else if(action==='item')fields=select('milestoneId','مرحله مالی',s.milestones.map(m=>[m.id,m.title]))+input('title','عنوان قلم / تحویل‌دادنی')+input('unit','واحد', 'text','بسته')+input('quantity','مقدار تعهد','number',1).replace('step="1"','step="0.001"')+input('unitPrice','نرخ ثابت توافق‌شده (ریال)','number')+input('dueDate','موعد تحویل','date')+input('owner','مسئول تحویل')+textarea('criteria','معیار و مستندات پذیرش');
-  else if(action==='delivery')fields=input('quantity','مقدار این تحویل','number',1).replace('step="1"','step="0.001"')+input('deliveredAt','تاریخ تحویل','date',today)+ref()+input('note','توضیح اختیاری','text','',false);
+  else if(action==='delivery')fields=input('quantity','مقدار این تحویل','number','').replace('step="1"','step="0.001"')+input('deliveredAt','تاریخ تحویل','date',today)+ref()+input('note','توضیح اختیاری','text','',false);
   else if(action==='invoice')fields=select('kind','نوع',[['progress',kindLabels.progress],['advance',kindLabels.advance],['final',kindLabels.final]])+select('milestoneId','مرحله',s.milestones.map(m=>[m.id,m.title]),true).replace('بدون انتخاب','برای پیش‌پرداخت مرحله لازم نیست')+input('number','شماره صورت‌وضعیت')+input('dueDate','سررسید','date')+input('gross','مبلغ پیش‌پرداخت (ریال)','number',0)+`<fieldset class="form-field full execution-lines"><legend>ردیف‌های تحویل تأییدشده؛ مقدار این دوره را وارد کنید</legend><div id="executionInvoiceLines" class="form-grid"></div></fieldset>`+[['tax','مالیات افزوده'],['retention','سپرده حسن انجام'],['withholding','مالیات تکلیفی'],['insurance','کسور بیمه'],['penalty','جریمه توافق‌شده'],['advanceRecovery','بازیافت پیش‌پرداخت']].map(([k,l])=>input(k,l+' (ریال)','number',0)).join('')+ref()+input('basis','مرجع و مبنای مالیات و کسورات (در صورت وجود الزامی)','text','',false)+`<output id="executionInvoicePreview" class="notice-note form-field full" aria-live="polite"></output>`;
   else if(action==='payment')fields=input('amount','مبلغ دریافت / پرداخت (ریال)','number',executionPaymentCapacity(s,id).remaining)+input('paidAt','تاریخ دریافت / پرداخت','date',today)+ref()+input('method','روش / بانک / ابزار پرداخت')+input('note','توضیح اختیاری','text','',false);
   else if(action==='retention-release')fields=input('amount','مبلغ آزادسازی (ریال)','number',String(BigInt(executionRetentionCapacity(s).remaining)>limitSafe?limitSafe:executionRetentionCapacity(s).remaining))+input('dueDate','سررسید','date',today)+ref()+comment();
@@ -171,7 +182,8 @@ export function createExecutionUI({state,api,showModal,requestCloseModal,showCon
   else if(action==='issue')fields=select('kind','نوع',Object.entries(kindLabels).filter(([k])=>['delay','dispute','risk','dependency'].includes(k)))+input('title','عنوان')+input('owner','مسئول رسیدگی')+input('dueDate','موعد پیگیری','date')+textarea('impact','اثر و اقدام لازم');
   else if(action==='change')fields=ref()+input('effectiveAmount','مبلغ توافق‌شده جدید (ریال)','number',s.effectiveAmount)+input('endDate','پایان جدید','date',s.endDate)+select('milestoneId','مرحله برای تغییر سقف (اختیاری)',s.milestones.map(m=>[m.id,m.title]),true)+input('gross','سقف جدید مرحله (در صورت انتخاب)','number','',false)+select('itemId','قلم (اختیاری)',s.items.map(i=>[i.id,i.title]),true)+input('unitPrice','نرخ جدید قلم (اختیاری؛ فقط کارکرد آینده)','number','',false)+input('quantity','مقدار جدید قلم (در صورت انتخاب)','number','',false).replace('step="1"','step="0.001"')+input('dueDate','موعد جدید قلم (در صورت انتخاب)','date','',false)+comment();
   else fields=ref()+comment();
-  showModal(titles[action],`<form id="executionForm" class="form-grid" data-command="${action}" data-id="${esc(id)}" data-contract-id="${esc(c.id)}" data-revision="${s.revision||0}"><p class="notice-note form-field full">مبالغ به ریال است. نرخ مالیات، کسورات و مجوزها باید از قرارداد و مدارک واقعی وارد شوند. ثبت پرداخت، جابه‌جایی پول یا ارسال به بانک نیست.</p>${fields}</form>`,`<button class="btn btn-secondary" data-exec="back">بازگشت به اجرا</button><button class="btn btn-primary" data-exec="save">ثبت ${esc(titles[action])}</button>`,true);
+  const notice=['delivery','accept','reject'].includes(action)?'مقدار و مدارک تحویل را با معیار پذیرش قلم تطبیق دهید. مرجع تصمیم بررسی، مستقل از مرجع تحویل اصلی ثبت می‌شود.':'مبالغ به ریال است. نرخ مالیات، کسورات و مجوزها باید از قرارداد و مدارک واقعی وارد شوند. ثبت پرداخت، جابه‌جایی پول یا ارسال به بانک نیست.';
+  showModal(titles[action],`<form id="executionForm" class="form-grid" data-command="${action}" data-id="${esc(id)}" data-contract-id="${esc(c.id)}" data-revision="${s.revision||0}"><p class="notice-note form-field full">${notice}</p>${fields}</form>`,`<button class="btn btn-secondary" data-exec="back">بازگشت به اجرا</button><button class="btn btn-primary" data-exec="save">ثبت ${esc(titles[action])}</button>`,true);
   if(['milestone','item'].includes(action)){
    const form=document.querySelector('#executionForm');form.insertAdjacentHTML('beforeend','<output id="executionBudgetPreview" class="notice-note form-field full" aria-live="polite"></output>');budgetPreview(form);
   }
@@ -192,6 +204,10 @@ export function createExecutionUI({state,api,showModal,requestCloseModal,showCon
   }
   if(action==='invoice-cancel'){
    const form=document.querySelector('#executionForm');form.insertAdjacentHTML('beforeend','<section id="executionCancellationPreview" class="notice-note form-field full" aria-label="پیش‌نمایش ابطال صورت‌وضعیت" aria-live="polite"></section>');cancellationPreview(form);
+  }
+  if(['delivery','accept','reject'].includes(action)){
+   const form=document.querySelector('#executionForm');form.deliveryExecution=structuredClone(s);
+   form.insertAdjacentHTML('beforeend','<section id="executionDeliveryPreview" class="notice-note form-field full" aria-label="پیش‌نمایش تحویل و بررسی" aria-live="polite"></section>');deliveryPreview(form);
   }
   if(action==='change'){
    const form=document.querySelector('#executionForm');form.changeExecution=structuredClone(s);
