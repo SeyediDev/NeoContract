@@ -36,7 +36,13 @@ test('viewer can compare an experimental price without a save action or server m
 
 test('legacy draft without its saved baseline cannot silently compare against a newer server version',async({page,request})=>{
  const model=fixture('پیش‌نویس قدیمی'),created=await request.post('/api/pricing-plans',{data:{model}}),plan=await created.json();
- await page.goto('/#view=pricing');await page.locator(`[data-p-action="load"][data-id="${plan.id}"]`).click();await page.locator('[data-p-field="bases.0.amount"]').fill('3000');
+ await page.goto('/#view=pricing');await page.locator(`[data-p-action="load"][data-id="${plan.id}"]`).click();
+ // Wait for this plan and its asynchronous history persistence before changing
+ // the saved draft fixture; a click alone can still leave the previous editor.
+ await expect(page.locator('[data-p-field="name"]')).toHaveValue(model.name);
+ await expect.poll(()=>page.evaluate(id=>{const d=JSON.parse(sessionStorage.getItem('neocontract-pricing-draft:00000000-0000-0000-0000-000000000001')||'null');return d?.id===id&&d.history?.some(v=>v.revision===1);},plan.id)).toBe(true);
+ await page.locator('[data-p-field="bases.0.amount"]').fill('3000');
+ await expect.poll(()=>page.evaluate(()=>JSON.parse(sessionStorage.getItem('neocontract-pricing-draft:00000000-0000-0000-0000-000000000001')).model.bases[0].amount)).toBe('3000');
  await page.evaluate(()=>{const key='neocontract-pricing-draft:00000000-0000-0000-0000-000000000001',d=JSON.parse(sessionStorage.getItem(key));delete d.baseline;delete d.compareRevision;d.history=[];sessionStorage.setItem(key,JSON.stringify(d));});
  model.bases[0].amount=2000;expect((await request.put('/api/pricing-plans/'+plan.id,{data:{model,revision:1}})).ok()).toBe(true);
  await page.reload();await expect(page.locator('[data-p-field="bases.0.amount"]')).toHaveValue('3000');await expect(page.locator('[data-p-comparison]')).toContainText('نسخه مبنا در دسترس نیست');await expect(page.locator('[data-p-delta]')).toHaveCount(0);await expect(page.getByRole('combobox',{name:'نسخه مبنای مقایسه'})).toBeDisabled();
