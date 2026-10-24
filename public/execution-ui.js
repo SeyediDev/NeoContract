@@ -3,6 +3,8 @@ import {executionFollowups,followupUrgencies,followupCategories} from './executi
 import {executionPreparation,executionItemValue} from './execution-preparation.js';
 import {executionInvoiceCapacity,executionInvoicePreview,executionDeductionRemaining,executionQuantityText,executionPaymentCapacity,executionRetentionCapacity,executionReceiptPreview,executionReversalPreview,executionCancellationPreview} from './execution-finance.js';
 import {executionClosure} from './execution-closure.js';
+import {executionChangePreview} from './execution-change.js';
+import {renderExecutionChangePreview,renderExecutionChangeHistory} from './execution-change-ui.js';
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const nf=v=>new Intl.NumberFormat('fa-IR',{maximumFractionDigits:3}).format(v||0);
 const money=v=>nf(typeof v==='string'&&/^-?\d+$/.test(v)?BigInt(v):v)+' ریال';
@@ -65,7 +67,7 @@ export function createExecutionUI({state,api,showModal,requestCloseModal,showCon
   if(section==='items')body=card('اقلام و تحویل‌دادنی‌ها',s.items.length?s.items.map(i=>{const p=summary.itemProgress.find(p=>p.id===i.id);return `<article class="execution-row"><h4>${esc(i.title)}</h4>${badge(p.accepted===p.quantity?'completed':'open',summary.overdueItems.includes(i.id))}<p>${nf(p.accepted)} پذیرفته از ${nf(p.quantity)} ${esc(i.unit)} · ${nf(p.submitted)} تحویل ثبت‌شده · ${nf(p.billed)} صورت‌وضعیت‌شده</p><p>مسئول: ${esc(i.owner)} · موعد: ${esc(dayText(i.dueDate))} · نرخ واحد: ${money(i.unitPrice)}</p><p>معیار پذیرش: ${esc(i.criteria)}</p>${operating&&p.submitted<p.quantity?button('delivery',i.id):''}</article>`;}).join(''):empty('ابتدا مرحله مالی و سپس اقلام آن را تعریف کنید.'),operating?button('item'):'')+card('رسید و بررسی تحویل',s.deliveries.length?s.deliveries.map(d=>`<article class="execution-row"><h4>${esc(s.items.find(i=>i.id===d.itemId)?.title)}</h4>${badge(d.status)}<p>${nf(d.quantity/1000)} · ${esc(dayText(d.deliveredAt))} · ${esc(d.reference)}</p><p>${esc(d.note)}</p>${d.review?`<p>مرجع بررسی: ${esc(d.review.reference)} · ${esc(d.review.comment)}</p>`:''}<div class="execution-actions">${operating&&d.status==='submitted'?button('accept',d.id)+button('reject',d.id):''}</div></article>`).join(''):empty('تحویلی ثبت نشده است.'));
   if(section==='finance')body=card('مراحل مالی',s.milestones.map(m=>`<article class="execution-row"><h4>${esc(m.title)}</h4>${phaseProgress(s,m.id)}<p>سقف: ${money(m.gross)} · سررسید: ${esc(dayText(m.dueDate))}</p><p>شرط آزادسازی: ${esc(m.condition)}</p></article>`).join('')||empty('مرحله‌ای ثبت نشده است.'),operating?button('milestone'):'')+card('صورت‌وضعیت‌ها',s.invoices.map(i=>{const value=paid(s,i.id);return `<article class="execution-row" data-execution-invoice="${esc(i.id)}"><h4>${esc(i.number)} · ${esc(kindLabels[i.kind])}</h4>${badge(i.status,summary.overdueInvoices.includes(i.id))}<p>ناخالص: ${money(i.gross)} · مالیات افزوده: ${money(i.tax)} · خالص: ${money(i.net)}</p><p>سپرده: ${money(i.retention)} · مالیات تکلیفی: ${money(i.withholding)} · بیمه: ${money(i.insurance)} · جریمه: ${money(i.penalty)} · بازیافت پیش‌پرداخت: ${money(i.advanceRecovery)}</p><p>پرداخت/دریافت ثبت‌شده: ${money(value)} · مانده: ${money(i.net-value)} · سررسید: ${esc(dayText(i.dueDate))}</p><p>مرجع: ${esc(i.reference)} · مبنای کسورات: ${esc(i.basis||'بدون کسورات')}</p>${i.lines.map(l=>`<p>${esc(l.title)} · ${nf(l.quantity/1000)} × ${money(l.unitPrice)} = ${money(l.amount)}</p>`).join('')}<div class="execution-actions">${live?(i.status==='submitted'?button('invoice-approve',i.id)+button('invoice-reject',i.id):i.status==='approved'?(value<i.net?button('payment',i.id):'')+button('invoice-dispute',i.id)+(i.withholding||i.insurance?button('deduction-settle',i.id):''):i.status==='disputed'?button('invoice-resolve',i.id):'')+(['submitted','approved','disputed'].includes(i.status)?button('invoice-cancel',i.id):''):''}</div>${i.decisions.map(d=>`<p class="muted-copy">${esc(titles[d.action])}: ${esc(d.comment)} · ${esc(d.reference)}</p>`).join('')}</article>`;}).join('')||empty('صورت‌وضعیتی ثبت نشده است.'),live?(operating?button('invoice'):'')+button('retention-release'):'')+card('رسیدهای دریافت / پرداخت',s.payments.map(p=>`<article class="execution-row"><strong>${esc(s.invoices.find(i=>i.id===p.invoiceId)?.number)} · ${money(p.amount)}</strong><p>${esc(dayText(p.paidAt))} · ${esc(p.method)} · ${esc(p.reference)}</p>${s.reversals.some(r=>r.paymentId===p.id)?badge('cancelled'):live?button('payment-reverse',p.id):''}</article>`).join('')||empty('رسیدی ثبت نشده است.'));
   if(section==='obligations')body=card('تعهدات قراردادی',s.obligations.map(o=>`<article class="execution-row"><h4>${esc(o.title)}</h4>${badge(o.status,summary.overdueObligations.includes(o.id))}<p>${esc(o.owner)} · ${esc(dayText(o.dueDate))}</p><p>${esc(o.condition)}</p>${o.completion?`<p>${esc(o.completion.reference)} · ${esc(o.completion.comment)}</p>`:operating?button('obligation-complete',o.id):''}</article>`).join('')||empty('تعهدی ثبت نشده است.'),operating?button('obligation'):'')+card('تضمین‌ها و ضمانت‌نامه‌ها',s.guarantees.map(g=>`<article class="execution-row"><h4>${esc(kindLabels[g.kind])} · ${money(g.amount)}</h4>${badge(g.status,summary.expiringGuarantees.includes(g.id))}<p>مرجع: ${esc(g.reference)} · صادرکننده: ${esc(g.issuer)} · ذی‌نفع: ${esc(g.beneficiary)}</p><p>انقضا: ${esc(dayText(g.expiryDate))} · شرط آزادسازی: ${esc(g.condition)}</p>${g.release?`<p>${esc(g.release.reference)} · ${esc(g.release.comment)}</p>`:live?button('guarantee-release',g.id)+button('guarantee-extend',g.id):''}</article>`).join('')||empty('تضمینی ثبت نشده است.'),operating?button('guarantee'):'');
-  if(section==='issues')body=card('تأخیر، اختلاف و ریسک',s.issues.map(i=>`<article class="execution-row"><h4>${esc(i.title)} · ${esc(kindLabels[i.kind])}</h4>${badge(i.status)}<p>${esc(i.owner)} · ${esc(dayText(i.dueDate))}</p><p>${esc(i.impact)}</p>${i.resolution?`<p>${esc(i.resolution.reference)} · ${esc(i.resolution.comment)}</p>`:live?button('issue-resolve',i.id):''}</article>`).join('')||empty('رویدادی ثبت نشده است.'),live?button('issue'):'')+card('تغییرات توافق‌شده',s.changes.map(ch=>`<article class="execution-row"><h4>${esc(ch.reference)}</h4><p>${esc(ch.reason)}</p><p>مبلغ: ${money(ch.before.amount)} ← ${money(ch.after.amount)} · پایان: ${esc(dayText(ch.before.endDate))} ← ${esc(dayText(ch.after.endDate))}</p>${ch.itemChange?`<p>قلم: ${esc(s.items.find(i=>i.id===ch.itemChange.itemId)?.title)} · مقدار: ${nf(ch.itemChange.before.quantity/1000)} ← ${nf(ch.itemChange.after.quantity/1000)} · موعد جدید: ${esc(dayText(ch.itemChange.after.dueDate))}</p>`:''}</article>`).join('')||empty('تغییری ثبت نشده است.'),operating?button('change'):'');
+  if(section==='issues')body=card('تأخیر، اختلاف و ریسک',s.issues.map(i=>`<article class="execution-row"><h4>${esc(i.title)} · ${esc(kindLabels[i.kind])}</h4>${badge(i.status)}<p>${esc(i.owner)} · ${esc(dayText(i.dueDate))}</p><p>${esc(i.impact)}</p>${i.resolution?`<p>${esc(i.resolution.reference)} · ${esc(i.resolution.comment)}</p>`:live?button('issue-resolve',i.id):''}</article>`).join('')||empty('رویدادی ثبت نشده است.'),live?button('issue'):'')+card('تغییرات توافق‌شده',s.changes.map(ch=>renderExecutionChangeHistory(s,ch)).join('')||empty('تغییری ثبت نشده است.'),operating?button('change'):'');
   if(section==='finance')body+=card('تسویه مالیات تکلیفی و بیمه',`<p>مالیات تکلیفی تسویه‌نشده: ${money(summary.withholdingOutstanding)} · بیمه تسویه‌نشده: ${money(summary.insuranceOutstanding)}</p>`+(s.deductionSettlements.map(d=>`<article class="execution-row"><strong>${d.kind==='withholding'?'مالیات تکلیفی':'بیمه'} · ${money(d.amount)}</strong><p>${esc(d.recipient)} · ${esc(dayText(d.settledAt))} · ${esc(d.reference)}</p><p>${esc(d.note)}</p>${s.deductionReversals.some(r=>r.settlementId===d.id)?badge('cancelled'):live?button('deduction-reverse',d.id):''}</article>`).join('')||empty('رسید تسویه‌ای ثبت نشده است.')));
   if(section==='finance')body=card('سپرده و مجوز آزادسازی',retentionHtml(s))+body;
   if(section==='overview'&&live)body=card('راهنمای آماده‌سازی اجرا',preparationHtml(s))+body;
@@ -85,6 +87,7 @@ export function createExecutionUI({state,api,showModal,requestCloseModal,showCon
   preview(form);
  }
  function preview(form){
+  if(form?.dataset.command==='change')return changePreview(form);
   if(form&&['milestone','item'].includes(form.dataset.command))return budgetPreview(form);
   if(form?.dataset.command==='deduction-settle')return deductionPreview(form);
   if(form&&['payment','retention-release'].includes(form.dataset.command))return receiptPreview(form);
@@ -98,6 +101,21 @@ export function createExecutionUI({state,api,showModal,requestCloseModal,showCon
   form.elements.basis.required=result.basisRequired;form.elements.advanceRecovery.max=result.capacity.advanceRecoverable;
   const cap=values.kind==='advance'?`سقف باقی‌مانده پیش‌پرداخت: ${money(result.capacity.advanceAvailable)}`:`سقف باقی‌مانده مرحله: ${result.stageRemaining===null?'مرحله انتخاب نشده':money(result.stageRemaining)} · کارکرد قابل صورت‌وضعیت قرارداد: ${money(result.capacity.contractRemaining)}`;
   form.querySelector('#executionInvoicePreview').innerHTML=`<h4>پیش‌نمایش مالی · ${state.detail.execution.basis.direction==='receivable'?'دریافت از مشتری':'پرداخت به طرف قرارداد'}</h4><p>${esc(cap)} · پیش‌پرداخت قابل بازیافت: ${money(result.capacity.advanceRecoverable)}</p><dl class="execution-finance-preview">${[['ناخالص',result.gross],['مالیات افزوده',result.tax],['کسورات',result.deductions],['خالص',result.net]].map(([label,value])=>`<div><dt>${label}</dt><dd>${value===null?'نیازمند مقدار معتبر':money(value)}</dd></div>`).join('')}</dl>${result.errors.length?`<ul class="execution-finance-errors">${[...new Set(result.errors.map(error=>error.message))].map(message=>`<li>${esc(message)}</li>`).join('')}</ul>`:'<p>مبالغ و مدارک هنگام ثبت در سرور بازبینی می‌شوند.</p>'}`;
+ }
+ function changePreview(form){
+  form.changeSelections??={itemId:{id:'',cache:new Map()},milestoneId:{id:'',cache:new Map()}};
+  for(const [name,fields] of [['itemId',['quantity','unitPrice','dueDate']],['milestoneId',['gross']]]){
+   const selection=form.changeSelections[name],id=form.elements[name].value;
+   if(selection.id!==id){
+    if(selection.id)selection.cache.set(selection.id,Object.fromEntries(fields.map(field=>[field,form.elements[field].value])));
+    const values=selection.cache.get(id)||{};for(const field of fields)form.elements[field].value=values[field]??'';selection.id=id;
+   }
+   for(const field of fields){form.elements[field].disabled=!id;form.elements[field].required=Boolean(id)&&field!=='unitPrice';}
+  }
+  const result=executionChangePreview(form.changeExecution,Object.fromEntries(new FormData(form)));
+  for(const input of form.querySelectorAll('input,select'))input.setCustomValidity('');
+  for(const {field,message} of result.errors){const control=form.elements[field];if(control&&!control.disabled)control.setCustomValidity([control.validationMessage,message].filter(Boolean).join(' '));}
+  form.querySelector('#executionChangePreview').innerHTML=renderExecutionChangePreview(result);
  }
  function deductionPreview(form){
   const remaining=executionDeductionRemaining(state.detail.execution,form.dataset.id),kind=form.elements.kind.value,maximum=remaining?.[kind]||'0',input=form.elements.amount;
@@ -175,11 +193,15 @@ export function createExecutionUI({state,api,showModal,requestCloseModal,showCon
   if(action==='invoice-cancel'){
    const form=document.querySelector('#executionForm');form.insertAdjacentHTML('beforeend','<section id="executionCancellationPreview" class="notice-note form-field full" aria-label="پیش‌نمایش ابطال صورت‌وضعیت" aria-live="polite"></section>');cancellationPreview(form);
   }
+  if(action==='change'){
+   const form=document.querySelector('#executionForm');form.changeExecution=structuredClone(s);
+   form.insertAdjacentHTML('beforeend','<section id="executionChangePreview" class="notice-note form-field full" aria-label="پیش‌نمایش تغییر توافق‌شده" aria-live="polite"></section><label class="form-field full"><span><input type="checkbox" name="confirmChangeReview" required> اثر تغییر بر مبلغ، موعد، مرحله و کارکرد آینده را مطابق مدرک بازبینی کرده‌ام.</span></label>');changePreview(form);
+  }
  }
  async function save(){
   const form=document.querySelector('#executionForm');preview(form);if(!form.reportValidity())return;
   const command=form.dataset.command,payload=Object.fromEntries(new FormData(form)),id=form.dataset.id,cid=form.dataset.contractId,tenant=state.tenantId,revision=state.modalRevision,button=document.querySelector('[data-exec="save"]');
-  if(command==='change'){if(payload.unitPrice==='')delete payload.unitPrice;if(!payload.milestoneId)delete payload.gross;}
+  if(command==='change'){delete payload.confirmChangeReview;if(payload.unitPrice==='')delete payload.unitPrice;if(!payload.milestoneId)delete payload.gross;}
   for(const name of ['amount','advanceLimit','unitPrice','gross','tax','retention','withholding','insurance','penalty','advanceRecovery','effectiveAmount'])if(name in payload)payload[name]=Number(payload[name]);
   if(command==='start')payload.confirmSigned=Boolean(payload.confirmSigned);
   if(command==='delivery')payload.itemId=id;else if(['payment','deduction-settle'].includes(command))payload.invoiceId=id;else if(id)payload.id=id;
@@ -216,7 +238,8 @@ export function createExecutionUI({state,api,showModal,requestCloseModal,showCon
    else if(!state.busy&&canExecute(roles(),action)&&!prerequisite(action,id)&&(action==='start'||executionActionAvailable(state.detail?.execution?.status,action)))editor(action,id);
   }catch(error){formError(error.message);}
  });
- document.addEventListener('change',e=>{const form=e.target.closest('#executionForm');if(form?.dataset.command==='invoice'&&['kind','milestoneId'].includes(e.target.name))invoiceLines(form);else if(form)preview(form);});
- document.addEventListener('input',e=>{if(e.target.closest('#executionForm'))preview(e.target.closest('#executionForm'));});
+ const resetChangeReview=(form,target)=>{if(form?.dataset.command==='change'&&target.name!=='confirmChangeReview')form.elements.confirmChangeReview.checked=false;};
+ document.addEventListener('change',e=>{const form=e.target.closest('#executionForm');resetChangeReview(form,e.target);if(form?.dataset.command==='invoice'&&['kind','milestoneId'].includes(e.target.name))invoiceLines(form);else if(form)preview(form);});
+ document.addEventListener('input',e=>{const form=e.target.closest('#executionForm');if(form){resetChangeReview(form,e.target);preview(form);}});
  return {render,open(contractId,target='overview'){section=Object.hasOwn(sections,target)?target:'overview';followupFilter='all';return showContract(contractId,'execution');}};
 }

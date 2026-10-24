@@ -4,6 +4,8 @@ import {randomUUID} from 'node:crypto';
 import {createDatabase} from '../lib/database.mjs';
 import {createStore} from '../lib/store.mjs';
 import {canExecute} from '../public/execution-permissions.js';
+import {executionChangePreview} from '../public/execution-change.js';
+import {executionPreparation} from '../public/execution-preparation.js';
 test('role matrix distinguishes operational, legal and financial execution commands',()=>{
  for(const action of ['start','pause','resume','close']){assert.equal(canExecute(['contract_admin'],action),true);for(const role of ['account_manager','legal_reviewer','finance_reviewer','viewer'])assert.equal(canExecute([role],action),false);}
  for(const action of ['item','milestone','delivery','obligation','issue']){assert.equal(canExecute(['account_manager'],action),true);assert.equal(canExecute(['finance_reviewer'],action),false);}
@@ -21,7 +23,8 @@ test('signed changes reprice only unbilled quantity and preserve historical fina
   await assert.rejects(cmd('item',{...item,quantity:3}),e=>e.status===400);await cmd('item',item);await cmd('delivery',{itemId:s.items[0].id,quantity:2,deliveredAt:'2026-10-10',reference:'DEL'});await cmd('accept',{id:s.deliveries[0].id,reference:'ACCEPT',comment:'پذیرش'});
   const invoice={kind:'progress',number:'INV-1',milestoneId:s.milestones[0].id,lines:[{itemId:s.items[0].id,quantity:1}],tax:0,retention:0,withholding:0,insurance:0,penalty:0,advanceRecovery:0,dueDate:'2026-12-01',reference:'INV'};await cmd('invoice',invoice);const frozen=structuredClone(s.invoices[0]);
   await assert.rejects(cmd('change',{effectiveAmount:1200,endDate:'2027-11-01',itemId:s.items[0].id,quantity:2,unitPrice:600,dueDate:'2026-12-01',reference:'BAD-CHANGE',comment:'بدون افزایش سقف'}),e=>e.status===400);
-  await cmd('change',{effectiveAmount:1200,endDate:'2027-11-01',milestoneId:s.milestones[0].id,gross:1200,itemId:s.items[0].id,quantity:2,unitPrice:600,dueDate:'2026-12-01',reference:'SIGNED-CHANGE',comment:'تغییر نرخ آینده'});assert.deepEqual(s.invoices[0],frozen);assert.equal(s.basis.amount,1000);
+  const changed={effectiveAmount:1200,endDate:'2027-11-01',milestoneId:s.milestones[0].id,gross:1200,itemId:s.items[0].id,quantity:2,unitPrice:600,dueDate:'2026-12-01',reference:'SIGNED-CHANGE',comment:'تغییر نرخ آینده'},preview=executionChangePreview(s,changed);assert.deepEqual(preview.errors,[]);
+  await cmd('change',changed);assert.deepEqual(executionPreparation(s),preview.after);assert.deepEqual(s.invoices[0],frozen);assert.equal(s.basis.amount,1000);
   await cmd('invoice',{...invoice,number:'INV-2'});assert.equal(s.invoices[1].gross,600);assert.equal(s.invoices[0].gross,500);
   await cmd('item',{...item,title:'خدمت بدون هزینه',quantity:1,unitPrice:0});const free=s.items.at(-1).id;await cmd('delivery',{itemId:free,quantity:1,deliveredAt:'2026-10-10',reference:'FREE-DEL'});await cmd('accept',{id:s.deliveries.at(-1).id,reference:'FREE-ACCEPT',comment:'پذیرش خدمت بدون هزینه'});await cmd('invoice',{...invoice,number:'FREE-INV',lines:[{itemId:free,quantity:1}]});assert.equal(s.invoices.at(-1).net,0);
   await assert.rejects(cmd('change',{effectiveAmount:1200,endDate:'2027-11-01',itemId:s.items[0].id,quantity:1,unitPrice:600,dueDate:'2026-12-01',reference:'LOWER',comment:'کاهش زیر تحویل'}),e=>e.status===400);

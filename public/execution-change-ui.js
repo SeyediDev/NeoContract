@@ -1,0 +1,17 @@
+import {executionQuantityText} from './execution-finance.js';
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const nf=new Intl.NumberFormat('fa-IR',{maximumFractionDigits:3});
+const money=v=>v===null||v===undefined?'نامشخص':nf.format(BigInt(v))+' ریال';
+const quantity=v=>v===null||v===undefined?'نامشخص':nf.format(Number(executionQuantityText(v)));
+const day=v=>v?new Intl.DateTimeFormat('fa-IR',{timeZone:'Asia/Tehran',dateStyle:'medium'}).format(new Date(v+'T12:00:00Z')):'نامشخص';
+const row=(label,before,after)=>`<tr><th scope="row">${esc(label)}</th><td data-label="پیش از تغییر">${esc(before)}</td><td data-label="پس از تغییر">${esc(after)}</td></tr>`;
+export function renderExecutionChangePreview(r){
+ let rows=row('مبلغ توافق‌شده',money(r.amount.before),money(r.amount.after))+row('پایان اجرا',day(r.endDate.before),day(r.endDate.after));
+ for(const m of r.stages)for(const [key,label] of [['gross','سقف مرحله'],['committed','کارکرد ثبت‌شده و تعهد آینده'],['remaining','ظرفیت باقی‌مانده']])rows+=row(m.title+' · '+label,money(m.before[key]),money(m.after?.[key]));
+ if(r.item){const i=r.item;rows+=row(i.title+' · مقدار تعهد ('+i.unit+')',quantity(i.before.quantity),quantity(i.after?.quantity))+row(i.title+' · نرخ واحد',money(i.before.unitPrice),money(i.after?.unitPrice))+row(i.title+' · موعد تحویل',day(i.before.dueDate),day(i.after?.dueDate));}
+ return `<h4>اثر تغییر توافق‌شده</h4><div class="execution-change-table" tabindex="0" role="region" aria-label="مقایسه تغییر توافق‌شده"><table><caption>مقادیر قبل و بعد از تغییر پیشنهادی</caption><thead><tr><th scope="col">موضوع</th><th scope="col">پیش از تغییر</th><th scope="col">پس از تغییر</th></tr></thead><tbody>${rows}</tbody></table></div>${r.item?`<p>قلم ${esc(r.item.title)} · تحویل غیرردشده: ${esc(quantity(r.item.delivered))} · صورت‌وضعیت‌شده: ${esc(quantity(r.item.billed))} ${esc(r.item.unit)}${r.item.after&&BigInt(r.item.after.unbilled)>=0n?' · مقدار مشمول نرخ آینده: '+esc(quantity(r.item.after.unbilled))+' '+esc(r.item.unit):''}</p>`:''}${r.errors.length?`<ul class="execution-finance-errors">${[...new Set(r.errors.map(e=>e.message))].map(message=>`<li>${esc(message)}</li>`).join('')}</ul>`:''}<p>صورت‌وضعیت‌های قبلی با نرخ تاریخی حفظ می‌شوند. نرخ خالی یعنی حفظ نرخ جاری؛ صفر نرخ صریح است. این پیش‌نمایش، ثبت اصلاحیه حقوقی، تغییر نرخ مدل قیمت‌گذاری یا تأیید پرداخت نیست؛ مرجع و علت واقعی و کنترل سرور لازم‌اند.</p>`;
+}
+export function renderExecutionChangeHistory(s,ch){
+ const m=ch.milestoneChange,i=ch.itemChange;
+ return `<article class="execution-row" data-execution-change="${esc(ch.id)}"><h4>${esc(ch.reference)}</h4><p>${esc(ch.reason)}</p><p>مبلغ پیش از تغییر: ${esc(money(ch.before.amount))} · پس از تغییر: ${esc(money(ch.after.amount))}</p><p>پایان پیش از تغییر: ${esc(day(ch.before.endDate))} · پس از تغییر: ${esc(day(ch.after.endDate))}</p>${m?`<p>مرحله ${esc(s.milestones.find(v=>v.id===m.milestoneId)?.title||'نامشخص')} · سقف پیش از تغییر: ${esc(money(m.before))} · پس از تغییر: ${esc(money(m.after))}</p>`:''}${i?`<p>قلم ${esc(s.items.find(v=>v.id===i.itemId)?.title||'نامشخص')} · مقدار پیش از تغییر: ${esc(quantity(i.before.quantity))} · پس از تغییر: ${esc(quantity(i.after.quantity))}</p><p>نرخ واحد پیش از تغییر: ${esc(money(i.before.unitPrice))} · پس از تغییر: ${esc(money(i.after.unitPrice))}</p><p>موعد پیش از تغییر: ${esc(day(i.before.dueDate))} · پس از تغییر: ${esc(day(i.after.dueDate))}</p>`:''}</article>`;
+}
